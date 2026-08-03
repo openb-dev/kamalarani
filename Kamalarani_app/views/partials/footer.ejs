@@ -1,0 +1,147 @@
+<footer role="contentinfo">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-wrap">
+          <img src="/images/logo.png" alt="Kamalarani Foundation Logo" class="footer-logo-img">
+          <div>
+            <div class="footer-brand">Kamalarani Foundation</div>
+            <div class="footer-tagline">সনাতনী সংস্কৃতি ও সমাজকল্যাণ</div>
+          </div>
+        </div>
+        <p>A registered non-profit bringing free art and education to village children across West Bengal. Reg. No. AAETK689KE20221.</p>
+        <div style="margin-top:14px;">
+          <a href="mailto:kamalaranifoundation17@gmail.com" style="font-size:0.85rem;color:#B9AE9E;">✉️ kamalaranifoundation17@gmail.com</a><br>
+          <a href="tel:+917980350454" style="font-size:0.85rem;color:#B9AE9E;margin-top:4px;display:block;">📞 +91 79803 50454</a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <nav class="footer-col" aria-label="Explore links">
+          <h4>Explore</h4>
+          <a href="/#about">About Us</a>
+          <a href="/#gallery">Gallery</a>
+          <a href="/calendar">Events</a>
+          <a href="/#team">Our Team</a>
+        </nav>
+        <nav class="footer-col" aria-label="Get involved links">
+          <h4>Get Involved</h4>
+          <a href="/#admission">Free Admission</a>
+          <a href="/#support">Support Us</a>
+          <a href="/#contact">Contact</a>
+        </nav>
+        <nav class="footer-col" aria-label="Head office">
+          <h4>Head Office</h4>
+          <address style="font-style:normal;font-size:0.82rem;color:#B9AE9E;line-height:1.7;">
+            Village: Panisala,<br>
+            P.O. Chhat Baro Chowki,<br>
+            Coochbehar — 736160<br>
+            West Bengal, India
+          </address>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © <%= new Date().getFullYear() %> Kamalarani Foundation. Reg. No. AAETK689KE20221. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- ── Floating Spiritual Contact Button ──────────────────────── -->
+<style>
+  .fab-wrap {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* round button */
+  .fab-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--vermilion);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 6px 24px rgba(178,58,47,0.55);
+    transition: transform .25s, box-shadow .25s;
+    position: relative;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+  }
+  .fab-btn:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 12px 32px rgba(178,58,47,0.75);
+  }
+
+  /* pulse ring */
+  .fab-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    animation: om-pulse 2.8s ease-out infinite;
+  }
+  @keyframes om-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(178,58,47,0.5); }
+    70%  { box-shadow: 0 0 0 18px rgba(178,58,47,0); }
+    100% { box-shadow: 0 0 0 0 rgba(178,58,47,0); }
+  }
+
+  /* Om mandala SVG */
+  .fab-btn svg {
+    width: 42px;
+    height: 42px;
+    transition: transform .6s ease;
+  }
+  .fab-btn:hover svg {
+    transform: rotate(30deg);
+  }
+
+  @media (max-width: 480px) {
+    .fab-wrap { bottom: 18px; right: 16px; }
+    .fab-btn  { width: 58px; height: 58px; }
+    .fab-btn svg { width: 36px; height: 36px; }
+  }
+</style>
+
+<div class="fab-wrap" id="fabWrap">
+  <a href="/#contact" class="fab-btn" id="fabBtn" aria-label="Contact Kamalarani Foundation">
+    <!-- Om (ॐ) Mandala SVG — Sanatani spiritual icon -->
+    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- 8 lotus petals — filled for visibility -->
+      <g fill="rgba(255,253,248,0.30)" stroke="#FFFDF8" stroke-width="1.6">
+        <ellipse cx="40" cy="9"  rx="5.5" ry="10" transform="rotate(0   40 40)"/>
+        <ellipse cx="40" cy="9"  rx="5.5" ry="10" transform="rotate(45  40 40)"/>
+        <ellipse cx="40" cy="9"  rx="5.5" ry="10" transform="rotate(90  40 40)"/>
+        <ellipse cx="40" cy="9"  rx="5.5" ry="10" transform="rotate(135 40 40)"/>
+        <ellipse cx="40" cy="9"  rx="5.5" ry="10" transform="rotate(180 40 40)"/>
+        <ellipse cx="40" cy="9"  rx="5.5" ry="10" transform="rotate(225 40 40)"/>
+        <ellipse cx="40" cy="9"  rx="5.5" ry="10" transform="rotate(270 40 40)"/>
+        <ellipse cx="40" cy="9"  rx="5.5" ry="10" transform="rotate(315 40 40)"/>
+      </g>
+
+      <!-- Marigold ring border -->
+      <circle cx="40" cy="40" r="19" fill="none" stroke="#E8912D" stroke-width="1.5" opacity="0.8"/>
+
+      <!-- OM symbol — large and bold -->
+      <text
+        x="40" y="50"
+        text-anchor="middle"
+        font-size="30"
+        font-family="serif"
+        fill="#FFFDF8"
+        font-weight="bold"
+      >ॐ</text>
+    </svg>
+  </a>
+</div>
+
+<!-- Om FAB: direct link, no toggle script needed -->
+

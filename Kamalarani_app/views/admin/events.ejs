@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Events Manager — Kamalarani Foundation CMS</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <%
+      var editEvent = locals.editEvent || null;
+      var events = locals.events || [];
+
+      function formatLocalDatetime(dateObj) {
+        if (!dateObj) return '';
+        const d = new Date(dateObj);
+        if (isNaN(d.getTime())) return '';
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
+    %>
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <span class="topbar-title">Events Manager</span>
+      </div>
+      <div class="topbar-right">
+        <a href="/calendar" class="topbar-site-link" target="_blank">↗ View Calendar</a>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <% if (locals.success && locals.success.length) { %>
+        <div class="flash-bar success">✅ <%= locals.success[0] %></div>
+      <% } %>
+      <% if (locals.error && locals.error.length) { %>
+        <div class="flash-bar error">⚠️ <%= locals.error[0] %></div>
+      <% } %>
+
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Events</h1>
+          <p>Create, edit and manage upcoming events shown on the homepage and calendar page.</p>
+        </div>
+      </div>
+
+      <div class="events-management-grid">
+        <!-- Create / Edit Form Card -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><%= editEvent ? '✏️ Edit Event' : '➕ Add New Event' %></span>
+            <% if (editEvent) { %>
+              <a href="/admin/events" class="btn btn-ghost btn-sm">Cancel Edit</a>
+            <% } %>
+          </div>
+          <div class="card-body">
+            <% if (editEvent) { %>
+              <form action="/admin/events/<%= editEvent.id %>?_method=PUT" method="POST" class="event-form-stack">
+            <% } else { %>
+              <form action="/admin/events" method="POST" class="event-form-stack">
+            <% } %>
+              <div class="field">
+                <label for="evTitle">Event Title *</label>
+                <input type="text" id="evTitle" name="title" required
+                  value="<%= editEvent ? editEvent.title : '' %>"
+                  placeholder="e.g. Art Class — Material Distribution Day">
+              </div>
+
+              <div class="field">
+                <label for="evDesc">Description</label>
+                <textarea id="evDesc" name="description" placeholder="Brief description of the event..."><%= editEvent ? (editEvent.description || '') : '' %></textarea>
+              </div>
+
+              <div class="datetime-grid">
+                <div class="field">
+                  <label for="evDate">Start Date & Time *</label>
+                  <input type="datetime-local" id="evDate" name="event_date" required
+                    value="<%= editEvent ? formatLocalDatetime(editEvent.event_date) : '' %>">
+                </div>
+                <div class="field">
+                  <label for="evEnd">End Date & Time</label>
+                  <input type="datetime-local" id="evEnd" name="end_date"
+                    value="<%= editEvent && editEvent.end_date ? formatLocalDatetime(editEvent.end_date) : '' %>">
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="evLocation">Location *</label>
+                <input type="text" id="evLocation" name="location" required
+                  value="<%= editEvent ? (editEvent.location || '') : '' %>"
+                  placeholder="e.g. Sri Sri Radha-Govinda Thakurbari, Natabari">
+              </div>
+
+              <div class="checkbox-row-card">
+                <input type="checkbox" id="evPublished" name="is_published"
+                  <%= editEvent ? (editEvent.is_published ? 'checked' : '') : 'checked' %>>
+                <label for="evPublished">Publish this event (visible on public calendar)</label>
+              </div>
+
+              <div class="form-actions" style="margin-top:8px;">
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                  <%= editEvent ? '💾 Save Changes' : '➕ Create Event' %>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Events List Card -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">All Events (<%= events.length %>)</span>
+          </div>
+          <% if (events.length === 0) { %>
+            <div class="empty-state">
+              <div class="empty-icon">📅</div>
+              <p>No events scheduled yet. Create your first event using the form.</p>
+            </div>
+          <% } else { %>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Date & Time</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% events.forEach(ev => { %>
+                    <tr class="<%= editEvent && editEvent.id === ev.id ? 'editing-row' : '' %>">
+                      <td class="td-name td-truncate" style="max-width:180px;">
+                        <%= ev.title %>
+                      </td>
+                      <td style="white-space:nowrap;font-size:0.82rem;">
+                        <div><strong><%= new Date(ev.event_date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %></strong></div>
+                        <div style="color:var(--text-muted);font-size:0.78rem;">
+                          <%= new Date(ev.event_date).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) %>
+                        </div>
+                      </td>
+                      <td class="td-truncate" style="max-width:160px;font-size:0.82rem;">
+                        <%= ev.location || '—' %>
+                      </td>
+                      <td>
+                        <span class="badge <%= ev.is_published ? 'badge-published' : 'badge-draft' %>">
+                          <%= ev.is_published ? 'Published' : 'Draft' %>
+                        </span>
+                      </td>
+                      <td style="text-align:right;">
+                        <div style="display:inline-flex;gap:6px;">
+                          <a href="/admin/events/<%= ev.id %>/edit" class="btn btn-ghost btn-sm">✏️ Edit</a>
+                          <form action="/admin/events/<%= ev.id %>?_method=DELETE" method="POST" style="display:inline;" onsubmit="return confirm('Delete this event?')">
+                            <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="/js/admin.js"></script>
+</body>
+</html>

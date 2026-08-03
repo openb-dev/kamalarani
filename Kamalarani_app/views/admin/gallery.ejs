@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Gallery Manager — Kamalarani Foundation CMS</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    /* ── Tab strip ─────────────────────────────── */
+    .gallery-tabs { display:flex; gap:8px; margin-bottom:24px; }
+    .gallery-tab  {
+      flex:1; padding:12px 20px; border:2px solid var(--border);
+      border-radius:10px; background:var(--bg-card); color:var(--text-secondary);
+      font-size:0.92rem; font-weight:600; cursor:pointer;
+      transition:all .2s; text-align:center;
+    }
+    .gallery-tab:hover  { border-color:var(--accent); color:var(--accent); }
+    .gallery-tab.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+    /* ── Upload panels ──────────────────────────── */
+    .upload-panel { display:none; }
+    .upload-panel.active { display:block; }
+
+    /* ── Upload zone ────────────────────────────── */
+    .upload-zone {
+      border:2px dashed var(--border); border-radius:12px;
+      padding:40px 20px; text-align:center; cursor:pointer;
+      transition:border-color .2s, background .2s; position:relative;
+    }
+    .upload-zone:hover, .upload-zone.dragover { border-color:var(--accent); background:rgba(var(--accent-rgb),.05); }
+    .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .upload-zone-icon { font-size:2.4rem; margin-bottom:8px; }
+    .upload-zone h3   { margin:0 0 4px; font-size:1rem; color:var(--text-primary); }
+    .upload-zone p    { margin:0; font-size:0.83rem; color:var(--text-muted); }
+
+    /* ── Preview grid ────────────────────────────── */
+    .preview-grid  { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+    .preview-item  { width:90px; height:70px; border-radius:8px; overflow:hidden; background:var(--bg-input); }
+    .preview-item img,
+    .preview-item video { width:100%; height:100%; object-fit:cover; }
+
+    /* ── Gallery admin grids ─────────────────────── */
+    .gallery-admin-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+      gap:14px;
+    }
+    .gallery-admin-item {
+      position:relative; border-radius:10px; overflow:hidden;
+      aspect-ratio:4/3; background:var(--bg-input);
+    }
+    .gallery-admin-item img,
+    .gallery-admin-item video { width:100%; height:100%; object-fit:cover; }
+    .item-overlay {
+      position:absolute; inset:0; background:rgba(0,0,0,.55);
+      opacity:0; transition:opacity .2s;
+      display:flex; flex-direction:column; justify-content:flex-end; padding:10px;
+    }
+    .gallery-admin-item:hover .item-overlay { opacity:1; }
+    .item-caption { color:#fff; font-size:0.75rem; margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .item-actions { display:flex; gap:6px; }
+    .item-type-badge { position:absolute; top:6px; left:6px; }
+
+    /* ── Section headings inside card ───────────── */
+    .media-section-title {
+      font-size:0.78rem; font-weight:700; letter-spacing:.06em;
+      text-transform:uppercase; color:var(--text-muted); margin-bottom:14px;
+    }
+    .badge-image { background:rgba(64,190,120,.18); color:#3db87a; }
+    .badge-video { background:rgba(120,80,220,.18); color:#8a5cf6; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <% var images = locals.images || []; var videos = locals.videos || []; %>
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <span class="topbar-title">Gallery Manager</span>
+      </div>
+      <div class="topbar-right">
+        <a href="/gallery" class="topbar-site-link" target="_blank">↗ View Public Gallery</a>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <% if (locals.success && locals.success.length) { %>
+        <div class="flash-bar success">✅ <%= locals.success[0] %></div>
+      <% } %>
+      <% if (locals.error && locals.error.length) { %>
+        <div class="flash-bar error">⚠️ <%= locals.error[0] %></div>
+      <% } %>
+
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Gallery</h1>
+          <p>Upload photos and videos from classes and events. They appear on the public gallery page.</p>
+        </div>
+      </div>
+
+      <!-- ── Tab strip ───────────────────────────────── -->
+      <div class="gallery-tabs" role="tablist">
+        <button class="gallery-tab active" id="tabImgBtn" role="tab" aria-selected="true"  aria-controls="panelImages" onclick="switchTab('images')">📷 Image Upload</button>
+        <button class="gallery-tab"        id="tabVidBtn" role="tab" aria-selected="false" aria-controls="panelVideos" onclick="switchTab('videos')">🎬 Video Upload</button>
+      </div>
+
+      <!-- ── IMAGE Upload Panel ─────────────────────── -->
+      <div class="upload-panel active card" id="panelImages" style="margin-bottom:28px;" role="tabpanel" aria-labelledby="tabImgBtn">
+        <div class="card-header">
+          <span class="card-title">📷 Upload Images</span>
+          <span style="font-size:0.8rem;color:var(--text-muted)">Max 20 files · 50 MB each · PNG, JPG, JPEG only</span>
+        </div>
+        <div class="card-body">
+          <form action="/admin/gallery/images" method="POST" enctype="multipart/form-data" id="imageForm">
+            <div class="upload-zone" id="imageDropZone">
+              <div class="upload-zone-icon">🖼️</div>
+              <h3>Drag &amp; drop images here</h3>
+              <p>or click to browse — PNG, JPG, JPEG only</p>
+              <input type="file" name="images" id="imageInput" multiple accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+            </div>
+            <div class="preview-grid" id="imagePreviewGrid"></div>
+            <div style="margin-top:20px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+              <div class="field" style="flex:1;min-width:240px;">
+                <label for="imageCaptionField">Caption (applies to all uploaded images)</label>
+                <input type="text" id="imageCaptionField" name="caption" placeholder="e.g. Art class at Natabari, July 2026">
+              </div>
+              <button type="submit" class="btn btn-primary" id="uploadImgBtn">📤 Upload Images</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── VIDEO Upload Panel ─────────────────────── -->
+      <div class="upload-panel card" id="panelVideos" style="margin-bottom:28px;" role="tabpanel" aria-labelledby="tabVidBtn">
+        <div class="card-header">
+          <span class="card-title">🎬 Upload Videos</span>
+          <span style="font-size:0.8rem;color:var(--text-muted)">Max 5 files · MP4 only · Up to 500 MB per file</span>
+        </div>
+        <div class="card-body">
+          <form action="/admin/gallery/videos" method="POST" enctype="multipart/form-data" id="videoForm">
+            <div class="upload-zone" id="videoDropZone">
+              <div class="upload-zone-icon">🎬</div>
+              <h3>Drag &amp; drop videos here</h3>
+              <p>or click to browse — MP4 format only</p>
+              <input type="file" name="videos" id="videoInput" multiple accept=".mp4,video/mp4">
+            </div>
+            <div class="preview-grid" id="videoPreviewGrid"></div>
+            <div style="margin-top:20px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+              <div class="field" style="flex:1;min-width:240px;">
+                <label for="videoCaptionField">Caption (applies to all uploaded videos)</label>
+                <input type="text" id="videoCaptionField" name="caption" placeholder="e.g. Drawing competition, July 2026">
+              </div>
+              <button type="submit" class="btn btn-primary" id="uploadVidBtn">📤 Upload Videos</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── Uploaded Images Grid ───────────────────── -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <span class="card-title">🖼️ Uploaded Images (<%= images.length %>)</span>
+        </div>
+        <div class="card-body">
+          <% if (images.length === 0) { %>
+            <div class="empty-state">
+              <div class="empty-icon">🖼️</div>
+              <p>No images uploaded yet. Use the Image panel above to add photos!</p>
+            </div>
+          <% } else { %>
+            <div class="gallery-admin-grid">
+              <% images.forEach(item => { %>
+                <div class="gallery-admin-item">
+                  <img src="<%= item.media_url %>" alt="<%= item.caption || 'Gallery image' %>" loading="lazy">
+                  <div class="item-type-badge"><span class="badge badge-image">image</span></div>
+                  <div class="item-overlay">
+                    <div class="item-caption"><%= item.caption || 'No caption' %></div>
+                    <div class="item-actions">
+                      <form action="/admin/gallery/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this image from gallery and disk?')">
+                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- ── Uploaded Videos Grid ───────────────────── -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🎬 Uploaded Videos (<%= videos.length %>)</span>
+        </div>
+        <div class="card-body">
+          <% if (videos.length === 0) { %>
+            <div class="empty-state">
+              <div class="empty-icon">🎬</div>
+              <p>No videos uploaded yet. Use the Video panel above to add MP4 videos!</p>
+            </div>
+          <% } else { %>
+            <div class="gallery-admin-grid">
+              <% videos.forEach(item => { %>
+                <div class="gallery-admin-item">
+                  <video src="<%= item.media_url %>" muted preload="metadata"></video>
+                  <div class="item-type-badge"><span class="badge badge-video">video</span></div>
+                  <div class="item-overlay">
+                    <div class="item-caption"><%= item.caption || 'No caption' %></div>
+                    <div class="item-actions">
+                      <form action="/admin/gallery/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this video from gallery and disk?')">
+                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="/js/admin.js"></script>
+<script>
+  // ── Tab switcher ────────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    const isImages = tab === 'images';
+    document.getElementById('tabImgBtn').classList.toggle('active', isImages);
+    document.getElementById('tabVidBtn').classList.toggle('active', !isImages);
+    document.getElementById('panelImages').classList.toggle('active', isImages);
+    document.getElementById('panelVideos').classList.toggle('active', !isImages);
+    document.getElementById('tabImgBtn').setAttribute('aria-selected', isImages ? 'true' : 'false');
+    document.getElementById('tabVidBtn').setAttribute('aria-selected', isImages ? 'false' : 'true');
+  }
+
+  // ── Drag-and-drop + preview helper ─────────────────────────────────────────
+  function initDropZone(dropZoneId, inputId, previewGridId, isVideo) {
+    const dropZone    = document.getElementById(dropZoneId);
+    const input       = document.getElementById(inputId);
+    const previewGrid = document.getElementById(previewGridId);
+
+    input.addEventListener('click', e => e.stopPropagation());
+    dropZone.addEventListener('click', () => input.click());
+
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer && e.dataTransfer.files.length) {
+        input.files = e.dataTransfer.files;
+        renderPreviews(e.dataTransfer.files, previewGrid, isVideo);
+      }
+    });
+
+    input.addEventListener('change', () => renderPreviews(input.files, previewGrid, isVideo));
+  }
+
+  function renderPreviews(files, grid, isVideo) {
+    grid.innerHTML = '';
+    if (!files) return;
+    Array.from(files).slice(0, 20).forEach(file => {
+      const div = document.createElement('div');
+      div.className = 'preview-item';
+      const url = URL.createObjectURL(file);
+      div.innerHTML = isVideo
+        ? `<video src="${url}" muted></video>`
+        : `<img src="${url}" alt="preview">`;
+      grid.appendChild(div);
+    });
+  }
+
+  initDropZone('imageDropZone', 'imageInput', 'imagePreviewGrid', false);
+  initDropZone('videoDropZone', 'videoInput', 'videoPreviewGrid', true);
+</script>
+</body>
+</html>

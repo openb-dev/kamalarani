@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery — Kamalarani Foundation</title>
+  <meta name="description" content="Photos and videos from Kamalarani Foundation's free art and music classes, material distributions, and events across West Bengal.">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    /* ── Colour tokens (mirror style.css) ───────────────── */
+    :root {
+      --marigold:      #E8912D;
+      --marigold-deep: #C4681B;
+      --vermilion:     #B23A2F;
+      --temple-cream:  #FBF3E4;
+      --temple-cream-2:#F5E9D3;
+      --leaf:          #4C6B3F;
+      --ink:           #2B2118;
+      --ink-soft:      #5A4E40;
+      --gold-line:     #D9A94E;
+      --white:         #FFFDF8;
+    }
+
+    /* Hero */
+    .gallery-page-hero {
+      background: linear-gradient(135deg, var(--temple-cream) 0%, var(--temple-cream-2) 100%);
+      padding: 28px 20px 0 !important;
+      text-align: center;
+      border-bottom: 1px solid var(--gold-line);
+    }
+    .gallery-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--ink-soft); font-size: 0.88rem; font-weight: 600;
+      text-decoration: none; margin-bottom: 20px;
+      transition: color .2s;
+    }
+    .gallery-back:hover { color: var(--vermilion); }
+    .gallery-page-hero h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--ink);
+      margin: 0 0 12px; font-weight: 800;
+    }
+    .gallery-page-hero p {
+      color: var(--ink-soft); font-size: 1.02rem;
+      max-width: 540px; margin: 0 auto;
+    }
+
+    /* Tabs */
+    .gallery-page-tabs {
+      display: flex; justify-content: center; gap: 10px;
+      padding: 24px 20px 20px; flex-wrap: wrap;
+    }
+    .gp-tab {
+      padding: 10px 26px;
+      border: 2px solid var(--gold-line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink-soft);
+      font-size: 0.92rem; font-weight: 700;
+      cursor: pointer; transition: all .2s;
+      font-family: 'Manrope', sans-serif;
+    }
+    .gp-tab:hover  { border-color: var(--vermilion); color: var(--vermilion); }
+    .gp-tab.active {
+      background: var(--vermilion);
+      border-color: var(--vermilion);
+      color: var(--white);
+      box-shadow: 0 4px 0 var(--marigold-deep);
+    }
+
+    /* Main area */
+    .gallery-section {
+      max-width: 1200px; margin: 0 auto;
+      padding: 16px 20px 80px;
+      background: var(--temple-cream);
+    }
+    .gallery-section-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--ink); margin: 0 0 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .gallery-section-title .count {
+      font-family: 'Manrope', sans-serif;
+      font-size: 0.78rem; background: var(--temple-cream-2);
+      color: var(--ink-soft); padding: 3px 12px;
+      border-radius: 999px; font-weight: 600;
+      border: 1px solid var(--gold-line);
+    }
+
+    /* Photo grid */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .photo-grid-item {
+      position: relative; aspect-ratio: 4/3;
+      border-radius: 14px; overflow: hidden;
+      cursor: zoom-in;
+      background: var(--temple-cream-2);
+      border: 1px solid var(--gold-line);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .photo-grid-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px -18px rgba(43,33,24,0.35);
+    }
+    .photo-grid-item img {
+      width:100%; height:100%; object-fit:cover; display:block;
+      transition: transform .3s;
+    }
+    .photo-grid-item:hover img { transform: scale(1.05); }
+    .photo-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 20px 12px 10px;
+      background: linear-gradient(to top, rgba(43,33,24,.65) 0%, transparent 100%);
+      color: var(--white); font-size: 0.78rem;
+      opacity: 0; transition: opacity .2s;
+    }
+    .photo-grid-item:hover .photo-caption { opacity: 1; }
+
+    /* Video grid */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    .video-card {
+      border-radius: 14px; overflow: hidden;
+      background: var(--white);
+      border: 1px solid var(--gold-line);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .video-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px -18px rgba(43,33,24,0.3);
+    }
+    .video-card video { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#000; }
+    .video-card-caption {
+      padding: 10px 14px;
+      font-size: 0.84rem; color: var(--ink-soft);
+      border-top: 1px solid var(--temple-cream-2);
+    }
+
+    /* Empty state */
+    .gallery-empty { text-align:center; padding:60px 20px; color: var(--ink-soft); }
+    .gallery-empty .empty-icon { font-size:3rem; margin-bottom:12px; }
+    .gallery-empty p { font-size:1rem; }
+
+    /* Tab panels */
+    .gp-panel { display:none; }
+    .gp-panel.active { display:block; }
+
+    /* Lightbox */
+    .lightbox {
+      position:fixed; inset:0; z-index:9999;
+      background:rgba(43,33,24,.92);
+      display:none; align-items:center; justify-content:center; padding:20px;
+    }
+    .lightbox.open { display:flex; }
+    .lightbox img {
+      max-width:90vw; max-height:90vh;
+      border-radius:10px; object-fit:contain;
+      box-shadow:0 0 60px rgba(43,33,24,.5);
+    }
+    .lightbox-close {
+      position:absolute; top:18px; right:22px;
+      font-size:1.3rem; color:var(--white); cursor:pointer;
+      background:rgba(251,243,228,.15); border:1px solid rgba(251,243,228,.25);
+      border-radius:50%; width:44px; height:44px;
+      display:flex; align-items:center; justify-content:center;
+      transition:background .2s;
+    }
+    .lightbox-close:hover { background:rgba(251,243,228,.3); }
+    .lightbox-caption {
+      position:absolute; bottom:24px; left:0; right:0;
+      text-align:center; color:rgba(251,243,228,.75);
+      font-size:0.9rem;
+    }
+  </style>
+</head>
+<body>
+<%- include('partials/header') %>
+
+<section class="gallery-page-hero">
+  <a href="/" class="gallery-back">← Back to Home</a>
+  <h1>📸 Our Gallery</h1>
+  <p>Photos and videos from free art &amp; music classes, events, and material distributions across West Bengal.</p>
+  <div class="gallery-page-tabs">
+    <button class="gp-tab active" id="gpTabPhotos" onclick="gpSwitch('photos')">🖼️ Photos (<%= images.length %>)</button>
+    <button class="gp-tab"       id="gpTabVideos" onclick="gpSwitch('videos')">🎬 Videos (<%= videos.length %>)</button>
+  </div>
+</section>
+
+<main id="main-content">
+  <div class="gallery-section">
+
+    <!-- Photos Panel -->
+    <div class="gp-panel active" id="gpPanelPhotos">
+      <% if (images.length === 0) { %>
+        <div class="gallery-empty">
+          <div class="empty-icon">🖼️</div>
+          <p>No photos uploaded yet — check back soon!</p>
+        </div>
+      <% } else { %>
+        <div class="gallery-section-title">
+          🖼️ Photos <span class="count"><%= images.length %> items</span>
+        </div>
+        <div class="photo-grid">
+          <% images.forEach(function(item) { %>
+            <div class="photo-grid-item"
+                 data-url="<%= item.media_url %>"
+                 data-caption="<%= item.caption || '' %>"
+                 tabindex="0"
+                 role="button"
+                 aria-label="<%= item.caption || 'Gallery photo' %>">
+              <img src="<%= item.media_url %>" alt="<%= item.caption || 'Kamalarani Foundation photo' %>" loading="lazy">
+              <% if (item.caption) { %><div class="photo-caption"><%= item.caption %></div><% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Videos Panel -->
+    <div class="gp-panel" id="gpPanelVideos">
+      <% if (videos.length === 0) { %>
+        <div class="gallery-empty">
+          <div class="empty-icon">🎬</div>
+          <p>No videos uploaded yet — check back soon!</p>
+        </div>
+      <% } else { %>
+        <div class="gallery-section-title">
+          🎬 Videos <span class="count"><%= videos.length %> items</span>
+        </div>
+        <div class="video-grid">
+          <% videos.forEach(function(item) { %>
+            <div class="video-card">
+              <video src="<%= item.media_url %>" controls preload="metadata"></video>
+              <% if (item.caption) { %>
+                <div class="video-card-caption"><%= item.caption %></div>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+  </div>
+</main>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script src="/js/script.js"></script>
+<script>
+  // Tab switch
+  function gpSwitch(tab) {
+    var isPhotos = tab === 'photos';
+    document.getElementById('gpTabPhotos').classList.toggle('active', isPhotos);
+    document.getElementById('gpTabVideos').classList.toggle('active', !isPhotos);
+    document.getElementById('gpPanelPhotos').classList.toggle('active', isPhotos);
+    document.getElementById('gpPanelVideos').classList.toggle('active', !isPhotos);
+  }
+
+  // Lightbox — use data attributes, no inline EJS in onclick
+  var lightbox     = document.getElementById('lightbox');
+  var lightboxImg  = document.getElementById('lightboxImg');
+  var lightboxCap  = document.getElementById('lightboxCaption');
+  var lightboxClose = document.getElementById('lightboxClose');
+
+  document.querySelectorAll('.photo-grid-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      lightboxImg.src = item.dataset.url;
+      lightboxImg.alt = item.dataset.caption || '';
+      lightboxCap.textContent = item.dataset.caption || '';
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+    item.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') item.click();
+    });
+  });
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lightboxImg.src = '';
+    document.body.style.overflow = '';
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function(e) { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
+</script>
+</body>
+</html>

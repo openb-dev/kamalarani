@@ -1,0 +1,45 @@
+<!-- Admin Sidebar Partial -->
+<aside class="sidebar" id="adminSidebar">
+  <div class="sidebar-brand">
+    <img src="/images/logo.png" alt="Kamalarani Foundation Logo" class="sidebar-logo-img">
+    <div class="brand-text">
+      <div class="brand-name">Kamalarani</div>
+      <div class="brand-sub">Foundation CMS</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Admin navigation">
+    <div class="nav-section-label">Main</div>
+    <a href="/admin/dashboard" class="<%= locals.currentPath === '/admin/dashboard' ? 'active' : '' %>">
+      <span class="nav-icon">📊</span> Dashboard
+    </a>
+
+    <div class="nav-section-label">Content</div>
+    <a href="/admin/gallery" class="<%= locals.currentPath === '/admin/gallery' ? 'active' : '' %>">
+      <span class="nav-icon">🖼️</span> Gallery
+    </a>
+    <a href="/admin/events" class="<%= locals.currentPath === '/admin/events' ? 'active' : '' %>">
+      <span class="nav-icon">📅</span> Events
+    </a>
+
+    <div class="nav-section-label">Inbox</div>
+    <a href="/admin/messages" class="<%= locals.currentPath === '/admin/messages' ? 'active' : '' %>">
+      <span class="nav-icon">✉️</span> Messages
+    </a>
+    <a href="/admin/admissions" class="<%= locals.currentPath === '/admin/admissions' ? 'active' : '' %>">
+      <span class="nav-icon">🎒</span> Admissions
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-avatar"><%= locals.admin ? locals.admin.name.charAt(0).toUpperCase() : 'A' %></div>
+      <div>
+        <div class="admin-name"><%= locals.admin ? locals.admin.name : 'Admin' %></div>
+        <div class="admin-role">Administrator</div>
+      </div>
+    </div>
+    <a href="/admin/logout"><button class="btn-logout">⏻ Sign Out</button></a>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

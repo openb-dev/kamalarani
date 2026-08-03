@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admissions — Kamalarani Foundation CMS</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <% var apps = locals.apps || []; %>
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <span class="topbar-title">Admission Applications</span>
+      </div>
+      <div class="topbar-right">
+        <span style="font-size:0.82rem;color:var(--text-secondary);"><%= apps.length %> total</span>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <% if (locals.success && locals.success.length) { %>
+        <div class="flash-bar success">✅ <%= locals.success[0] %></div>
+      <% } %>
+      <% if (locals.error && locals.error.length) { %>
+        <div class="flash-bar error">⚠️ <%= locals.error[0] %></div>
+      <% } %>
+
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Admissions</h1>
+          <p>Art &amp; Music class enrollment applications submitted through the public website.</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <% const pendingCount = apps.filter(a => a.status === 'pending').length; %>
+          <% const approvedCount = apps.filter(a => a.status === 'approved').length; %>
+          <% if (pendingCount > 0) { %>
+            <span class="badge badge-pending" style="padding:6px 14px;font-size:0.8rem;"><%= pendingCount %> pending</span>
+          <% } %>
+          <% if (approvedCount > 0) { %>
+            <span class="badge badge-approved" style="padding:6px 14px;font-size:0.8rem;"><%= approvedCount %> approved</span>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">All Applications</span>
+        </div>
+
+        <% if (apps.length === 0) { %>
+          <div class="empty-state">
+            <div class="empty-icon">🎒</div>
+            <p>No admission applications received yet.</p>
+          </div>
+        <% } else { %>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Student Name</th>
+                  <th>DOB / Gender</th>
+                  <th>Class</th>
+                  <th>Programme</th>
+                  <th>Parent / Mobile</th>
+                  <th>Address</th>
+                  <th>Applied On</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% apps.forEach((app, idx) => { %>
+                  <tr style="<%= app.status === 'pending' ? 'background:rgba(240,192,64,0.04)' : '' %>">
+                    <td style="color:var(--text-muted);font-size:0.8rem;"><%= idx + 1 %></td>
+                    <td>
+                      <div class="td-name"><%= app.student_name %></div>
+                      <% if (app.email) { %>
+                        <div style="font-size:0.76rem;color:var(--text-muted);">
+                          <a href="mailto:<%= app.email %>" style="color:var(--info);"><%= app.email %></a>
+                        </div>
+                      <% } %>
+                    </td>
+                    <td style="font-size:0.82rem;">
+                      <%= app.dob ? new Date(app.dob).toLocaleDateString('en-IN') : '—' %><br>
+                      <span style="color:var(--text-muted);"><%= app.gender || '—' %></span>
+                    </td>
+                    <td style="font-size:0.85rem;font-weight:600;color:var(--text-primary);"><%= app.class_applying_for || '—' %></td>
+                    <td>
+                      <% if (app.programme === 'Art Class') { %>
+                        <span class="badge" style="background:rgba(255,160,60,.15);color:#f0a03c;">🎨 Art</span>
+                      <% } else if (app.programme === 'Music Class') { %>
+                        <span class="badge" style="background:rgba(120,80,220,.15);color:#8a5cf6;">🎵 Music</span>
+                      <% } else if (app.programme === 'Both') { %>
+                        <span class="badge" style="background:rgba(64,190,120,.15);color:#3db87a;">🎨🎵 Both</span>
+                      <% } else { %>
+                        <span style="color:var(--text-muted);font-size:0.82rem;">—</span>
+                      <% } %>
+                    </td>
+                    <td style="font-size:0.82rem;">
+                      <div><%= app.father_name ? '👨 ' + app.father_name : '' %></div>
+                      <div><%= app.mother_name ? '👩 ' + app.mother_name : '' %></div>
+                      <a href="tel:<%= app.parent_mobile %>" style="color:var(--info);font-weight:600;">📞 <%= app.parent_mobile %></a>
+                    </td>
+                    <td class="td-truncate" style="max-width:160px;font-size:0.8rem;color:var(--text-muted);">
+                      <%= app.address || '—' %>
+                    </td>
+                    <td style="white-space:nowrap;font-size:0.8rem;">
+                      <%= new Date(app.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
+                    </td>
+                    <td>
+                      <span class="badge badge-<%= app.status %>"><%= app.status %></span>
+                    </td>
+                    <td>
+                      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <form action="/admin/admissions/<%= app.id %>?_method=PUT" method="POST" style="display:flex;gap:4px;">
+                          <select name="status" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:0.78rem;padding:4px 8px;">
+                            <option value="pending"  <%= app.status==='pending'  ? 'selected':'' %>>Pending</option>
+                            <option value="approved" <%= app.status==='approved' ? 'selected':'' %>>Approved</option>
+                            <option value="rejected" <%= app.status==='rejected' ? 'selected':'' %>>Rejected</option>
+                          </select>
+                          <button type="submit" class="btn btn-ghost btn-sm">Save</button>
+                        </form>
+                        <form action="/admin/admissions/<%= app.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this application permanently?')">
+                          <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="/js/admin.js"></script>
+</body>
+</html>

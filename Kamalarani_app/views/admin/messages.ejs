@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Messages — Kamalarani Foundation CMS</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <% var messages = locals.messages || []; %>
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <span class="topbar-title">Contact Messages</span>
+      </div>
+      <div class="topbar-right">
+        <span style="font-size:0.82rem;color:var(--text-secondary);"><%= messages.length %> total</span>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <% if (locals.success && locals.success.length) { %>
+        <div class="flash-bar success">✅ <%= locals.success[0] %></div>
+      <% } %>
+      <% if (locals.error && locals.error.length) { %>
+        <div class="flash-bar error">⚠️ <%= locals.error[0] %></div>
+      <% } %>
+
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Messages</h1>
+          <p>Enquiries submitted through the contact form on the website.</p>
+        </div>
+      </div>
+
+      <% var messages = locals.messages || []; %>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">All Messages</span>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <% const newCount = messages.filter(m => m.status === 'new').length; %>
+            <% if (newCount > 0) { %>
+              <span class="badge badge-new"><%= newCount %> new</span>
+            <% } %>
+          </div>
+        </div>
+
+        <% if (messages.length === 0) { %>
+          <div class="empty-state">
+            <div class="empty-icon">✉️</div>
+            <p>No messages received yet.</p>
+          </div>
+        <% } else { %>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Subject</th>
+                  <th>Message</th>
+                  <th>Received</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% messages.forEach(msg => { %>
+                  <tr style="<%= msg.status === 'new' ? 'background:rgba(91,156,246,0.04)' : '' %>">
+                    <td class="td-name"><%= msg.name %></td>
+                    <td>
+                      <a href="mailto:<%= msg.email %>" style="color:var(--info);font-size:0.85rem;">
+                        <%= msg.email %>
+                      </a>
+                    </td>
+                    <td class="td-truncate" style="max-width:160px;"><%= msg.subject || '—' %></td>
+                    <td>
+                      <span title="<%= msg.message %>" class="td-truncate" style="max-width:200px;display:block;font-size:0.82rem;color:var(--text-muted);">
+                        <%= msg.message.substring(0, 80) %><%= msg.message.length > 80 ? '…' : '' %>
+                      </span>
+                    </td>
+                    <td style="white-space:nowrap;font-size:0.8rem;">
+                      <%= new Date(msg.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
+                    </td>
+                    <td>
+                      <span class="badge badge-<%= msg.status %>"><%= msg.status %></span>
+                    </td>
+                    <td>
+                      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <!-- Update Status -->
+                        <form action="/admin/messages/<%= msg.id %>?_method=PUT" method="POST" style="display:flex;gap:4px;">
+                          <select name="status" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:0.78rem;padding:4px 8px;">
+                            <option value="new"     <%= msg.status==='new'     ? 'selected':'' %>>New</option>
+                            <option value="read"    <%= msg.status==='read'    ? 'selected':'' %>>Read</option>
+                            <option value="replied" <%= msg.status==='replied' ? 'selected':'' %>>Replied</option>
+                          </select>
+                          <button type="submit" class="btn btn-ghost btn-sm">Save</button>
+                        </form>
+                        <!-- Delete -->
+                        <form action="/admin/messages/<%= msg.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this message permanently?')">
+                          <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="/js/admin.js"></script>
+</body>
+</html>

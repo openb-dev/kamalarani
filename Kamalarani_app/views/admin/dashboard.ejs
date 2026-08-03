@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard — Kamalarani Foundation CMS</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <span class="topbar-title">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <a href="/" class="topbar-site-link" target="_blank">↗ View Website</a>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <!-- Flash messages -->
+      <% if (locals.success && locals.success.length) { %>
+        <div class="flash-bar success">✅ <%= locals.success[0] %></div>
+      <% } %>
+      <% if (locals.error && locals.error.length) { %>
+        <div class="flash-bar error">⚠️ <%= locals.error[0] %></div>
+      <% } %>
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Good <%= new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening' %>, <%= locals.admin ? locals.admin.name.split(' ')[0] : 'Admin' %> 👋</h1>
+          <p>Here's what's happening at Kamalarani Foundation today.</p>
+        </div>
+      </div>
+
+      <%
+        var s = locals.stats || { totalMessages:0, newMessages:0, totalApps:0, pendingApps:0, totalGallery:0, totalEvents:0, upcomingEvents:0 };
+        var rMsgs = locals.recentMessages || [];
+        var rApps = locals.recentApps || [];
+      %>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-icon orange">✉️</div>
+          <div class="stat-card-value"><%= s.totalMessages %></div>
+          <div class="stat-card-label">Total Messages</div>
+          <% if (s.newMessages > 0) { %>
+            <div class="stat-card-sub" style="color:var(--info)"><%= s.newMessages %> new &amp; unread</div>
+          <% } else { %>
+            <div class="stat-card-sub">All messages read</div>
+          <% } %>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon red">🎒</div>
+          <div class="stat-card-value"><%= s.totalApps %></div>
+          <div class="stat-card-label">Admission Applications</div>
+          <% if (s.pendingApps > 0) { %>
+            <div class="stat-card-sub" style="color:var(--warning)"><%= s.pendingApps %> pending review</div>
+          <% } else { %>
+            <div class="stat-card-sub">No pending applications</div>
+          <% } %>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon blue">🖼️</div>
+          <div class="stat-card-value"><%= s.totalGallery %></div>
+          <div class="stat-card-label">Gallery Items</div>
+          <div class="stat-card-sub">Images &amp; videos uploaded</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon green">📅</div>
+          <div class="stat-card-value"><%= s.totalEvents %></div>
+          <div class="stat-card-label">Total Events</div>
+          <% if (s.upcomingEvents > 0) { %>
+            <div class="stat-card-sub" style="color:var(--success)"><%= s.upcomingEvents %> upcoming</div>
+          <% } else { %>
+            <div class="stat-card-sub">No upcoming events</div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <span class="card-title">Quick Actions</span>
+        </div>
+        <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a href="/admin/gallery" class="btn btn-primary">🖼️ Upload to Gallery</a>
+          <a href="/admin/events" class="btn btn-ghost">📅 Add Event</a>
+          <a href="/admin/messages" class="btn btn-ghost">✉️ View Messages</a>
+          <a href="/admin/admissions" class="btn btn-ghost">🎒 Review Applications</a>
+        </div>
+      </div>
+
+      <!-- Recent tables -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Messages</span>
+            <a href="/admin/messages" class="btn btn-ghost btn-sm">View All</a>
+          </div>
+          <% if (rMsgs.length === 0) { %>
+            <div class="empty-state">
+              <div class="empty-icon">✉️</div>
+              <p>No messages yet.</p>
+            </div>
+          <% } else { %>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Subject</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody>
+                  <% rMsgs.forEach(function(msg) { %>
+                    <tr>
+                      <td class="td-name"><%= msg.name %></td>
+                      <td class="td-truncate"><%= msg.subject || '—' %></td>
+                      <td><span class="badge badge-<%= msg.status %>"><%= msg.status %></span></td>
+                      <td style="white-space:nowrap;font-size:0.8rem;"><%= new Date(msg.created_at).toLocaleDateString('en-IN') %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Admissions</span>
+            <a href="/admin/admissions" class="btn btn-ghost btn-sm">View All</a>
+          </div>
+          <% if (rApps.length === 0) { %>
+            <div class="empty-state">
+              <div class="empty-icon">🎒</div>
+              <p>No applications yet.</p>
+            </div>
+          <% } else { %>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Student</th><th>Class</th><th>Status</th></tr></thead>
+                <tbody>
+                  <% rApps.forEach(function(app) { %>
+                    <tr>
+                      <td class="td-name"><%= app.student_name %></td>
+                      <td><%= app.class_applying_for || '—' %></td>
+                      <td><span class="badge badge-<%= app.status %>"><%= app.status %></span></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-main -->
+</div><!-- /admin-layout -->
+
+<script src="/js/admin.js"></script>
+</body>
+</html>
