@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS events (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES admins(id) ON DELETE SET NULL
 );
-CREATE INDEX IF NOT EXISTS idx_events_date ON events(event_date);
+CREATE INDEX idx_events_date ON events(event_date);
 
 CREATE TABLE IF NOT EXISTS gallery_items (
   id INT AUTO_INCREMENT PRIMARY KEY,

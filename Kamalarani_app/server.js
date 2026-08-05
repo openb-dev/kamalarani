@@ -17,6 +17,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'images', 'logo.png')));
 
 // Body parsing & method override
 app.use(express.urlencoded({ extended: true }));

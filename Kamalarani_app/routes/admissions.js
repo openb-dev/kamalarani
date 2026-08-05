@@ -39,7 +39,12 @@ router.post('/admissions', async (req, res) => {
 
   // Server-side validation
   if (!studentName) {
-    req.flash('error', 'Student Name is required. Please fill in the student\'s name.');
+    req.flash('error', 'Student Name is required.');
+    return res.redirect('/#admission');
+  }
+
+  if (!dob) {
+    req.flash('error', 'Date of Birth is required.');
     return res.redirect('/#admission');
   }
 
@@ -58,8 +63,23 @@ router.post('/admissions', async (req, res) => {
     return res.redirect('/#admission');
   }
 
+  if (!fatherName) {
+    req.flash('error', 'Father\'s Name is required.');
+    return res.redirect('/#admission');
+  }
+
+  if (!motherName) {
+    req.flash('error', 'Mother\'s Name is required.');
+    return res.redirect('/#admission');
+  }
+
   if (!parentMobile) {
     req.flash('error', 'Parent Mobile Number is required.');
+    return res.redirect('/#admission');
+  }
+
+  if (!address) {
+    req.flash('error', 'Residential Address is required.');
     return res.redirect('/#admission');
   }
 
