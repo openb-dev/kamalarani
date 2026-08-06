@@ -66,7 +66,9 @@
               <thead>
                 <tr>
                   <th>#</th>
+                  <th>Photo</th>
                   <th>Student Name</th>
+                  <th>ID Proof</th>
                   <th>DOB / Gender</th>
                   <th>Class</th>
                   <th>Programme</th>
@@ -82,11 +84,32 @@
                   <tr style="<%= app.status === 'pending' ? 'background:rgba(240,192,64,0.04)' : '' %>">
                     <td style="color:var(--text-muted);font-size:0.8rem;"><%= idx + 1 %></td>
                     <td>
+                      <% if (app.passport_photo) { %>
+                        <a href="<%= app.passport_photo %>" target="_blank" title="Click to view full photo">
+                          <img src="<%= app.passport_photo %>" alt="Passport Photo" style="width:40px;height:48px;object-fit:cover;border-radius:4px;border:1px solid var(--border);">
+                        </a>
+                      <% } else { %>
+                        <span style="color:var(--text-muted);font-size:0.75rem;">No Photo</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <span style="display:inline-block;padding:2px 6px;background:rgba(178,58,47,0.1);color:var(--vermilion);font-weight:700;font-size:0.75rem;border-radius:4px;margin-bottom:4px;">
+                        <%= app.arn || ('KFA-2026-' + String(app.id).padStart(4, '0')) %>
+                      </span>
                       <div class="td-name"><%= app.student_name %></div>
                       <% if (app.email) { %>
                         <div style="font-size:0.76rem;color:var(--text-muted);">
                           <a href="mailto:<%= app.email %>" style="color:var(--info);"><%= app.email %></a>
                         </div>
+                      <% } %>
+                    </td>
+                    <td style="font-size:0.8rem;">
+                      <% if (app.id_proof) { %>
+                        <a href="<%= app.id_proof %>" target="_blank" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:0.75rem;" title="View Aadhaar / Birth Certificate">
+                          🪪 View ID
+                        </a>
+                      <% } else { %>
+                        <span style="color:var(--text-muted);font-size:0.75rem;">No Document</span>
                       <% } %>
                     </td>
                     <td style="font-size:0.82rem;">
@@ -108,6 +131,9 @@
                     <td style="font-size:0.82rem;">
                       <div><%= app.father_name ? '👨 ' + app.father_name : '' %></div>
                       <div><%= app.mother_name ? '👩 ' + app.mother_name : '' %></div>
+                      <% if (app.occupation) { %>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">💼 <%= app.occupation %></div>
+                      <% } %>
                       <a href="tel:<%= app.parent_mobile %>" style="color:var(--info);font-weight:600;">📞 <%= app.parent_mobile %></a>
                     </td>
                     <td class="td-truncate" style="max-width:160px;font-size:0.8rem;color:var(--text-muted);">
@@ -120,7 +146,10 @@
                       <span class="badge badge-<%= app.status %>"><%= app.status %></span>
                     </td>
                     <td>
-                      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                        <a href="/admin/admissions/pdf/<%= app.id %>" target="_blank" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:0.75rem;font-weight:700;" title="Print/Download PDF Form">
+                          📄 PDF
+                        </a>
                         <form action="/admin/admissions/<%= app.id %>?_method=PUT" method="POST" style="display:flex;gap:4px;">
                           <select name="status" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:0.78rem;padding:4px 8px;">
                             <option value="pending"  <%= app.status==='pending'  ? 'selected':'' %>>Pending</option>

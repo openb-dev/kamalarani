@@ -45,7 +45,7 @@
   "legalName": "Kamalarani Foundation",
   "taxID": "AAETK689KE20221",
   "email": "kamalaranifoundation17@gmail.com",
-  "telephone": ["+917980350454", "+919123902781"],
+  "telephone": "+917003502022",
   "address": [
     {
       "@type": "PostalAddress",
@@ -313,9 +313,9 @@
           <li>Classes held at Sri Sri Radha-Govinda Thakurbari, Natabari</li>
         </ul>
       </div>
-      <form class="adm-form" id="admissionForm" action="/admissions" method="POST" aria-label="Art class admission form">
+      <form class="adm-form" id="admissionForm" action="/admissions" method="POST" enctype="multipart/form-data" aria-label="Art class admission form">
         <% if (locals.success && locals.success.length) { %>
-          <div class="flash flash-success full" role="alert"><% locals.success.forEach(function(msg){ %><p><%= msg %></p><% }) %></div>
+          <div class="flash flash-success full" role="alert"><% locals.success.forEach(function(msg){ %><p><%- msg %></p><% }) %></div>
         <% } %>
         <% if (locals.error && locals.error.length) { %>
           <div class="flash flash-error full" role="alert"><% locals.error.forEach(function(msg){ %><p><%= msg %></p><% }) %></div>
@@ -326,6 +326,7 @@
           <label for="gender">Gender *</label>
           <select id="gender" name="gender" required><option value="">Select Gender</option><option>Male</option><option>Female</option><option>Other</option></select>
         </div>
+        <div class="field"><label for="schoolName">School Name (Optional)</label><input type="text" id="schoolName" name="school_name" placeholder="Current school name"></div>
         <div class="field">
           <label for="classFor">Class Applying For *</label>
           <select id="classFor" name="class_applying_for" required>
@@ -353,15 +354,141 @@
         </div>
         <div class="field"><label for="fatherName">Father's Name *</label><input type="text" id="fatherName" name="father_name" required placeholder="Father's full name"></div>
         <div class="field"><label for="motherName">Mother's Name *</label><input type="text" id="motherName" name="mother_name" required placeholder="Mother's full name"></div>
+        <div class="field"><label for="occupation">Father's / Guardian's Occupation *</label><input type="text" id="occupation" name="occupation" required placeholder="e.g. Business, Service, Farmer, Teacher"></div>
         <div class="field"><label for="mobile">Parent's Mobile No. *</label><input type="tel" id="mobile" name="parent_mobile" required pattern="^(\+91[\-\s]?)?[0]?[6-9]\d{9}$" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9 (e.g. 9876543210)" placeholder="e.g. 9876543210" autocomplete="tel"></div>
         <div class="field"><label for="email">Email ID (Optional)</label><input type="email" id="email" name="email" autocomplete="email" placeholder="e.g. parent@gmail.com (optional)"></div>
-        <div class="field full"><label for="address">Residential Address *</label><input type="text" id="address" name="address" required placeholder="Village/Locality, P.O., P.S., District, PIN"></div>
-        <p class="form-note">Bring an Aadhaar copy (if available) and a passport-size photo at the time of your first class.</p>
-        <button type="submit" class="adm-submit" id="admitSubmitBtn">Submit Application</button>
+        <div class="field"><label for="aadhaarNo">Student Aadhaar No. (Optional)</label><input type="text" id="aadhaarNo" name="aadhaar_no" placeholder="12-digit Aadhaar number"></div>
+
+        <!-- Address Breakdown -->
+        <div class="field full" style="margin-top:10px;margin-bottom:2px;"><h4 style="font-size:0.95rem;color:var(--vermilion);font-weight:700;">🏡 Residential Address Details</h4></div>
+        <div class="field"><label for="villageLocality">Village / Locality *</label><input type="text" id="villageLocality" name="village_locality" required placeholder="Village or Locality name"></div>
+        <div class="field"><label for="po">Post Office (P.O.) *</label><input type="text" id="po" name="po" required placeholder="P.O. name"></div>
+        <div class="field"><label for="ps">Police Station (P.S.) *</label><input type="text" id="ps" name="ps" required placeholder="P.S. name"></div>
+        <div class="field"><label for="district">District *</label><input type="text" id="district" name="district" required placeholder="District (e.g. Coochbehar)"></div>
+        <div class="field"><label for="state">State *</label><input type="text" id="state" name="state" required value="West Bengal"></div>
+        <div class="field"><label for="pinCode">PIN Code *</label><input type="text" id="pinCode" name="pin_code" required pattern="\d{6}" title="Please enter a valid 6-digit PIN code" placeholder="6-digit PIN Code (e.g. 736160)"></div>
+
+        <div class="field full" style="margin-top:10px;margin-bottom:2px;"><h4 style="font-size:0.95rem;color:var(--vermilion);font-weight:700;">📄 Mandatory Documents Upload</h4></div>
+        <div class="field full">
+          <label for="passportPhoto">Student's Passport-Size Photo *</label>
+          <input type="file" id="passportPhoto" name="passport_photo" accept="image/jpeg,image/jpg,image/png,image/webp" required style="padding: 10px; background: var(--white); border: 1.5px dashed var(--gold-line); border-radius: 8px; cursor: pointer; width: 100%;">
+          <small style="display:block;margin-top:4px;color:var(--ink-soft);font-size:0.78rem;">Upload a clear passport-size photo of the student (JPG, PNG, WEBP — Max 10MB)</small>
+        </div>
+        <div class="field full">
+          <label for="idProof">Identity Proof (Aadhaar Card / Birth Certificate) *</label>
+          <input type="file" id="idProof" name="id_proof" accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf" required style="padding: 10px; background: var(--white); border: 1.5px dashed var(--gold-line); border-radius: 8px; cursor: pointer; width: 100%;">
+          <small style="display:block;margin-top:4px;color:var(--ink-soft);font-size:0.78rem;">Upload student's Aadhaar Card or Birth Certificate (JPG, PNG, WEBP, PDF — Max 10MB)</small>
+        </div>
+        <p class="form-note">Upon submitting, a unique Application Reference Number (ARN) &amp; printable PDF admission form will be generated for your records.</p>
+        <button type="submit" class="adm-submit" id="admitSubmitBtn">Submit Application &amp; Generate Form PDF</button>
       </form>
     </div>
   </div>
 </section>
+
+<!-- ── Admission Success Modal Popup ──────────────────────────── -->
+<div id="admissionModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(20,14,10,0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:18px;">
+  <div style="background:#FFFDF8; border:2px solid var(--marigold); border-radius:20px; max-width:520px; width:100%; padding:32px 28px; box-shadow:0 24px 60px rgba(0,0,0,0.4); text-align:center; position:relative; font-family:'Manrope',sans-serif;">
+    <button type="button" id="closeModalCross" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--ink-soft);">&times;</button>
+    <div style="font-size:3.4rem; margin-bottom:8px;">🎉</div>
+    <h3 style="font-size:1.45rem; color:var(--vermilion); font-weight:800; margin-bottom:6px; font-family:'Fraunces',serif;">Application Submitted Successfully!</h3>
+    <p style="font-size:0.92rem; color:var(--ink-soft); margin-bottom:20px;">Thank you for enrolling your child in Kamalarani Foundation Free Art &amp; Music Classes.</p>
+
+    <div style="background:var(--temple-cream); border:1px dashed var(--gold-line); border-radius:14px; padding:18px; margin-bottom:24px; text-align:left;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.9rem;">
+        <span style="color:var(--ink-soft); font-weight:600;">Application Ref. No. (ARN):</span>
+        <strong id="modalArn" style="color:var(--vermilion); font-family:monospace; font-size:1.05rem;">KFA-2026-0001</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.88rem;">
+        <span style="color:var(--ink-soft);">Student Name:</span>
+        <strong id="modalStudentName" style="color:var(--ink);">—</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:0.88rem;">
+        <span style="color:var(--ink-soft);">Class &amp; Programme:</span>
+        <strong id="modalClassProgramme" style="color:var(--ink);">—</strong>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+      <a id="modalDownloadBtn" href="#" target="_blank" class="adm-submit" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:12px 24px; margin:0; font-size:0.92rem; border-radius:999px;">
+        📄 Print / Download Admission PDF
+      </a>
+      <button type="button" id="modalCloseBtn" style="padding:12px 24px; border-radius:999px; border:1.5px solid var(--ink-soft); background:transparent; font-weight:700; color:var(--ink); cursor:pointer;">
+        Done
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('admissionForm');
+  const modal = document.getElementById('admissionModal');
+  if (!form || !modal) return;
+
+  const submitBtn = document.getElementById('admitSubmitBtn');
+  const modalArn = document.getElementById('modalArn');
+  const modalStudentName = document.getElementById('modalStudentName');
+  const modalClassProgramme = document.getElementById('modalClassProgramme');
+  const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  const closeModalCross = document.getElementById('closeModalCross');
+
+  function closeModal() {
+    modal.style.display = 'none';
+    form.reset();
+  }
+
+  if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+  if (closeModalCross) closeModalCross.addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const origBtnText = submitBtn ? submitBtn.innerText : 'Submit Application & Generate Form PDF';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Submitting & Generating PDF...';
+    }
+
+    try {
+      const formData = new FormData(form);
+      const res = await fetch('/admissions', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        },
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        if (modalArn) modalArn.innerText = data.arn;
+        if (modalStudentName) modalStudentName.innerText = data.student_name || '';
+        if (modalClassProgramme) modalClassProgramme.innerText = (data.class_applying_for || '') + ' — ' + (data.programme || '');
+        if (modalDownloadBtn) modalDownloadBtn.href = data.downloadUrl;
+
+        modal.style.display = 'flex';
+      } else {
+        alert(data.message || 'Submission failed. Please check your form details.');
+      }
+    } catch (err) {
+      console.error('Admission submit error:', err);
+      alert('Could not submit application. Please check network connection and try again.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = origBtnText;
+      }
+    }
+  });
+});
+</script>
 
 <section class="support" id="support" aria-labelledby="support-heading">
   <div class="wrap">
@@ -392,10 +519,8 @@
           <p>Village: Panisala, P.O. Chhat Baro Chowki, P.S. Tufanganj, District Coochbehar, Pin Code - 736160, West Bengal, India</p>
         </div>
         <div class="contact-card">
-          <h3>📞 Contact Numbers</h3>
-          <a href="tel:+917980350454">79803 50454</a>
-          <a href="tel:+919123902781">91239 02781</a>
-          <a href="tel:+919163969424">91639 69424</a>
+          <h3>📞 Contact Number</h3>
+          <a href="tel:+917003502022">+91 70035 02022</a>
         </div>
         <div class="contact-card">
           <h3>✉️ Email</h3>
@@ -405,7 +530,7 @@
           <h3>🌐 Follow Us</h3>
           <div class="social-links-wrap" style="margin-top:8px;">
             <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Facebook">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
             <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Instagram">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>

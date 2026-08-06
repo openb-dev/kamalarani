@@ -1,8 +1,7 @@
 -- Kamalarani Foundation — Database Schema
 -- Run this file once to create all tables.
--- For existing databases:
---   ALTER TABLE gallery_items CHANGE cloudinary_public_id file_name VARCHAR(255);
---   ALTER TABLE admission_applications ADD COLUMN IF NOT EXISTS programme VARCHAR(50) DEFAULT NULL AFTER class_applying_for;
+-- For existing databases that already have admission_applications, run:
+--   migrations/alter_admissions_columns.sql
 
 CREATE DATABASE IF NOT EXISTS kamalarani_db;
 USE kamalarani_db;
@@ -54,16 +53,29 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 
 CREATE TABLE IF NOT EXISTS admission_applications (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  arn VARCHAR(50) UNIQUE,
   student_name VARCHAR(255) NOT NULL,
   dob DATE,
   gender VARCHAR(20),
+  school_name VARCHAR(255),
   class_applying_for VARCHAR(50),
   programme VARCHAR(50),
   father_name VARCHAR(255),
   mother_name VARCHAR(255),
+  occupation VARCHAR(255),
   parent_mobile VARCHAR(20) NOT NULL,
+  mother_mobile VARCHAR(20),
   email VARCHAR(255),
+  aadhaar_no VARCHAR(20),
+  village_locality VARCHAR(255),
+  po VARCHAR(255),
+  ps VARCHAR(255),
+  district VARCHAR(255),
+  state VARCHAR(100) DEFAULT 'West Bengal',
+  pin_code VARCHAR(10),
   address TEXT,
+  passport_photo VARCHAR(500),
+  id_proof VARCHAR(500),
   status ENUM('pending','approved','rejected') DEFAULT 'pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

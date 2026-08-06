@@ -544,10 +544,10 @@
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border: 1.5px solid #D9A94E !important;
-  background: #1B1510 !important;
-  color: #E8E0D2 !important;
-  border-radius: 4px !important;
+  border: 1.5px solid var(--vermilion) !important;
+  background: transparent !important;
+  color: var(--vermilion) !important;
+  border-radius: 6px !important;
   transition: all 0.22s ease !important;
   text-decoration: none !important;
   padding: 0 !important;
@@ -569,5 +569,12 @@
   display: block !important;
   margin: auto !important;
   flex-shrink: 0 !important;
+  color: var(--vermilion) !important;
+  fill: none !important;
+  stroke: var(--vermilion) !important;
+}
+.social-icon-btn:hover svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 

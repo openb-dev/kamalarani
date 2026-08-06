@@ -1,7 +1,48 @@
 const express = require('express');
-const pool = require('../config/db');
+const multer  = require('multer');
+const path    = require('path');
+const fs      = require('fs');
+const pool    = require('../config/db');
 const { requireAdminSession } = require('../middleware/auth');
-const router = express.Router();
+const router  = express.Router();
+
+// Ensure upload directory exists
+const uploadDir = path.join(__dirname, '../public/uploads/admissions');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer storage for admission documents
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const prefix = file.fieldname === 'passport_photo' ? 'photo' : 'idproof';
+    cb(null, `${prefix}-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (file.fieldname === 'passport_photo') {
+    if (['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) return cb(null, true);
+    return cb(new Error('Only JPG, JPEG, PNG, and WEBP images are allowed for passport photo.'));
+  }
+  if (file.fieldname === 'id_proof') {
+    if (['.jpg', '.jpeg', '.png', '.webp', '.pdf'].includes(ext)) return cb(null, true);
+    return cb(new Error('Only JPG, JPEG, PNG, WEBP, and PDF files are allowed for identity proof.'));
+  }
+  cb(new Error('Unexpected file upload.'));
+};
+
+const uploadDocuments = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: fileFilter
+}).fields([
+  { name: 'passport_photo', maxCount: 1 },
+  { name: 'id_proof', maxCount: 1 }
+]);
 
 // Strict Indian mobile number validator
 function isValidMobileNumber(mobileStr) {
@@ -24,89 +65,144 @@ function isValidMobileNumber(mobileStr) {
 const VALID_CLASSES    = ['Nursery','KG','Class I','Class II','Class III','Class IV','Class V','Class VI','Class VII','Class VIII'];
 const VALID_PROGRAMMES = ['Art Class','Music Class','Both'];
 
+const { generateAdmissionPDF } = require('../utils/pdfGenerator');
+
 // Public: submit admission form
-router.post('/admissions', async (req, res) => {
-  const studentName      = (req.body.student_name || '').trim();
-  const dob              = (req.body.dob || '').trim() || null;
-  const gender           = (req.body.gender || '').trim() || null;
-  const classApplyingFor = (req.body.class_applying_for || '').trim() || null;
-  const programme        = (req.body.programme || '').trim() || null;
-  const fatherName       = (req.body.father_name || '').trim() || null;
-  const motherName       = (req.body.mother_name || '').trim() || null;
-  const parentMobile     = (req.body.parent_mobile || '').trim();
-  const email            = (req.body.email || '').trim() || null;
-  const address          = (req.body.address || '').trim() || null;
+router.post('/admissions', (req, res) => {
+  uploadDocuments(req, res, async (err) => {
+    const isAjax = req.xhr || 
+                   req.headers['x-requested-with'] === 'XMLHttpRequest' || 
+                   (req.headers.accept && req.headers.accept.includes('application/json'));
 
-  // Server-side validation
-  if (!studentName) {
-    req.flash('error', 'Student Name is required.');
-    return res.redirect('/#admission');
-  }
+    const sendError = (msg) => {
+      if (isAjax) {
+        return res.status(400).json({ success: false, message: msg });
+      }
+      req.flash('error', msg);
+      return res.redirect('/#admission');
+    };
 
-  if (!dob) {
-    req.flash('error', 'Date of Birth is required.');
-    return res.redirect('/#admission');
-  }
+    if (err) {
+      const errorMsg = err instanceof multer.MulterError ? 'Upload Error: ' + err.message : (err.message || 'File upload failed.');
+      return sendError(errorMsg);
+    }
 
-  if (!gender) {
-    req.flash('error', 'Please select a Gender.');
-    return res.redirect('/#admission');
-  }
+    const body = req.body || {};
 
-  if (!classApplyingFor || !VALID_CLASSES.includes(classApplyingFor)) {
-    req.flash('error', 'Please select a valid Class (Nursery to Class VIII).');
-    return res.redirect('/#admission');
-  }
+    const studentName      = (body.student_name || '').trim();
+    const dob              = (body.dob || '').trim() || null;
+    const gender           = (body.gender || '').trim() || null;
+    const schoolName       = (body.school_name || '').trim() || null;
+    const classApplyingFor = (body.class_applying_for || '').trim() || null;
+    const programme        = (body.programme || '').trim() || null;
+    const fatherName       = (body.father_name || '').trim() || null;
+    const motherName       = (body.mother_name || '').trim() || null;
+    const occupation       = (body.occupation || '').trim() || null;
+    const parentMobile     = (body.parent_mobile || '').trim();
+    const motherMobile     = (body.mother_mobile || '').trim() || null;
+    const email            = (body.email || '').trim() || null;
+    const aadhaarNo        = (body.aadhaar_no || '').trim() || null;
 
-  if (!programme || !VALID_PROGRAMMES.includes(programme)) {
-    req.flash('error', 'Please select a Programme (Art Class, Music Class, or Both).');
-    return res.redirect('/#admission');
-  }
+    // Address Breakdown
+    const villageLocality  = (body.village_locality || '').trim() || null;
+    const po               = (body.po || '').trim() || null;
+    const ps               = (body.ps || '').trim() || null;
+    const district         = (body.district || '').trim() || null;
+    const state            = (body.state || 'West Bengal').trim();
+    const pinCode          = (body.pin_code || '').trim() || null;
 
-  if (!fatherName) {
-    req.flash('error', 'Father\'s Name is required.');
-    return res.redirect('/#admission');
-  }
+    // Combined address for compatibility
+    const address          = `${villageLocality || ''}, P.O. ${po || ''}, P.S. ${ps || ''}, Dist. ${district || ''}, ${state} - ${pinCode || ''}`.replace(/^, /, '').trim();
 
-  if (!motherName) {
-    req.flash('error', 'Mother\'s Name is required.');
-    return res.redirect('/#admission');
-  }
+    const passportFile     = req.files && req.files['passport_photo'] ? req.files['passport_photo'][0] : null;
+    const idProofFile      = req.files && req.files['id_proof'] ? req.files['id_proof'][0] : null;
 
-  if (!parentMobile) {
-    req.flash('error', 'Parent Mobile Number is required.');
-    return res.redirect('/#admission');
-  }
+    const passportPhoto    = passportFile ? '/uploads/admissions/' + passportFile.filename : null;
+    const idProof          = idProofFile ? '/uploads/admissions/' + idProofFile.filename : null;
 
-  if (!address) {
-    req.flash('error', 'Residential Address is required.');
-    return res.redirect('/#admission');
-  }
+    // Server-side validation
+    if (!studentName) return sendError('Student Name is required.');
+    if (!dob) return sendError('Date of Birth is required.');
+    if (!gender) return sendError('Please select a Gender.');
+    if (!classApplyingFor || !VALID_CLASSES.includes(classApplyingFor)) return sendError('Please select a valid Class (Nursery to Class VIII).');
+    if (!programme || !VALID_PROGRAMMES.includes(programme)) return sendError('Please select a Programme (Art Class, Music Class, or Both).');
+    if (!fatherName) return sendError('Father\'s Name is required.');
+    if (!motherName) return sendError('Mother\'s Name is required.');
+    if (!occupation) return sendError('Father\'s / Guardian\'s Occupation is required.');
+    if (!parentMobile) return sendError('Parent Mobile Number is required.');
+    if (!villageLocality || !po || !ps || !district || !pinCode) return sendError('Complete Residential Address details (Village, P.O., P.S., District, PIN Code) are required.');
+    if (!passportPhoto) return sendError('Student\'s Passport-Size Photo is required.');
+    if (!idProof) return sendError('Identity Proof (Aadhaar Card / Birth Certificate) is required.');
 
-  // Strict mobile number validation
-  if (!isValidMobileNumber(parentMobile)) {
-    req.flash('error', 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9 (e.g. 9876543210).');
-    return res.redirect('/#admission');
-  }
+    // Strict mobile number validation
+    if (!isValidMobileNumber(parentMobile)) return sendError('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9 (e.g. 9876543210).');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendError('Please enter a valid email address.');
 
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    req.flash('error', 'Please enter a valid email address.');
-    return res.redirect('/#admission');
-  }
+    try {
+      // Generate Unique Application Reference Number (ARN)
+      const year = new Date().getFullYear();
+      const [countRows] = await pool.query('SELECT COUNT(*) as cnt FROM admission_applications');
+      const nextId = (countRows[0].cnt || 0) + 1;
+      const arn = `KFA-${year}-${String(nextId).padStart(4, '0')}`;
 
+      await pool.query(
+        `INSERT INTO admission_applications
+         (arn, student_name, dob, gender, school_name, class_applying_for, programme, father_name, mother_name, occupation, parent_mobile, mother_mobile, email, aadhaar_no, village_locality, po, ps, district, state, pin_code, address, passport_photo, id_proof)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [arn, studentName, dob, gender, schoolName, classApplyingFor, programme, fatherName, motherName, occupation, parentMobile, motherMobile, email, aadhaarNo, villageLocality, po, ps, district, state, pinCode, address, passportPhoto, idProof]
+      );
+
+      const downloadUrl = `/admissions/pdf/${arn}`;
+
+      if (isAjax) {
+        return res.json({
+          success: true,
+          arn: arn,
+          student_name: studentName,
+          class_applying_for: classApplyingFor,
+          programme: programme,
+          downloadUrl: downloadUrl,
+          message: 'Application submitted successfully!'
+        });
+      }
+
+      req.flash('success', `Application submitted successfully! Your Unique Application Ref. No. is <strong>${arn}</strong>. <a href="${downloadUrl}" target="_blank" style="display:inline-block;margin-top:6px;background:var(--vermilion);color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-weight:700;">📄 Click here to Print/Download Admission Form PDF</a>`);
+      return res.redirect('/#admission');
+    } catch (dbErr) {
+      console.error('[ADMISSIONS POST ERROR]', dbErr);
+      return sendError('Could not submit application. Please check your entries and try again.');
+    }
+  });
+});
+
+// Public PDF download route by ARN
+router.get('/admissions/pdf/:arn', async (req, res) => {
   try {
-    await pool.query(
-      `INSERT INTO admission_applications
-       (student_name, dob, gender, class_applying_for, programme, father_name, mother_name, parent_mobile, email, address)
-       VALUES (?,?,?,?,?,?,?,?,?,?)`,
-      [studentName, dob, gender, classApplyingFor, programme, fatherName, motherName, parentMobile, email, address]
-    );
-    req.flash('success', 'Application submitted successfully! Our team will contact you shortly.');
+    const [rows] = await pool.query('SELECT * FROM admission_applications WHERE arn = ? OR id = ?', [req.params.arn, req.params.arn]);
+    if (!rows.length) {
+      req.flash('error', 'Admission application not found.');
+      return res.redirect('/#admission');
+    }
+    generateAdmissionPDF(rows[0], res);
   } catch (err) {
-    console.error('[ADMISSIONS POST ERROR]', err);
-    req.flash('error', 'Could not submit application. Please check your entries and try again.');
+    console.error('[PDF GENERATION ERROR]', err);
+    res.status(500).send('Could not generate admission form PDF.');
   }
-  res.redirect('/#admission');
+});
+
+// Admin PDF download route by ID
+router.get('/admin/admissions/pdf/:id', requireAdminSession, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM admission_applications WHERE id = ?', [req.params.id]);
+    if (!rows.length) {
+      req.flash('error', 'Application not found.');
+      return res.redirect('/admin/admissions');
+    }
+    generateAdmissionPDF(rows[0], res);
+  } catch (err) {
+    console.error('[ADMIN PDF ERROR]', err);
+    res.status(500).send('Could not generate admission form PDF.');
+  }
 });
 
 // Admin: view all applications
