@@ -265,17 +265,17 @@
     </div>
     <div class="team-grid">
       <div class="team-card">
-        <div class="team-avatar" aria-hidden="true">SD</div>
+        <img class="team-avatar" src="/images/team/snata-das.png" alt="Snata Das, President" width="120" height="120" loading="lazy">
         <h3>Snata Das</h3>
         <span>President</span>
       </div>
       <div class="team-card">
-        <div class="team-avatar" aria-hidden="true">ND</div>
+        <img class="team-avatar" src="/images/team/nishi-das.png" alt="Nishi Das, Secretary" width="120" height="120" loading="lazy">
         <h3>Nishi Das</h3>
         <span>Secretary</span>
       </div>
       <div class="team-card">
-        <div class="team-avatar" aria-hidden="true">BD</div>
+        <img class="team-avatar" src="/images/team/beauti-das.png" alt="Beauti Das, Treasurer" width="120" height="120" loading="lazy">
         <h3>Beauti Das</h3>
         <span>Treasurer</span>
       </div>
@@ -350,6 +350,14 @@
             <option value="Art Class">🎨 Art Class</option>
             <option value="Music Class">🎵 Music Class</option>
             <option value="Both">🎨🎵 Both (Art &amp; Music)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="branch">Branch *</label>
+          <select id="branch" name="branch" required>
+            <option value="">Select Branch</option>
+            <option value="Coochbehar">Coochbehar</option>
+            <option value="Kolkata">Kolkata</option>
           </select>
         </div>
         <div class="field"><label for="fatherName">Father's Name *</label><input type="text" id="fatherName" name="father_name" required placeholder="Father's full name"></div>
@@ -448,6 +456,11 @@ document.addEventListener('DOMContentLoaded', function() {
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     const origBtnText = submitBtn ? submitBtn.innerText : 'Submit Application & Generate Form PDF';
     if (submitBtn) {
       submitBtn.disabled = true;
@@ -465,21 +478,29 @@ document.addEventListener('DOMContentLoaded', function() {
         body: formData
       });
 
-      const data = await res.json();
+      const raw = await res.text();
+      let data = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        console.error('Admission submit non-JSON response:', res.status, raw.slice(0, 400));
+        alert('Server error while submitting (status ' + res.status + '). Please try again.');
+        return;
+      }
 
-      if (data.success) {
-        if (modalArn) modalArn.innerText = data.arn;
+      if (data && data.success) {
+        if (modalArn) modalArn.innerText = data.arn || '';
         if (modalStudentName) modalStudentName.innerText = data.student_name || '';
         if (modalClassProgramme) modalClassProgramme.innerText = (data.class_applying_for || '') + ' — ' + (data.programme || '');
-        if (modalDownloadBtn) modalDownloadBtn.href = data.downloadUrl;
+        if (modalDownloadBtn) modalDownloadBtn.href = data.downloadUrl || '#';
 
         modal.style.display = 'flex';
       } else {
-        alert(data.message || 'Submission failed. Please check your form details.');
+        alert((data && data.message) || 'Submission failed. Please check your form details.');
       }
     } catch (err) {
       console.error('Admission submit error:', err);
-      alert('Could not submit application. Please check network connection and try again.');
+      alert(err.message || 'Could not submit application. Please check network connection and try again.');
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -529,10 +550,10 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="contact-card">
           <h3>🌐 Follow Us</h3>
           <div class="social-links-wrap" style="margin-top:8px;">
-            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Facebook">
+            <a href="https://www.facebook.com/share/1J8gXzQyCu/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Facebook">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
-            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Instagram">
+            <a href="https://www.instagram.com/kamalaranithakurbari" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Instagram">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
             </a>
           </div>

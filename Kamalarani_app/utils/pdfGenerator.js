@@ -29,27 +29,34 @@ function generateAdmissionPDF(app, res) {
     } catch (_) {}
   }
 
-  doc.font('Helvetica-Bold').fontSize(18).fillColor('#2B2118').text('KAMALARANI FOUNDATION', leftMargin + 60, headerStartY, { width: contentWidth - 60, align: 'center' });
-  doc.font('Helvetica').fontSize(10).fillColor('#B23A2F').text('Sanatan Culture & Social Welfare (Reg. No. AAETK689KE20221)', leftMargin + 60, headerStartY + 22, { width: contentWidth - 60, align: 'center' });
-  doc.font('Helvetica-Bold').fontSize(14).fillColor('#2B2118').text('ART CLASS ADMISSION FORM', leftMargin, headerStartY + 38, { width: contentWidth, align: 'center' });
-  doc.font('Helvetica-Oblique').fontSize(9).fillColor('#5A4E40').text('Nursery to Class-VIII', leftMargin, headerStartY + 56, { width: contentWidth, align: 'center' });
+  // Passport photo first so title can be centered in the remaining header space
+  const photoBoxW = 90;
+  const photoBoxH = 105;
+  const photoBoxX = leftMargin + contentWidth - photoBoxW;
+  const photoBoxY = headerStartY;
+  // Center titles in the band left of the photo, but bias slightly toward page centre
+  const headerTextWidth = photoBoxX - leftMargin - 12;
+  const titleWidth = Math.round((headerTextWidth + contentWidth) / 2);
 
-  // Top Metadata (ARN & Date)
+  doc.font('Helvetica-Bold').fontSize(18).fillColor('#2B2118').text('KAMALARANI FOUNDATION', leftMargin + 60, headerStartY, { width: headerTextWidth - 60, align: 'center' });
+  doc.font('Helvetica').fontSize(10).fillColor('#B23A2F').text('Sanatan Culture & Social Welfare (Reg. No. AAETK689KE20221)', leftMargin + 60, headerStartY + 22, { width: headerTextWidth - 60, align: 'center' });
+  doc.font('Helvetica-Bold').fontSize(14).fillColor('#2B2118').text('ART CLASS ADMISSION FORM', leftMargin, headerStartY + 38, { width: titleWidth, align: 'center' });
+  doc.font('Helvetica-Oblique').fontSize(9).fillColor('#5A4E40').text('Nursery to Class-VIII', leftMargin, headerStartY + 56, { width: titleWidth, align: 'center' });
+
+  // Top Metadata (ARN & Date) — date stays left of the photo
   const metaY = headerStartY + 74;
   doc.font('Helvetica-Bold').fontSize(10).fillColor('#000000');
   doc.text(`Admission No. (ARN): ${app.arn || ('KFA-' + new Date().getFullYear() + '-' + String(app.id).padStart(4, '0'))}`, leftMargin, metaY);
-  
-  const createdDateStr = app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN');
-  doc.text(`Admission Date: ${createdDateStr}`, leftMargin + 320, metaY);
 
-  // Passport Photo Box (Top Right)
-  const photoBoxX = leftMargin + 415;
-  const photoBoxY = headerStartY + 15;
-  const photoBoxW = 90;
-  const photoBoxH = 105;
+  const createdDateStr = app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN');
+  const dateX = leftMargin + 250;
+  doc.text(`Admission Date: ${createdDateStr}`, dateX, metaY, {
+    width: photoBoxX - dateX - 10,
+    lineBreak: false
+  });
 
   doc.rect(photoBoxX, photoBoxY, photoBoxW, photoBoxH).strokeColor('#8A7F6E').lineWidth(1).stroke();
-  
+
   let photoLoaded = false;
   if (app.passport_photo) {
     const fullPhotoPath = path.join(__dirname, '../public', app.passport_photo);
@@ -106,20 +113,24 @@ function generateAdmissionPDF(app, res) {
   renderField("Class:", app.class_applying_for, leftMargin + 285, curY, 235, 45);
   curY += 22;
 
-  renderField("5. Father's Name:", app.father_name, leftMargin, curY, 270, 105);
+  renderField("5. Programme:", app.programme || '—', leftMargin, curY, 270, 85);
+  renderField("Branch:", app.branch || '—', leftMargin + 285, curY, 235, 55);
+  curY += 22;
+
+  renderField("6. Father's Name:", app.father_name, leftMargin, curY, 270, 105);
   renderField("Mobile No.:", app.parent_mobile, leftMargin + 285, curY, 235, 75);
   curY += 22;
 
-  renderField("6. Mother's Name:", app.mother_name, leftMargin, curY, 270, 105);
+  renderField("7. Mother's Name:", app.mother_name, leftMargin, curY, 270, 105);
   renderField("Mobile No.:", app.mother_mobile || app.parent_mobile, leftMargin + 285, curY, 235, 75);
   curY += 22;
 
-  renderField("7. Occupation:", app.occupation || '—', leftMargin, curY, 270, 95);
+  renderField("8. Occupation:", app.occupation || '—', leftMargin, curY, 270, 95);
   renderField("Email ID:", app.email || '—', leftMargin + 285, curY, 235, 60);
   curY += 24;
 
   // Address Section
-  doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#222222').text("8. Residential Address:", leftMargin, curY);
+  doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#222222').text("9. Residential Address:", leftMargin, curY);
   curY += 16;
 
   renderField("Vill. / Locality:", app.village_locality || app.address || '—', leftMargin + 15, curY, contentWidth - 15, 90);
@@ -134,18 +145,18 @@ function generateAdmissionPDF(app, res) {
   renderField("PIN:", app.pin_code || '—', leftMargin + 355, curY, 165, 35);
   curY += 24;
 
-  renderField("9. Aadhaar No. of Student (if applicable):", app.aadhaar_no || '—', leftMargin, curY, contentWidth, 230);
+  renderField("10. Aadhaar No. of Student (if applicable):", app.aadhaar_no || '—', leftMargin, curY, contentWidth, 230);
   curY += 22;
 
-  renderField("10. Blood Group:", app.blood_group || '—', leftMargin, curY, 240, 90);
+  renderField("11. Blood Group:", app.blood_group || '—', leftMargin, curY, 240, 90);
   renderField("Height:", app.height || '—', leftMargin + 270, curY, 250, 50);
   curY += 22;
 
-  renderField("11. Nationality:", app.nationality || 'Indian', leftMargin, curY, 240, 80);
+  renderField("12. Nationality:", app.nationality || 'Indian', leftMargin, curY, 240, 80);
   renderField("Religion:", app.religion || '—', leftMargin + 270, curY, 250, 55);
   curY += 22;
 
-  renderField("12. Category (General/SC/ST/OBC/EWS/Others):", app.category || 'General', leftMargin, curY, contentWidth, 250);
+  renderField("13. Category (General/SC/ST/OBC/EWS/Others):", app.category || 'General', leftMargin, curY, contentWidth, 250);
   curY += 28;
 
   // Box on bottom right: Free Art Materials Checklist

@@ -72,6 +72,7 @@
                   <th>DOB / Gender</th>
                   <th>Class</th>
                   <th>Programme</th>
+                  <th>Branch</th>
                   <th>Parent / Mobile</th>
                   <th>Address</th>
                   <th>Applied On</th>
@@ -126,6 +127,15 @@
                         <span class="badge" style="background:rgba(64,190,120,.15);color:#3db87a;">🎨🎵 Both</span>
                       <% } else { %>
                         <span style="color:var(--text-muted);font-size:0.82rem;">—</span>
+                      <% } %>
+                    </td>
+                    <td style="font-size:0.85rem;font-weight:600;">
+                      <% if (app.branch === 'Coochbehar') { %>
+                        <span class="badge" style="background:rgba(76,107,63,.12);color:var(--leaf);">Coochbehar</span>
+                      <% } else if (app.branch === 'Kolkata') { %>
+                        <span class="badge" style="background:rgba(217,169,78,.18);color:#8A6020;">Kolkata</span>
+                      <% } else { %>
+                        <span style="color:var(--text-muted);font-size:0.82rem;"><%= app.branch || '—' %></span>
                       <% } %>
                     </td>
                     <td style="font-size:0.82rem;">

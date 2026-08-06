@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS admission_applications (
   school_name VARCHAR(255),
   class_applying_for VARCHAR(50),
   programme VARCHAR(50),
+  branch VARCHAR(50),
   father_name VARCHAR(255),
   mother_name VARCHAR(255),
   occupation VARCHAR(255),

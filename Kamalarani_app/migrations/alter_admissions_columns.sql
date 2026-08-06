@@ -16,3 +16,4 @@ ALTER TABLE admission_applications ADD COLUMN ps VARCHAR(255) NULL AFTER po;
 ALTER TABLE admission_applications ADD COLUMN district VARCHAR(255) NULL AFTER ps;
 ALTER TABLE admission_applications ADD COLUMN state VARCHAR(100) NULL DEFAULT 'West Bengal' AFTER district;
 ALTER TABLE admission_applications ADD COLUMN pin_code VARCHAR(10) NULL AFTER state;
+ALTER TABLE admission_applications ADD COLUMN branch VARCHAR(50) NULL AFTER programme;

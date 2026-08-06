@@ -18,6 +18,7 @@ const COLUMNS = [
   { name: 'district',         sql: "ADD COLUMN district VARCHAR(255) NULL AFTER ps" },
   { name: 'state',            sql: "ADD COLUMN state VARCHAR(100) NULL DEFAULT 'West Bengal' AFTER district" },
   { name: 'pin_code',         sql: "ADD COLUMN pin_code VARCHAR(10) NULL AFTER state" },
+  { name: 'branch',           sql: "ADD COLUMN branch VARCHAR(50) NULL AFTER programme" },
 ];
 
 async function columnExists(connection, table, column) {

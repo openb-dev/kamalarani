@@ -103,6 +103,14 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('[SERVER ERROR]', err);
   const errMsg = err && (err.message || (typeof err === 'string' ? err : 'Internal Server Error'));
+  const wantsJson = req.xhr ||
+    req.headers['x-requested-with'] === 'XMLHttpRequest' ||
+    (req.headers.accept && req.headers.accept.includes('application/json'));
+
+  if (wantsJson) {
+    return res.status(500).json({ success: false, message: errMsg });
+  }
+
   req.flash('error', errMsg);
   res.status(500).redirect(req.header('Referer') || '/');
 });
