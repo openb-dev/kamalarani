@@ -186,8 +186,8 @@ router.post(
         return res.redirect('/admin/gallery');
       }
 
-      let msg = `${savedFiles.length} image(s) processed & uploaded successfully! (resized to 1920×1080 / 1080×1920, compressed to ≤3 MB each)`;
-      if (failedFiles.length > 0) msg += ` — ${failedFiles.length} failed: ${failedFiles.join(', ')}`;
+      let msg = `${savedFiles.length} image(s) uploaded successfully!`;
+      if (failedFiles.length > 0) msg += ` (${failedFiles.length} failed: ${failedFiles.join(', ')})`;
       req.flash('success', msg);
       return res.redirect('/admin/gallery');
     } catch (err) {
