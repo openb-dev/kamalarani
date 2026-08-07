@@ -8,6 +8,9 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Admissions — Kamalarani Foundation CMS</title>
   <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    .row-pending { background: rgba(240,192,64,0.04); }
+  </style>
 </head>
 <body>
 <div class="admin-layout">
@@ -82,7 +85,7 @@
               </thead>
               <tbody>
                 <% apps.forEach((app, idx) => { %>
-                  <tr style="<%= app.status === 'pending' ? 'background:rgba(240,192,64,0.04)' : '' %>">
+                  <tr class="<%= app.status === 'pending' ? 'row-pending' : '' %>">
                     <td style="color:var(--text-muted);font-size:0.8rem;"><%= idx + 1 %></td>
                     <td>
                       <% if (app.passport_photo) { %>

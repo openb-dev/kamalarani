@@ -138,6 +138,7 @@
               <input type="file" name="images" id="imageInput" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
             </div>
             <div class="preview-grid" id="imagePreviewGrid"></div>
+            <div id="imageErrorBanner" style="display:none;margin-top:10px;padding:10px 14px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;color:#b91c1c;font-size:0.85rem;font-weight:600;"></div>
             <div style="margin-top:20px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
               <div class="field" style="flex:1;min-width:240px;">
                 <label for="imageCaptionField">Caption (applies to all uploaded images)</label>
@@ -291,6 +292,8 @@
         e.stopPropagation();
         fileStore[storeKey].splice(idx, 1);
         syncInputFiles(input, fileStore[storeKey]);
+        // Re-check limit after removal
+        if (fileStore[storeKey].length <= maxCount) clearError();
         renderPreviews(fileStore[storeKey], grid, isVideo, storeKey, input, maxCount);
       });
       div.appendChild(btn);
@@ -307,10 +310,37 @@
     input.addEventListener('click', e => e.stopPropagation());
     dropZone.addEventListener('click', () => input.click());
 
+    // ── Error banner helpers ─────────────────────────────────────────────────
+    const errorBannerId = storeKey === 'images' ? 'imageErrorBanner' : null;
+    const uploadBtn     = storeKey === 'images' ? document.getElementById('uploadImgBtn') : null;
+
+    function showError(msg) {
+      if (!errorBannerId) return;
+      const banner = document.getElementById(errorBannerId);
+      banner.textContent = '⚠️ ' + msg;
+      banner.style.display = 'block';
+      if (uploadBtn) uploadBtn.disabled = true;
+    }
+    function clearError() {
+      if (!errorBannerId) return;
+      const banner = document.getElementById(errorBannerId);
+      banner.style.display = 'none';
+      banner.textContent = '';
+      if (uploadBtn) uploadBtn.disabled = false;
+    }
+
     const handleFiles = (incomingFiles) => {
       const incoming = Array.from(incomingFiles);
-      // Merge with existing; cap at maxCount
-      const merged = [...fileStore[storeKey], ...incoming].slice(0, maxCount);
+      const merged   = [...fileStore[storeKey], ...incoming];
+
+      // ── Hard limit check ──────────────────────────────────────────────────
+      if (merged.length > maxCount) {
+        showError(`You can only upload up to ${maxCount} images at a time. Currently selected: ${merged.length}. Please remove some before uploading.`);
+        // Still show what was already queued — don't add the new batch
+        return;
+      }
+
+      clearError();
       fileStore[storeKey] = merged;
       syncInputFiles(input, merged);
       renderPreviews(merged, previewGrid, isVideo, storeKey, input, maxCount);
@@ -330,6 +360,16 @@
 
   initDropZone('imageDropZone', 'imageInput', 'imagePreviewGrid', false, 'images', 15);
   initDropZone('videoDropZone', 'videoInput', 'videoPreviewGrid', true,  'videos', 5);
+
+  // ── Final submit guard ────────────────────────────────────────────────────
+  document.getElementById('imageForm').addEventListener('submit', (e) => {
+    if (fileStore.images.length > 15) {
+      e.preventDefault();
+      document.getElementById('imageErrorBanner').style.display = 'block';
+      document.getElementById('imageErrorBanner').textContent =
+        '⚠️ Cannot upload more than 15 images at a time. Please remove some and try again.';
+    }
+  });
 </script>
 </body>
 </html>
