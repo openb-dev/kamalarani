@@ -84,6 +84,7 @@
     transform: translateY(-1px);
   }
 
+
   .brand-centered {
     display: flex; flex-direction: column; align-items: center;
     text-decoration: none; flex: 1; text-align: center;
@@ -396,122 +397,90 @@
 
   /* ===== Team ===== */
   .team{
-    background: linear-gradient(135deg, #0a1628 0%, #0f1b2d 40%, #1a1035 70%, #0f1b2d 100%);
+    background: var(--temple-cream);
     position: relative;
     overflow: hidden;
   }
-  /* Decorative background orbs */
-  .team::before {
-    content: '';
-    position: absolute;
-    top: -120px;
-    left: -100px;
-    width: 420px;
-    height: 420px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(232,145,45,0.18) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .team::after {
-    content: '';
-    position: absolute;
-    bottom: -100px;
-    right: -80px;
-    width: 360px;
-    height: 360px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(180,70,160,0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .team .section-head h2 { color: #FFFDF8; }
-  .team .section-head p  { color: rgba(255,253,248,0.6); }
+  .team .section-head h2 { color: var(--ink); }
+  .team .section-head p  { color: var(--ink-soft); }
 
-  .team-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; position:relative; z-index:1;}
-  @media(max-width:760px){.team-grid{grid-template-columns:1fr 1fr;}}
-  @media(max-width:520px){.team-grid{grid-template-columns:1fr;}}
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    max-width: 840px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  @media(max-width:760px){ .team-grid { grid-template-columns: 1fr 1fr; } }
+  @media(max-width:520px){ .team-grid { grid-template-columns: 1fr; } }
 
-  .team-card{
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 20px;
-    padding: 32px 22px 28px;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+  /* Portrait profile card */
+  .team-card {
+    background: var(--white);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.09);
     transition: transform .28s cubic-bezier(0.25,0.46,0.45,0.94),
-                box-shadow .28s ease,
-                border-color .28s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .team-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--marigold), var(--vermilion), var(--marigold));
-    background-size: 200% 100%;
-    animation: shimmerBar 3s linear infinite;
-    border-radius: 20px 20px 0 0;
-  }
-  @keyframes shimmerBar {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+                box-shadow .28s ease;
   }
   .team-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(232,145,45,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
-    border-color: rgba(232,145,45,0.4);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.15);
   }
 
-  .team-avatar{
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    margin: 0 auto 18px;
+  /* Photo area — fills the top of the card */
+  .team-card-photo {
+    width: 100%;
+    aspect-ratio: 3 / 3;
+    overflow: hidden;
+    background: #e8e4e0;
+  }
+  .team-card-photo img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    object-position: center 18%;
+    object-position: center top;
     display: block;
-    border: 3px solid transparent;
-    background-clip: padding-box;
-    box-shadow:
-      0 0 0 3px var(--marigold),
-      0 0 20px rgba(232,145,45,0.45),
-      0 6px 24px rgba(0,0,0,0.35);
-    transition: box-shadow .3s ease, transform .3s ease;
+    transition: transform .4s ease;
   }
-  .team-card:hover .team-avatar {
-    box-shadow:
-      0 0 0 3px #f5c842,
-      0 0 32px rgba(232,145,45,0.7),
-      0 8px 28px rgba(0,0,0,0.4);
-    transform: scale(1.05);
+  .team-card:hover .team-card-photo img {
+    transform: scale(1.04);
   }
 
-  .team-card h2,.team-card h3,.team-card h4{
-    font-size: 1.05rem;
-    margin-bottom: 8px;
-    color: #FFFDF8;
+  /* Name + role below photo */
+  .team-card-body {
+    padding: 14px 16px 16px;
+  }
+  .team-card-body h3 {
+    font-size: 0.97rem;
     font-family: 'Fraunces', serif;
     font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 6px;
   }
-  .team-card span {
+  .team-role-badge {
     display: inline-block;
     font-size: 0.72rem;
-    font-weight: 800;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #0a1628;
-    background: linear-gradient(90deg, var(--marigold), #f5c842);
-    padding: 4px 14px;
+    color: var(--vermilion);
+    background: rgba(180,50,20,0.08);
+    padding: 4px 12px;
     border-radius: 999px;
-    box-shadow: 0 3px 10px rgba(232,145,45,0.35);
+  }
+  .team-card-desc {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin: 8px 0 0;
+    line-height: 1.4;
   }
 
+  /* Teaching volunteers / members */
   .team-role-title {
     font-size: 0.78rem;
-    color: rgba(255,253,248,0.45);
+    color: var(--ink-soft);
     text-align: center;
     margin: 52px 0 20px;
     font-weight: 700;
@@ -525,7 +494,7 @@
     display: inline-block;
     width: 40px;
     height: 1px;
-    background: rgba(232,145,45,0.4);
+    background: var(--gold-line);
     vertical-align: middle;
     margin: 0 12px;
   }
@@ -536,25 +505,23 @@
     justify-content: center;
     max-width: 760px;
     margin: 0 auto;
-    position: relative;
-    z-index: 1;
   }
   .members-list span {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.13);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: var(--white);
+    border: 1px solid var(--gold-line);
     padding: 8px 18px;
     border-radius: 999px;
     font-size: 0.85rem;
-    color: rgba(255,253,248,0.75);
+    color: var(--ink-soft);
     transition: background .2s, border-color .2s, color .2s;
   }
   .members-list span:hover {
-    background: rgba(232,145,45,0.15);
-    border-color: rgba(232,145,45,0.45);
-    color: #FFFDF8;
+    background: rgba(232,145,45,0.08);
+    border-color: var(--marigold);
+    color: var(--ink);
   }
+
+
 
   /* ===== Admission form ===== */
   .admission{background:var(--white);}

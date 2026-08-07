@@ -4,6 +4,7 @@ const path    = require('path');
 const fs      = require('fs');
 const pool    = require('../config/db');
 const { requireAdminSession } = require('../middleware/auth');
+const { processImage }        = require('../utils/imageProcessor');
 const router  = express.Router();
 
 // Ensure upload directory exists
@@ -12,37 +13,69 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer storage for admission documents
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const prefix = file.fieldname === 'passport_photo' ? 'photo' : 'idproof';
-    cb(null, `${prefix}-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  }
-});
+const PDF_MAX_BYTES = 5 * 1024 * 1024; // 5 MB hard limit for PDFs (cannot be compressed)
+const IMAGE_EXTS    = ['.jpg', '.jpeg', '.png', '.webp'];
 
+// Multer: memory storage so we can compress before writing to disk
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
   if (file.fieldname === 'passport_photo') {
-    if (['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) return cb(null, true);
+    if (IMAGE_EXTS.includes(ext)) return cb(null, true);
     return cb(new Error('Only JPG, JPEG, PNG, and WEBP images are allowed for passport photo.'));
   }
   if (file.fieldname === 'id_proof') {
-    if (['.jpg', '.jpeg', '.png', '.webp', '.pdf'].includes(ext)) return cb(null, true);
+    if ([...IMAGE_EXTS, '.pdf'].includes(ext)) return cb(null, true);
     return cb(new Error('Only JPG, JPEG, PNG, WEBP, and PDF files are allowed for identity proof.'));
   }
   cb(new Error('Unexpected file upload.'));
 };
 
+// Accept up to 50 MB in memory so we can compress anything down to 5 MB
 const uploadDocuments = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: fileFilter
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter
 }).fields([
   { name: 'passport_photo', maxCount: 1 },
-  { name: 'id_proof', maxCount: 1 }
+  { name: 'id_proof',       maxCount: 1 }
 ]);
+
+/**
+ * Save a multer memory-file to disk after processing.
+ * Images → resize-first then compress via shared imageProcessor (target: 3 MB).
+ * PDFs   → pass-through, reject if > 5 MB.
+ * Returns the public URL path string.
+ */
+async function saveUploadedFile(file) {
+  const ext    = path.extname(file.originalname).toLowerCase();
+  const prefix = file.fieldname === 'passport_photo' ? 'photo' : 'idproof';
+  const uid    = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+
+  if (IMAGE_EXTS.includes(ext)) {
+    const processed = await processImage(file.buffer);
+    const filename  = `${prefix}-${uid}.jpg`;
+    fs.writeFileSync(path.join(uploadDir, filename), processed);
+    console.log(
+      `[UPLOAD] ${file.fieldname}: ${(file.buffer.length / 1024).toFixed(0)} KB → ` +
+      `${(processed.length / 1024).toFixed(0)} KB → ${filename}`
+    );
+    return '/uploads/admissions/' + filename;
+  }
+
+  if (ext === '.pdf') {
+    if (file.buffer.length > PDF_MAX_BYTES) {
+      throw new Error(
+        `PDF file is ${(file.buffer.length / (1024 * 1024)).toFixed(1)} MB. ` +
+        'Please upload a PDF smaller than 5 MB, or scan at a lower resolution.'
+      );
+    }
+    const filename = `${prefix}-${uid}.pdf`;
+    fs.writeFileSync(path.join(uploadDir, filename), file.buffer);
+    return '/uploads/admissions/' + filename;
+  }
+
+  throw new Error('Unsupported file type.');
+}
 
 // Strict Indian mobile number validator
 function isValidMobileNumber(mobileStr) {
@@ -126,8 +159,16 @@ router.post('/admissions', (req, res) => {
 
       const passportFile  = req.files && req.files.passport_photo ? req.files.passport_photo[0] : null;
       const idProofFile   = req.files && req.files.id_proof ? req.files.id_proof[0] : null;
-      const passportPhoto = passportFile ? '/uploads/admissions/' + passportFile.filename : null;
-      const idProof       = idProofFile ? '/uploads/admissions/' + idProofFile.filename : null;
+
+      // Compress and save uploaded files
+      let passportPhoto = null;
+      let idProof       = null;
+      try {
+        if (passportFile) passportPhoto = await saveUploadedFile(passportFile);
+        if (idProofFile)  idProof       = await saveUploadedFile(idProofFile);
+      } catch (fileErr) {
+        return sendError(fileErr.message || 'File processing failed.');
+      }
 
       if (!studentName) return sendError('Student Name is required.');
       if (!dob) return sendError('Date of Birth is required.');

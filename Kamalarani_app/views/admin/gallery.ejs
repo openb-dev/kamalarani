@@ -38,9 +38,22 @@
 
     /* ── Preview grid ────────────────────────────── */
     .preview-grid  { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
-    .preview-item  { width:90px; height:70px; border-radius:8px; overflow:hidden; background:var(--bg-input); }
+    .preview-item  {
+      width:90px; height:70px; border-radius:8px; overflow:hidden;
+      background:var(--bg-input); position:relative;
+    }
     .preview-item img,
     .preview-item video { width:100%; height:100%; object-fit:cover; }
+    .preview-remove {
+      position:absolute; top:3px; right:3px;
+      width:20px; height:20px; border-radius:50%;
+      background:rgba(0,0,0,.65); color:#fff;
+      border:none; cursor:pointer; font-size:13px; line-height:20px;
+      display:flex; align-items:center; justify-content:center;
+      transition:background .15s;
+      z-index:2;
+    }
+    .preview-remove:hover { background:rgba(220,40,40,.85); }
 
     /* ── Gallery admin grids ─────────────────────── */
     .gallery-admin-grid {
@@ -114,7 +127,7 @@
       <div class="upload-panel active card" id="panelImages" style="margin-bottom:28px;" role="tabpanel" aria-labelledby="tabImgBtn">
         <div class="card-header">
           <span class="card-title">📷 Upload Images</span>
-          <span style="font-size:0.8rem;color:var(--text-muted)">Max 20 files · 50 MB each · PNG, JPG, JPEG only</span>
+          <span style="font-size:0.8rem;color:var(--text-muted)">Max 15 files · auto-compressed to 5 MB · PNG, JPG, JPEG, WEBP</span>
         </div>
         <div class="card-body">
           <form action="/admin/gallery/images" method="POST" enctype="multipart/form-data" id="imageForm">
@@ -122,7 +135,7 @@
               <div class="upload-zone-icon">🖼️</div>
               <h3>Drag &amp; drop images here</h3>
               <p>or click to browse — PNG, JPG, JPEG only</p>
-              <input type="file" name="images" id="imageInput" multiple accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+              <input type="file" name="images" id="imageInput" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
             </div>
             <div class="preview-grid" id="imagePreviewGrid"></div>
             <div style="margin-top:20px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
@@ -243,8 +256,50 @@
     document.getElementById('tabVidBtn').setAttribute('aria-selected', isImages ? 'false' : 'true');
   }
 
-  // ── Drag-and-drop + preview helper ─────────────────────────────────────────
-  function initDropZone(dropZoneId, inputId, previewGridId, isVideo) {
+  // ── Drag-and-drop + preview helper (with per-item remove) ───────────────────
+
+  // Holds the current File arrays (since FileList is read-only)
+  const fileStore = { images: [], videos: [] };
+
+  function syncInputFiles(input, files) {
+    const dt = new DataTransfer();
+    files.forEach(f => dt.items.add(f));
+    input.files = dt.files;
+  }
+
+  function renderPreviews(files, grid, isVideo, storeKey, input, maxCount) {
+    grid.innerHTML = '';
+    if (!files || files.length === 0) return;
+    const limited = files.slice(0, maxCount);
+    limited.forEach((file, idx) => {
+      const div = document.createElement('div');
+      div.className = 'preview-item';
+      const url = URL.createObjectURL(file);
+
+      const media = document.createElement(isVideo ? 'video' : 'img');
+      media.src = url;
+      if (isVideo) media.muted = true;
+      div.appendChild(media);
+
+      // ── Remove button ──
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'preview-remove';
+      btn.title = 'Remove this file';
+      btn.innerHTML = '&times;';
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileStore[storeKey].splice(idx, 1);
+        syncInputFiles(input, fileStore[storeKey]);
+        renderPreviews(fileStore[storeKey], grid, isVideo, storeKey, input, maxCount);
+      });
+      div.appendChild(btn);
+
+      grid.appendChild(div);
+    });
+  }
+
+  function initDropZone(dropZoneId, inputId, previewGridId, isVideo, storeKey, maxCount) {
     const dropZone    = document.getElementById(dropZoneId);
     const input       = document.getElementById(inputId);
     const previewGrid = document.getElementById(previewGridId);
@@ -252,36 +307,29 @@
     input.addEventListener('click', e => e.stopPropagation());
     dropZone.addEventListener('click', () => input.click());
 
+    const handleFiles = (incomingFiles) => {
+      const incoming = Array.from(incomingFiles);
+      // Merge with existing; cap at maxCount
+      const merged = [...fileStore[storeKey], ...incoming].slice(0, maxCount);
+      fileStore[storeKey] = merged;
+      syncInputFiles(input, merged);
+      renderPreviews(merged, previewGrid, isVideo, storeKey, input, maxCount);
+    };
+
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', e => {
       e.preventDefault();
       dropZone.classList.remove('dragover');
-      if (e.dataTransfer && e.dataTransfer.files.length) {
-        input.files = e.dataTransfer.files;
-        renderPreviews(e.dataTransfer.files, previewGrid, isVideo);
-      }
+      if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
     });
-
-    input.addEventListener('change', () => renderPreviews(input.files, previewGrid, isVideo));
-  }
-
-  function renderPreviews(files, grid, isVideo) {
-    grid.innerHTML = '';
-    if (!files) return;
-    Array.from(files).slice(0, 20).forEach(file => {
-      const div = document.createElement('div');
-      div.className = 'preview-item';
-      const url = URL.createObjectURL(file);
-      div.innerHTML = isVideo
-        ? `<video src="${url}" muted></video>`
-        : `<img src="${url}" alt="preview">`;
-      grid.appendChild(div);
+    input.addEventListener('change', () => {
+      if (input.files && input.files.length) handleFiles(input.files);
     });
   }
 
-  initDropZone('imageDropZone', 'imageInput', 'imagePreviewGrid', false);
-  initDropZone('videoDropZone', 'videoInput', 'videoPreviewGrid', true);
+  initDropZone('imageDropZone', 'imageInput', 'imagePreviewGrid', false, 'images', 15);
+  initDropZone('videoDropZone', 'videoInput', 'videoPreviewGrid', true,  'videos', 5);
 </script>
 </body>
 </html>

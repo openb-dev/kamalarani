@@ -5,6 +5,7 @@ const fs      = require('fs');
 const { execFile, execFileSync } = require('child_process');
 const pool    = require('../config/db');
 const { requireAdminSession } = require('../middleware/auth');
+const { processImage }        = require('../utils/imageProcessor');
 
 const router = express.Router();
 
@@ -22,30 +23,18 @@ try {
   console.warn('[GALLERY] ffmpeg not found — video compression will be skipped.');
 }
 
-// ─── Multer storages ─────────────────────────────────────────────────────────
-const imageStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, imageUploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, 'img-' + Date.now() + '-' + Math.round(Math.random() * 1e9) + ext);
-  }
-});
-
-const videoStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, videoUploadDir),
-  filename: (req, file, cb) => {
-    cb(null, 'vid-' + Date.now() + '-' + Math.round(Math.random() * 1e9) + '.mp4');
-  }
-});
-
-const ALLOWED_IMAGE_EXTS = ['.jpg', '.jpeg', '.png'];
-const ALLOWED_VIDEO_EXTS = ['.mp4'];
+// ─── Constants ────────────────────────────────────────────────────────────────
+const ALLOWED_IMAGE_EXTS   = ['.jpg', '.jpeg', '.png', '.webp'];
+const ALLOWED_VIDEO_EXTS   = ['.mp4'];
 const VIDEO_COMPRESS_THRESHOLD = 10 * 1024 * 1024; // 10 MB
+const IMAGE_MAX_BYTES      = 5 * 1024 * 1024;       // 5 MB target after compression
+const MAX_IMAGES_BATCH     = 15;                     // max images per upload
 
+// ─── File filters ─────────────────────────────────────────────────────────────
 const imageFileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
   if (ALLOWED_IMAGE_EXTS.includes(ext)) return cb(null, true);
-  cb(new Error('Only JPG, JPEG, and PNG images are allowed.'));
+  cb(new Error('Only JPG, JPEG, PNG, and WEBP images are allowed.'));
 };
 
 const videoFileFilter = (req, file, cb) => {
@@ -54,8 +43,25 @@ const videoFileFilter = (req, file, cb) => {
   cb(new Error('Only MP4 videos are allowed.'));
 };
 
-const uploadImages = multer({ storage: imageStorage, limits: { fileSize: 50 * 1024 * 1024 }, fileFilter: imageFileFilter });
+// ─── Multer: Images → memory storage (compressed before saving to disk) ───────
+const uploadImages = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },   // accept up to 50 MB; compress to ≤5 MB
+  fileFilter: imageFileFilter
+});
+
+// ─── Multer: Videos → disk storage ───────────────────────────────────────────
+const videoStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, videoUploadDir),
+  filename: (req, file, cb) => {
+    cb(null, 'vid-' + Date.now() + '-' + Math.round(Math.random() * 1e9) + '.mp4');
+  }
+});
 const uploadVideos = multer({ storage: videoStorage, limits: { fileSize: 500 * 1024 * 1024 }, fileFilter: videoFileFilter });
+
+// ─── Helper: compress image buffer with sharp until ≤ 3 MB ───────────────────
+// Delegated to shared imageProcessor utility (resize-first → compress).
+const compressImageBuffer = processImage;
 
 // ─── Helper: compress a video file using ffmpeg ───────────────────────────────
 function compressVideo(inputPath) {
@@ -121,12 +127,12 @@ router.get('/admin/gallery', requireAdminSession, async (req, res) => {
   }
 });
 
-// ─── ADMIN: Upload IMAGES ─────────────────────────────────────────────────────
+// ─── ADMIN: Upload IMAGES (max 15 at a time, auto-compressed to ≤5 MB each) ──
 router.post(
   '/admin/gallery/images',
   requireAdminSession,
   (req, res, next) => {
-    uploadImages.array('images', 20)(req, res, (err) => {
+    uploadImages.array('images', MAX_IMAGES_BATCH)(req, res, (err) => {
       if (err) {
         req.flash('error', err instanceof multer.MulterError ? 'Upload Error: ' + err.message : (err.message || 'File upload failed.'));
         return res.redirect('/admin/gallery');
@@ -137,22 +143,52 @@ router.post(
   async (req, res) => {
     try {
       if (!req.files || req.files.length === 0) {
-        req.flash('error', 'No images selected. Please select at least one PNG, JPG, or JPEG image.');
+        req.flash('error', 'No images selected. Please select at least one JPG, PNG, or WEBP image.');
         return res.redirect('/admin/gallery');
       }
 
-      const caption  = (req.body.caption || '').trim() || null;
-      const adminId  = req.session.admin ? req.session.admin.id : null;
-
-      for (const file of req.files) {
-        const mediaUrl = '/uploads/gallery/images/' + file.filename;
-        await pool.query(
-          'INSERT INTO gallery_items (media_type, media_url, caption, file_name, uploaded_by) VALUES (?, ?, ?, ?, ?)',
-          ['image', mediaUrl, caption, file.filename, adminId]
-        );
+      if (req.files.length > MAX_IMAGES_BATCH) {
+        req.flash('error', `You can upload a maximum of ${MAX_IMAGES_BATCH} images at a time.`);
+        return res.redirect('/admin/gallery');
       }
 
-      req.flash('success', `${req.files.length} image(s) uploaded successfully!`);
+      const caption   = (req.body.caption || '').trim() || null;
+      const adminId   = req.session.admin ? req.session.admin.id : null;
+      const savedFiles = [];
+      const failedFiles = [];
+
+      for (const file of req.files) {
+        try {
+          const compressed = await compressImageBuffer(file.buffer);
+          const filename   = `img-${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
+          const filepath   = path.join(imageUploadDir, filename);
+          fs.writeFileSync(filepath, compressed);
+
+          console.log(
+            `[GALLERY] ${file.originalname}: ${(file.buffer.length / 1024).toFixed(0)} KB → ` +
+            `${(compressed.length / 1024).toFixed(0)} KB → ${filename}`
+          );
+
+          const mediaUrl = '/uploads/gallery/images/' + filename;
+          await pool.query(
+            'INSERT INTO gallery_items (media_type, media_url, caption, file_name, uploaded_by) VALUES (?, ?, ?, ?, ?)',
+            ['image', mediaUrl, caption, filename, adminId]
+          );
+          savedFiles.push(filename);
+        } catch (fileErr) {
+          console.error('[GALLERY IMAGE COMPRESS ERROR]', file.originalname, fileErr.message);
+          failedFiles.push(file.originalname);
+        }
+      }
+
+      if (savedFiles.length === 0) {
+        req.flash('error', 'All images failed to process. Please try again.');
+        return res.redirect('/admin/gallery');
+      }
+
+      let msg = `${savedFiles.length} image(s) processed & uploaded successfully! (resized to 1920×1080 / 1080×1920, compressed to ≤3 MB each)`;
+      if (failedFiles.length > 0) msg += ` — ${failedFiles.length} failed: ${failedFiles.join(', ')}`;
+      req.flash('success', msg);
       return res.redirect('/admin/gallery');
     } catch (err) {
       console.error('[GALLERY IMAGE UPLOAD DB ERROR]', err);

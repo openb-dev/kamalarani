@@ -265,19 +265,34 @@
     </div>
     <div class="team-grid">
       <div class="team-card">
-        <img class="team-avatar" src="/images/team/snata-das.png" alt="Snata Das, President" width="120" height="120" loading="lazy">
-        <h3>Snata Das</h3>
-        <span>President</span>
+        <div class="team-card-photo">
+          <img src="/images/team/snata-das.png" alt="Snata Das, President" loading="lazy">
+        </div>
+        <div class="team-card-body">
+          <h3>Snata Das</h3>
+          <span class="team-role-badge">President</span>
+          <p class="team-card-desc">Dedicated to art education &amp; cultural preservation.</p>
+        </div>
       </div>
       <div class="team-card">
-        <img class="team-avatar" src="/images/team/nishi-das.png" alt="Nishi Das, Secretary" width="120" height="120" loading="lazy">
-        <h3>Nishi Das</h3>
-        <span>Secretary</span>
+        <div class="team-card-photo">
+          <img src="/images/team/nishi-das.png" alt="Nishi Das, Secretary" loading="lazy">
+        </div>
+        <div class="team-card-body">
+          <h3>Nishi Das</h3>
+          <span class="team-role-badge">Secretary</span>
+          <p class="team-card-desc">Dedicated to art education &amp; cultural preservation.</p>
+        </div>
       </div>
       <div class="team-card">
-        <img class="team-avatar" src="/images/team/beauti-das.png" alt="Beauti Das, Treasurer" width="120" height="120" loading="lazy">
-        <h3>Beauti Das</h3>
-        <span>Treasurer</span>
+        <div class="team-card-photo">
+          <img src="/images/team/beauti-das.png" alt="Beauti Das, Treasurer" loading="lazy">
+        </div>
+        <div class="team-card-body">
+          <h3>Beauti Das</h3>
+          <span class="team-role-badge">Treasurer</span>
+          <p class="team-card-desc">Dedicated to art education &amp; cultural preservation.</p>
+        </div>
       </div>
     </div>
 
@@ -380,12 +395,12 @@
         <div class="field full">
           <label for="passportPhoto">Student's Passport-Size Photo *</label>
           <input type="file" id="passportPhoto" name="passport_photo" accept="image/jpeg,image/jpg,image/png,image/webp" required style="padding: 10px; background: var(--white); border: 1.5px dashed var(--gold-line); border-radius: 8px; cursor: pointer; width: 100%;">
-          <small style="display:block;margin-top:4px;color:var(--ink-soft);font-size:0.78rem;">Upload a clear passport-size photo of the student (JPG, PNG, WEBP — Max 10MB)</small>
+          <small style="display:block;margin-top:4px;color:var(--ink-soft);font-size:0.78rem;">Upload a clear passport-size photo of the student (JPG, PNG, WEBP — large files auto-compressed to 5MB)</small>
         </div>
         <div class="field full">
           <label for="idProof">Identity Proof (Aadhaar Card / Birth Certificate) *</label>
           <input type="file" id="idProof" name="id_proof" accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf" required style="padding: 10px; background: var(--white); border: 1.5px dashed var(--gold-line); border-radius: 8px; cursor: pointer; width: 100%;">
-          <small style="display:block;margin-top:4px;color:var(--ink-soft);font-size:0.78rem;">Upload student's Aadhaar Card or Birth Certificate (JPG, PNG, WEBP, PDF — Max 10MB)</small>
+          <small style="display:block;margin-top:4px;color:var(--ink-soft);font-size:0.78rem;">Upload student's Aadhaar Card or Birth Certificate (JPG, PNG, WEBP — auto-compressed to 5MB &nbsp;|&nbsp; PDF — Max 5MB)</small>
         </div>
         <p class="form-note">Upon submitting, a unique Application Reference Number (ARN) &amp; printable PDF admission form will be generated for your records.</p>
         <button type="submit" class="adm-submit" id="admitSubmitBtn">Submit Application &amp; Generate Form PDF</button>
