@@ -99,3 +99,25 @@ document.querySelectorAll('.flash').forEach(el => {
 
   startSlideTimer();
 })();
+
+// Accordion toggle helper for team members section
+function toggleAccordion(id) {
+  const item = document.getElementById(id);
+  if (!item) return;
+  const isOpen = item.classList.contains('open');
+
+  // Close all accordion items
+  document.querySelectorAll('.accordion-item').forEach(el => {
+    el.classList.remove('open');
+    const btn = el.querySelector('.accordion-header');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  });
+
+  // Toggle clicked item if it wasn't already open
+  if (!isOpen) {
+    item.classList.add('open');
+    const btn = item.querySelector('.accordion-header');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+  }
+}
+

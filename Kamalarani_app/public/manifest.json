@@ -1,0 +1,25 @@
+{
+  "name": "Kamalarani Foundation CMS",
+  "short_name": "KF CMS",
+  "description": "Kamalarani Foundation Content Management System & Admin Portal",
+  "start_url": "/admin/login",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFDF8",
+  "theme_color": "#B23A2F",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -304,14 +304,50 @@
       <span>Nupur Pal — Art Teacher</span>
     </div>
 
-    <div class="team-role-title">Kolkata Members</div>
-    <div class="members-list">
-      <span>Sushanta Das</span><span>Bappa Tanti</span><span>Nikhil Sardar</span>
-      <span>Sanjib Dolai</span><span>Sanjay Rana</span><span>Ranjit Sardar</span>
-      <span>Bijay Sardar</span><span>Rahul Singh</span><span>Raja Singh</span>
-      <span>Sanju Singh</span><span>Prabir Sardar</span><span>Debasish Sardar</span>
+    <!-- Members Accordion -->
+    <div class="members-accordion">
+
+      <!-- Kolkata — open by default -->
+      <div class="accordion-item open" id="acc-kolkata">
+        <button class="accordion-header" aria-expanded="true" aria-controls="acc-kolkata-body" onclick="toggleAccordion('acc-kolkata')">
+          <span class="accordion-label">
+            <span class="accordion-dot kolkata"></span>
+            Kolkata Members
+          </span>
+          <span class="accordion-count"><%= 12 %> members</span>
+          <span class="accordion-chevron">▾</span>
+        </button>
+        <div class="accordion-body" id="acc-kolkata-body">
+          <div class="members-list">
+            <span>Sushanta Das</span><span>Bappa Tanti</span><span>Nikhil Sardar</span>
+            <span>Sanjib Dolai</span><span>Sanjay Rana</span><span>Ranjit Sardar</span>
+            <span>Bijay Sardar</span><span>Rahul Singh</span><span>Raja Singh</span>
+            <span>Sanju Singh</span><span>Prabir Sardar</span><span>Debasish Sardar</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coochbehar — collapsed by default -->
+      <div class="accordion-item" id="acc-coochbehar">
+        <button class="accordion-header" aria-expanded="false" aria-controls="acc-coochbehar-body" onclick="toggleAccordion('acc-coochbehar')">
+          <span class="accordion-label">
+            <span class="accordion-dot coochbehar"></span>
+            Coochbehar Members
+          </span>
+          <span class="accordion-count"><%= 0 %> members</span>
+          <span class="accordion-chevron">▾</span>
+        </button>
+        <div class="accordion-body" id="acc-coochbehar-body">
+          <div class="members-list">
+            <!-- Coochbehar member names will be added here -->
+            <span style="color:var(--ink-soft);font-style:italic;">Names coming soon…</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
+
 </section>
 
 <section class="admission" id="admission" aria-labelledby="admission-heading">

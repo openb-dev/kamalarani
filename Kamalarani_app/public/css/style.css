@@ -521,6 +521,89 @@
     color: var(--ink);
   }
 
+  /* Members Accordion */
+  .members-accordion {
+    max-width: 760px;
+    margin: 30px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .accordion-item {
+    background: var(--white);
+    border: 1px solid var(--gold-line);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: box-shadow .2s ease, border-color .2s ease;
+  }
+  .accordion-item:hover {
+    border-color: var(--marigold);
+  }
+  .accordion-item.open {
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    border-color: var(--marigold);
+  }
+  .accordion-header {
+    width: 100%;
+    padding: 16px 20px;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+    text-align: left;
+  }
+  .accordion-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .accordion-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .accordion-dot.kolkata { background: var(--vermilion); }
+  .accordion-dot.coochbehar { background: var(--marigold); }
+
+  .accordion-right-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .accordion-count {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    background: rgba(0,0,0,0.04);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .accordion-chevron {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    transition: transform .3s ease;
+  }
+  .accordion-item.open .accordion-chevron {
+    transform: rotate(180deg);
+  }
+  .accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .35s cubic-bezier(0,1,0,1), padding .35s ease;
+    padding: 0 20px;
+  }
+  .accordion-item.open .accordion-body {
+    max-height: 1000px;
+    transition: max-height .4s ease-in-out, padding .3s ease;
+    padding: 0 20px 20px;
+  }
+
 
 
   /* ===== Admission form ===== */

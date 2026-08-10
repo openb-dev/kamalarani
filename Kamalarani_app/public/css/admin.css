@@ -702,3 +702,27 @@ input[type="datetime-local"] {
   .gallery-admin-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
   .login-card { padding: 32px 24px; }
 }
+
+/* PWA Install Button */
+.pwa-install-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 18px;
+  margin-bottom: 14px;
+  background: rgba(232, 145, 45, 0.12);
+  color: var(--vermilion);
+  border: 1.5px solid var(--marigold);
+  border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.pwa-install-btn:hover {
+  background: var(--marigold);
+  color: #fff;
+}
