@@ -764,3 +764,250 @@
   stroke: #FFFFFF !important;
 }
 
+/* ===== Founder & Tribute Pages (ISKCON Bhiwandi Style Layout) ===== */
+.founder-section {
+  padding: 56px 0 80px;
+  background: var(--temple-cream);
+}
+.founder-breadcrumb {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin-bottom: 32px;
+}
+.founder-breadcrumb a {
+  color: var(--vermilion);
+  text-decoration: none;
+  font-weight: 600;
+}
+.founder-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.founder-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 52px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .founder-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.founder-badge {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vermilion);
+  background: rgba(178, 58, 47, 0.08);
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.founder-title {
+  font-size: 2.8rem;
+  font-family: 'Fraunces', serif;
+  font-weight: 800;
+  color: var(--vermilion);
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.founder-subtitle {
+  font-size: 1.35rem;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.founder-bengali-intro {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--marigold-deep);
+  border-left: 3px solid var(--marigold);
+  padding-left: 16px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.founder-body-text p {
+  font-size: 1.02rem;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+  line-height: 1.75;
+}
+
+.founder-quote {
+  background: var(--white);
+  border: 1.5px solid var(--gold-line);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin: 32px 0;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(43,33,24,0.05);
+}
+.founder-quote .quote-mark {
+  font-family: 'Fraunces', serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--marigold);
+  margin-bottom: -10px;
+  display: block;
+}
+.founder-quote p {
+  font-family: 'Fraunces', serif;
+  font-size: 1.12rem;
+  color: var(--ink);
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: 10px !important;
+}
+.founder-quote .quote-author {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--vermilion);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+}
+
+.founder-body-text h3 {
+  font-size: 1.3rem;
+  margin: 32px 0 18px;
+  color: var(--ink);
+}
+
+.founder-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.pillar-card {
+  background: var(--white);
+  border: 1px solid var(--gold-line);
+  border-radius: 12px;
+  padding: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.pillar-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(43,33,24,0.08);
+}
+.pillar-icon {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+.pillar-card h4 {
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.pillar-card p {
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+  margin-bottom: 0 !important;
+  line-height: 1.45;
+}
+
+.founder-cta-wrap {
+  display: flex;
+  gap: 14px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+/* Founder Portrait Column (Right Side - Bhiwandi Style) */
+.founder-image-column {
+  position: sticky;
+  top: 90px;
+}
+.founder-image-card {
+  background: var(--white);
+  border: 2px solid var(--gold-line);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 12px 36px rgba(43,33,24,0.12);
+  text-align: center;
+}
+.founder-image-frame {
+  width: 100%;
+  aspect-ratio: 4 / 4.8;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #EFE4D2;
+}
+.founder-image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.founder-image-caption {
+  padding: 16px 12px 6px;
+}
+.founder-image-caption h3 {
+  font-size: 1.25rem;
+  color: var(--vermilion);
+  margin-bottom: 2px;
+}
+.founder-image-caption p {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.caption-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(232, 145, 45, 0.12);
+  color: var(--marigold-deep);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* Nav Dropdown Styling */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--white);
+  min-width: 200px;
+  border: 1.5px solid var(--gold-line);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(43,33,24,0.12);
+  padding: 8px 0;
+  z-index: 200;
+}
+.nav-dropdown:hover .dropdown-menu {
+  display: block;
+}
+.dropdown-menu a {
+  display: block !important;
+  padding: 10px 16px !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  text-transform: uppercase;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.dropdown-menu a:hover {
+  background: var(--temple-cream-2) !important;
+  color: var(--vermilion) !important;
+}
+

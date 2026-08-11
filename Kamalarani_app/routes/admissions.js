@@ -102,7 +102,7 @@ function wantsJson(req) {
 
 // Valid dropdown values
 const VALID_CLASSES    = ['Nursery','KG','Class I','Class II','Class III','Class IV','Class V','Class VI','Class VII','Class VIII'];
-const VALID_PROGRAMMES = ['Art Class','Music Class','Both'];
+const VALID_PROGRAMMES = ['Art Class','Music Class','Both','Education Programme','Gita Gyaan','Cultural Programme','Other Programmes'];
 const VALID_BRANCHES   = ['Coochbehar','Kolkata'];
 
 const { generateAdmissionPDF } = require('../utils/pdfGenerator');
@@ -136,7 +136,8 @@ router.post('/admissions', (req, res) => {
       const gender           = String(body.gender || '').trim() || null;
       const schoolName       = String(body.school_name || '').trim() || null;
       const classApplyingFor = String(body.class_applying_for || '').trim() || null;
-      const programme        = String(body.programme || '').trim() || null;
+      const rawProgramme     = String(body.programme || '').trim();
+      const programmeDetails = String(body.programme_details || '').trim();
       const branch           = String(body.branch || '').trim() || null;
       const fatherName       = String(body.father_name || '').trim() || null;
       const motherName       = String(body.mother_name || '').trim() || null;
@@ -176,8 +177,16 @@ router.post('/admissions', (req, res) => {
       if (!classApplyingFor || !VALID_CLASSES.includes(classApplyingFor)) {
         return sendError('Please select a valid Class (Nursery to Class VIII).');
       }
-      if (!programme || !VALID_PROGRAMMES.includes(programme)) {
-        return sendError('Please select a Programme (Art Class, Music Class, or Both).');
+      if (!rawProgramme || !VALID_PROGRAMMES.includes(rawProgramme)) {
+        return sendError('Please select a valid Programme.');
+      }
+
+      let programme = rawProgramme;
+      if (['Cultural Programme', 'Other Programmes'].includes(rawProgramme)) {
+        if (!programmeDetails) {
+          return sendError('Please describe the specific programme you wish to enroll in.');
+        }
+        programme = `${rawProgramme} (${programmeDetails})`;
       }
       if (!branch || !VALID_BRANCHES.includes(branch)) {
         return sendError('Please select a Branch (Coochbehar or Kolkata).');

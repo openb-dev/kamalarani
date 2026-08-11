@@ -371,6 +371,16 @@
         <% if (locals.error && locals.error.length) { %>
           <div class="flash flash-error full" role="alert"><% locals.error.forEach(function(msg){ %><p><%= msg %></p><% }) %></div>
         <% } %>
+        <div class="field full" style="margin-bottom: 6px;">
+          <div style="padding: 16px 20px; background: rgba(232,145,45,0.08); border: 1.5px solid var(--gold-line); border-radius: 12px;">
+            <h3 style="font-size: 1.05rem; font-family: 'Fraunces', serif; color: var(--vermilion); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+              <span>📝</span> Admission Form for Various Programmes
+            </h3>
+            <p style="margin: 0; font-size: 0.88rem; color: var(--ink-soft); line-height: 1.55;">
+              This is the official admission form to enrol students in Kamalarani Foundation's various free initiatives including Art Class, Music Class, Education Programme, Gita Gyaan, and Cultural Programmes. Submitting this form generates a unique Application Reference Number (ARN) and a printable PDF admission form.
+            </p>
+          </div>
+        </div>
         <div class="field"><label for="studentName">Student's Name *</label><input type="text" id="studentName" name="student_name" required autocomplete="name" placeholder="Full name of student"></div>
         <div class="field"><label for="dob">Date of Birth *</label><input type="date" id="dob" name="dob" required></div>
         <div class="field">
@@ -401,7 +411,16 @@
             <option value="Art Class">🎨 Art Class</option>
             <option value="Music Class">🎵 Music Class</option>
             <option value="Both">🎨🎵 Both (Art &amp; Music)</option>
+            <option value="Education Programme">📚 Education Programme</option>
+            <option value="Gita Gyaan">📖 Gita Gyaan</option>
+            <option value="Cultural Programme">🎭 Cultural Programme</option>
+            <option value="Other Programmes">✨ Other Programmes</option>
           </select>
+        </div>
+        <div class="field full" id="programmeDetailsWrap" style="display:none;">
+          <label for="programmeDetails">Programme Description / Details *</label>
+          <input type="text" id="programmeDetails" name="programme_details" placeholder="Describe programme (e.g. Drama, Folk Dance, Recitation)">
+          <small style="display:block;margin-top:4px;color:var(--ink-soft);font-size:0.8rem;font-weight:600;">💡 e.g. Drama, Folk Dance, Recitation, Vedic Chanting, Social Service, etc.</small>
         </div>
         <div class="field">
           <label for="branch">Branch *</label>
@@ -493,9 +512,31 @@ document.addEventListener('DOMContentLoaded', function() {
   const modalCloseBtn = document.getElementById('modalCloseBtn');
   const closeModalCross = document.getElementById('closeModalCross');
 
+  const progSelect = document.getElementById('programme');
+  const progWrap   = document.getElementById('programmeDetailsWrap');
+  const progInput  = document.getElementById('programmeDetails');
+
+  function toggleProgrammeDetails() {
+    if (!progSelect || !progWrap || !progInput) return;
+    const val = progSelect.value;
+    if (val === 'Cultural Programme' || val === 'Other Programmes') {
+      progWrap.style.display = 'block';
+      progInput.required = true;
+    } else {
+      progWrap.style.display = 'none';
+      progInput.required = false;
+      progInput.value = '';
+    }
+  }
+  if (progSelect) {
+    progSelect.addEventListener('change', toggleProgrammeDetails);
+    toggleProgrammeDetails();
+  }
+
   function closeModal() {
     modal.style.display = 'none';
     form.reset();
+    toggleProgrammeDetails();
   }
 
   if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
@@ -571,6 +612,75 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="support-card"><span class="num" aria-hidden="true">🙋</span><p>Volunteer as a teacher for our weekly classes</p></div>
       <div class="support-card"><span class="num" aria-hidden="true">🤝</span><p>Partner with us to expand into new villages</p></div>
     </div>
+
+    <!-- Official Bank Account Details Card -->
+    <div class="bank-details-card" style="margin-top: 36px; background: var(--white); border: 2px solid var(--gold-line); border-radius: 20px; padding: 32px 28px; box-shadow: 0 10px 32px rgba(43,33,24,0.08); position: relative; overflow: hidden;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1.5px solid var(--temple-cream-2);">
+        <div>
+          <span style="display: inline-block; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--vermilion); background: rgba(178,58,47,0.08); padding: 4px 12px; border-radius: 999px; margin-bottom: 6px;">OFFICIAL BANK DETAILS</span>
+          <h3 style="font-size: 1.35rem; font-family: 'Fraunces', serif; color: var(--ink); margin: 0;">Direct Bank Transfer (NEFT / RTGS / IMPS)</h3>
+        </div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--leaf); background: rgba(76,107,63,0.12); padding: 6px 14px; border-radius: 999px;">
+          ✓ Verified Non-Profit Account
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; text-align: left;">
+        
+        <!-- Account Info -->
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="bank-info-item">
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); display: block; letter-spacing: 0.05em;">Account Name</span>
+            <strong style="font-size: 1.1rem; color: var(--vermilion); font-family: 'Fraunces', serif;">KAMALARANI FOUNDATION</strong>
+          </div>
+          
+          <div class="bank-info-item">
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); display: block; letter-spacing: 0.05em;">Account Number</span>
+            <strong style="font-size: 1.35rem; color: var(--ink); font-family: monospace; letter-spacing: 0.08em;">120001431700</strong>
+          </div>
+
+          <div class="bank-info-item">
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); display: block; letter-spacing: 0.05em;">IFSC Code</span>
+            <strong style="font-size: 1.15rem; color: var(--ink); font-family: monospace;">CNRB0019760</strong>
+          </div>
+
+          <div class="bank-info-item">
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); display: block; letter-spacing: 0.05em;">MICR &amp; SWIFT Code</span>
+            <span style="font-size: 0.92rem; color: var(--ink); font-weight: 700;">MICR: 700015159 &nbsp;|&nbsp; SWIFT: CNRBINBBBFD</span>
+          </div>
+        </div>
+
+        <!-- Bank Branch & Contact Info -->
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="bank-info-item">
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); display: block; letter-spacing: 0.05em;">Bank Name &amp; Branch</span>
+            <strong style="font-size: 1.05rem; color: var(--ink);">CANARA BANK — BIDHAN NAGAR, KOLKATA</strong>
+          </div>
+
+          <div class="bank-info-item">
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); display: block; letter-spacing: 0.05em;">Branch Address</span>
+            <p style="font-size: 0.9rem; color: var(--ink-soft); margin: 0; line-height: 1.5;">
+              Y-20, EP BLOCK, SALT LAKE CITY, SEC - 5, KOLKATA, WEST BENGAL — 700091
+            </p>
+          </div>
+
+          <div class="bank-info-item">
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); display: block; letter-spacing: 0.05em;">Contact Phone Numbers</span>
+            <p style="font-size: 0.95rem; color: var(--vermilion); font-weight: 700; margin: 0;">
+              📞 <a href="tel:+917003502022" style="color: inherit; text-decoration: underline;">+91 70035 02022</a> &nbsp;|&nbsp; 
+              <a href="tel:+917980350454" style="color: inherit; text-decoration: underline;">+91 79803 50454</a>
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--gold-line); font-size: 0.82rem; color: var(--ink-soft); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <span>Registered Non-Profit Reg No: <strong>AAETK689KE20221</strong> &nbsp;|&nbsp; PAN: <strong>AAETK6895K</strong></span>
+        <span style="color: var(--vermilion); font-weight: 700;">Thank you for empowering village children through your support! 🙏</span>
+      </div>
+    </div>
+
   </div>
 </section>
 

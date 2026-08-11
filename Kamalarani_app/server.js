@@ -94,6 +94,10 @@ app.get('/', async (req, res) => {
   }
 });
 
+// Dedicated Founder & Inspiration Pages
+app.get('/joy-charan-das', (req, res) => res.render('joy-charan-das'));
+app.get('/kamalarani-das', (req, res) => res.render('kamalarani-das'));
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).render('404');
