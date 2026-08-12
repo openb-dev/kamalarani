@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="notranslate">
 <head>
   <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/images/logo.png">
   <link rel="apple-touch-icon" href="/images/icon-192.png">
@@ -65,24 +66,24 @@
     /* ── Gallery admin grids ─────────────────────── */
     .gallery-admin-grid {
       display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
-      gap:14px;
+      grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+      gap:16px;
     }
-    .gallery-admin-item {
-      position:relative; border-radius:10px; overflow:hidden;
-      aspect-ratio:4/3; background:var(--bg-input);
+    .gallery-admin-card {
+      border:1px solid var(--border); border-radius:10px; overflow:hidden;
+      background:var(--bg-card); display:flex; flex-direction:column;
+      position:relative; box-shadow:0 2px 8px rgba(0,0,0,0.04);
     }
-    .gallery-admin-item img,
-    .gallery-admin-item video { width:100%; height:100%; object-fit:cover; }
-    .item-overlay {
-      position:absolute; inset:0; background:rgba(0,0,0,.55);
-      opacity:0; transition:opacity .2s;
-      display:flex; flex-direction:column; justify-content:flex-end; padding:10px;
+    .gallery-admin-thumb {
+      width:100%; aspect-ratio:4/3; background:var(--bg-input); overflow:hidden; position:relative;
     }
-    .gallery-admin-item:hover .item-overlay { opacity:1; }
-    .item-caption { color:#fff; font-size:0.75rem; margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .item-actions { display:flex; gap:6px; }
-    .item-type-badge { position:absolute; top:6px; left:6px; }
+    .gallery-admin-thumb img,
+    .gallery-admin-thumb video { width:100%; height:100%; object-fit:cover; display:block; }
+    .gallery-admin-info {
+      padding:10px 12px; display:flex; flex-direction:column; gap:4px;
+      border-top:1px solid var(--border); background:#fff;
+    }
+    .item-type-badge { position:absolute; top:6px; left:6px; z-index:2; }
 
     /* ── Section headings inside card ───────────── */
     .media-section-title {
@@ -146,12 +147,8 @@
             </div>
             <div class="preview-grid" id="imagePreviewGrid"></div>
             <div id="imageErrorBanner" style="display:none;margin-top:10px;padding:10px 14px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;color:#b91c1c;font-size:0.85rem;font-weight:600;"></div>
-            <div style="margin-top:20px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
-              <div class="field" style="flex:1;min-width:240px;">
-                <label for="imageCaptionField">Caption (applies to all uploaded images)</label>
-                <input type="text" id="imageCaptionField" name="caption" placeholder="e.g. Art class at Natabari, July 2026">
-              </div>
-              <button type="submit" class="btn btn-primary" id="uploadImgBtn">📤 Upload Images</button>
+            <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+              <button type="submit" class="btn btn-primary" id="uploadImgBtn" style="padding:10px 24px; font-size:0.95rem;">📤 Upload Images</button>
             </div>
           </form>
         </div>
@@ -172,12 +169,9 @@
               <input type="file" name="videos" id="videoInput" multiple accept=".mp4,video/mp4">
             </div>
             <div class="preview-grid" id="videoPreviewGrid"></div>
-            <div style="margin-top:20px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
-              <div class="field" style="flex:1;min-width:240px;">
-                <label for="videoCaptionField">Caption (applies to all uploaded videos)</label>
-                <input type="text" id="videoCaptionField" name="caption" placeholder="e.g. Drawing competition, July 2026">
-              </div>
-              <button type="submit" class="btn btn-primary" id="uploadVidBtn">📤 Upload Videos</button>
+            <div id="videoErrorBanner" style="display:none;margin-top:10px;padding:10px 14px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;color:#b91c1c;font-size:0.85rem;font-weight:600;"></div>
+            <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+              <button type="submit" class="btn btn-primary" id="uploadVidBtn" style="padding:10px 24px; font-size:0.95rem;">📤 Upload Videos</button>
             </div>
           </form>
         </div>
@@ -197,16 +191,25 @@
           <% } else { %>
             <div class="gallery-admin-grid">
               <% images.forEach(item => { %>
-                <div class="gallery-admin-item">
-                  <img src="<%= item.media_url %>" alt="<%= item.caption || 'Gallery image' %>" loading="lazy">
-                  <div class="item-type-badge"><span class="badge badge-image">image</span></div>
-                  <div class="item-overlay">
-                    <div class="item-caption"><%= item.caption || 'No caption' %></div>
-                    <div class="item-actions">
-                      <form action="/admin/gallery/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this image from gallery and disk?')">
-                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>
-                      </form>
+                <% 
+                  const pPurpose = item.purpose || item.caption || 'Free Art Class';
+                  const pDate = item.event_date ? new Date(item.event_date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '15 Jul 2026';
+                  const pPlace = item.place || 'Natabari';
+                %>
+                <div class="gallery-admin-card">
+                  <div class="gallery-admin-thumb">
+                    <img src="<%= item.media_url %>" alt="<%= pPurpose %>" loading="lazy">
+                    <div class="item-type-badge"><span class="badge badge-image">image</span></div>
+                  </div>
+                  <div class="gallery-admin-info">
+                    <div style="font-weight:700; font-size:0.83rem; color:var(--text-primary); line-height:1.2;"><%= pPurpose %></div>
+                    <div style="font-size:0.75rem; color:var(--text-secondary); display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+                      <span>📍 <%= pPlace %></span>
+                      <span>📅 <%= pDate %></span>
                     </div>
+                    <form action="/admin/gallery/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this image permanently?')">
+                      <button type="submit" class="btn btn-danger btn-sm" style="width:100%; font-size:0.75rem; padding:4px 8px;">🗑 Delete</button>
+                    </form>
                   </div>
                 </div>
               <% }) %>
@@ -229,16 +232,25 @@
           <% } else { %>
             <div class="gallery-admin-grid">
               <% videos.forEach(item => { %>
-                <div class="gallery-admin-item">
-                  <video src="<%= item.media_url %>" muted preload="metadata"></video>
-                  <div class="item-type-badge"><span class="badge badge-video">video</span></div>
-                  <div class="item-overlay">
-                    <div class="item-caption"><%= item.caption || 'No caption' %></div>
-                    <div class="item-actions">
-                      <form action="/admin/gallery/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this video from gallery and disk?')">
-                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>
-                      </form>
+                <% 
+                  const vPurpose = item.purpose || item.caption || 'Free Class Video';
+                  const vDate = item.event_date ? new Date(item.event_date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '15 Jul 2026';
+                  const vPlace = item.place || 'Natabari';
+                %>
+                <div class="gallery-admin-card">
+                  <div class="gallery-admin-thumb">
+                    <video src="<%= item.media_url %>" muted preload="metadata"></video>
+                    <div class="item-type-badge"><span class="badge badge-video">video</span></div>
+                  </div>
+                  <div class="gallery-admin-info">
+                    <div style="font-weight:700; font-size:0.83rem; color:var(--text-primary); line-height:1.2;"><%= vPurpose %></div>
+                    <div style="font-size:0.75rem; color:var(--text-secondary); display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+                      <span>📍 <%= vPlace %></span>
+                      <span>📅 <%= vDate %></span>
                     </div>
+                    <form action="/admin/gallery/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this video permanently?')">
+                      <button type="submit" class="btn btn-danger btn-sm" style="width:100%; font-size:0.75rem; padding:4px 8px;">🗑 Delete</button>
+                    </form>
                   </div>
                 </div>
               <% }) %>
@@ -275,38 +287,166 @@
     input.files = dt.files;
   }
 
-  function renderPreviews(files, grid, isVideo, storeKey, input, maxCount) {
+  function showError(storeKey, msg) {
+    const errorBannerId = storeKey === 'images' ? 'imageErrorBanner' : 'videoErrorBanner';
+    const uploadBtnId   = storeKey === 'images' ? 'uploadImgBtn' : 'uploadVidBtn';
+    const banner = document.getElementById(errorBannerId);
+    const uploadBtn = document.getElementById(uploadBtnId);
+    if (banner) {
+      banner.textContent = '⚠️ ' + msg;
+      banner.style.display = 'block';
+    }
+    if (uploadBtn) uploadBtn.disabled = true;
+  }
+
+  function clearError(storeKey) {
+    const errorBannerId = storeKey === 'images' ? 'imageErrorBanner' : 'videoErrorBanner';
+    const uploadBtnId   = storeKey === 'images' ? 'uploadImgBtn' : 'uploadVidBtn';
+    const banner = document.getElementById(errorBannerId);
+    const uploadBtn = document.getElementById(uploadBtnId);
+    if (banner) {
+      banner.style.display = 'none';
+      banner.textContent = '';
+    }
+    if (uploadBtn) uploadBtn.disabled = false;
+  }
+
+  function saveCurrentInputValues(storeKey) {
+    const gridId = storeKey === 'images' ? 'imagePreviewGrid' : 'videoPreviewGrid';
+    const grid = document.getElementById(gridId);
+    if (!grid) return [];
+    const cards = grid.querySelectorAll('.preview-item-card');
+    const values = [];
+    cards.forEach(card => {
+      const p = card.querySelector('.' + storeKey + '-purpose-input');
+      const d = card.querySelector('.' + storeKey + '-date-input');
+      const pl = card.querySelector('.' + storeKey + '-place-input');
+      values.push({
+        purpose: p ? p.value : '',
+        date: d ? d.value : '',
+        place: pl ? pl.value : ''
+      });
+    });
+    return values;
+  }
+
+  function renderPreviews(files, grid, isVideo, storeKey, input, maxCount, savedValues) {
     grid.innerHTML = '';
     if (!files || files.length === 0) return;
+
+    const values = savedValues || [];
+
+    // Batch fill header container
+    const batchBar = document.createElement('div');
+    batchBar.style.cssText = 'width:100%; background:rgba(178,58,47,0.06); border:1px solid rgba(178,58,47,0.2); border-radius:8px; padding:10px 14px; margin-bottom:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;';
+    batchBar.innerHTML = `
+      <span style="font-size:0.82rem; font-weight:700; color:var(--vermilion);">⚡ Quick Batch-Fill Details for All ${files.length} File(s):</span>
+      <input type="text" id="${storeKey}_batchPurpose" placeholder="Purpose e.g. Free Art Supplies Distribution" style="padding:6px 10px; font-size:0.8rem; border-radius:6px; border:1px solid #ccc; flex:1; min-width:180px;">
+      <input type="date" id="${storeKey}_batchDate" value="2026-07-15" style="padding:6px 10px; font-size:0.8rem; border-radius:6px; border:1px solid #ccc;">
+      <select id="${storeKey}_batchPlace" style="padding:6px 10px; font-size:0.8rem; border-radius:6px; border:1px solid #ccc; background:#fff;">
+        <option value="Natabari">Natabari</option>
+        <option value="Kolkata">Kolkata</option>
+        <option value="Coochbehar">Coochbehar</option>
+        <option value="West Bengal">West Bengal</option>
+      </select>
+      <button type="button" class="btn btn-outline btn-sm" style="font-size:0.78rem; padding:6px 12px;" onclick="applyBatchFill('${storeKey}')">Apply To All</button>
+    `;
+    grid.appendChild(batchBar);
+
     const limited = files.slice(0, maxCount);
     limited.forEach((file, idx) => {
-      const div = document.createElement('div');
-      div.className = 'preview-item';
+      const card = document.createElement('div');
+      card.className = 'preview-item-card';
+      card.style.cssText = 'width:100%; display:flex; gap:14px; background:#FDFBF7; border:1px solid #EFE4D2; border-radius:10px; padding:12px; margin-bottom:8px; align-items:center; flex-wrap:wrap; position:relative;';
+
       const url = URL.createObjectURL(file);
+      const val = values[idx] || {};
+
+      // Thumbnail container
+      const thumbBox = document.createElement('div');
+      thumbBox.style.cssText = 'width:90px; height:70px; border-radius:8px; overflow:hidden; background:#eee; position:relative; flex-shrink:0;';
 
       const media = document.createElement(isVideo ? 'video' : 'img');
       media.src = url;
+      media.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block;';
       if (isVideo) media.muted = true;
-      div.appendChild(media);
+      thumbBox.appendChild(media);
 
-      // ── Remove button ──
+      // Remove button
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'preview-remove';
       btn.title = 'Remove this file';
       btn.innerHTML = '&times;';
       btn.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
+        const currentVals = saveCurrentInputValues(storeKey);
+        currentVals.splice(idx, 1);
         fileStore[storeKey].splice(idx, 1);
         syncInputFiles(input, fileStore[storeKey]);
-        // Re-check limit after removal
-        if (fileStore[storeKey].length <= maxCount) clearError();
-        renderPreviews(fileStore[storeKey], grid, isVideo, storeKey, input, maxCount);
+        if (fileStore[storeKey].length <= maxCount) clearError(storeKey);
+        renderPreviews(fileStore[storeKey], grid, isVideo, storeKey, input, maxCount, currentVals);
       });
-      div.appendChild(btn);
+      thumbBox.appendChild(btn);
+      card.appendChild(thumbBox);
 
-      grid.appendChild(div);
+      // Input fields container
+      const fieldsBox = document.createElement('div');
+      fieldsBox.style.cssText = 'flex:1; min-width:280px; display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px;';
+
+      const purposeVal = val.purpose ? val.purpose.replace(/"/g, '&quot;') : '';
+      const dateVal = val.date || '';
+      const placeVal = val.place || '';
+
+      fieldsBox.innerHTML = `
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">📌 Purpose / Title <span style="color:red">*</span></label>
+          <input type="text" name="purposes[]" class="${storeKey}-purpose-input" required placeholder="Enter Purpose / Program Name *" value="${purposeVal}" style="width:100%; padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:0.83rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">📅 Event Date <span style="color:red">*</span></label>
+          <input type="date" name="event_dates[]" class="${storeKey}-date-input" required value="${dateVal}" style="width:100%; padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:0.83rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">📍 Place / Location <span style="color:red">*</span></label>
+          <select name="places[]" class="${storeKey}-place-input" required style="width:100%; padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:0.83rem; background:#fff;">
+            <option value="" disabled ${!placeVal ? 'selected' : ''}>-- Select Location * --</option>
+            <option value="Natabari" ${placeVal === 'Natabari' ? 'selected' : ''}>Natabari</option>
+            <option value="Kolkata" ${placeVal === 'Kolkata' ? 'selected' : ''}>Kolkata</option>
+            <option value="Coochbehar" ${placeVal === 'Coochbehar' ? 'selected' : ''}>Coochbehar</option>
+            <option value="West Bengal" ${placeVal === 'West Bengal' ? 'selected' : ''}>Other Location (West Bengal)</option>
+          </select>
+        </div>
+      `;
+      card.appendChild(fieldsBox);
+      grid.appendChild(card);
     });
+  }
+
+  function applyBatchFill(storeKey) {
+    const pVal = (document.getElementById(storeKey + '_batchPurpose').value || '').trim();
+    const dVal = (document.getElementById(storeKey + '_batchDate').value || '').trim();
+    const plVal = (document.getElementById(storeKey + '_batchPlace').value || '').trim();
+
+    if (pVal) {
+      document.querySelectorAll('.' + storeKey + '-purpose-input').forEach(inp => {
+        inp.value = pVal;
+        inp.style.border = '1px solid var(--border)';
+      });
+    }
+    if (dVal) {
+      document.querySelectorAll('.' + storeKey + '-date-input').forEach(inp => {
+        inp.value = dVal;
+        inp.style.border = '1px solid var(--border)';
+      });
+    }
+    if (plVal) {
+      document.querySelectorAll('.' + storeKey + '-place-input').forEach(inp => {
+        inp.value = plVal;
+        inp.style.border = '1px solid var(--border)';
+      });
+    }
   }
 
   function initDropZone(dropZoneId, inputId, previewGridId, isVideo, storeKey, maxCount) {
@@ -317,40 +457,20 @@
     input.addEventListener('click', e => e.stopPropagation());
     dropZone.addEventListener('click', () => input.click());
 
-    // ── Error banner helpers ─────────────────────────────────────────────────
-    const errorBannerId = storeKey === 'images' ? 'imageErrorBanner' : null;
-    const uploadBtn     = storeKey === 'images' ? document.getElementById('uploadImgBtn') : null;
-
-    function showError(msg) {
-      if (!errorBannerId) return;
-      const banner = document.getElementById(errorBannerId);
-      banner.textContent = '⚠️ ' + msg;
-      banner.style.display = 'block';
-      if (uploadBtn) uploadBtn.disabled = true;
-    }
-    function clearError() {
-      if (!errorBannerId) return;
-      const banner = document.getElementById(errorBannerId);
-      banner.style.display = 'none';
-      banner.textContent = '';
-      if (uploadBtn) uploadBtn.disabled = false;
-    }
-
     const handleFiles = (incomingFiles) => {
       const incoming = Array.from(incomingFiles);
+      const currentVals = saveCurrentInputValues(storeKey);
       const merged   = [...fileStore[storeKey], ...incoming];
 
-      // ── Hard limit check ──────────────────────────────────────────────────
       if (merged.length > maxCount) {
-        showError(`You can only upload up to ${maxCount} images at a time. Currently selected: ${merged.length}. Please remove some before uploading.`);
-        // Still show what was already queued — don't add the new batch
+        showError(storeKey, `You can only upload up to ${maxCount} files at a time. Currently selected: ${merged.length}. Please remove some before uploading.`);
         return;
       }
 
-      clearError();
+      clearError(storeKey);
       fileStore[storeKey] = merged;
       syncInputFiles(input, merged);
-      renderPreviews(merged, previewGrid, isVideo, storeKey, input, maxCount);
+      renderPreviews(merged, previewGrid, isVideo, storeKey, input, maxCount, currentVals);
     };
 
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
@@ -368,14 +488,47 @@
   initDropZone('imageDropZone', 'imageInput', 'imagePreviewGrid', false, 'images', 15);
   initDropZone('videoDropZone', 'videoInput', 'videoPreviewGrid', true,  'videos', 5);
 
-  // ── Final submit guard ────────────────────────────────────────────────────
-  document.getElementById('imageForm').addEventListener('submit', (e) => {
-    if (fileStore.images.length > 15) {
-      e.preventDefault();
-      document.getElementById('imageErrorBanner').style.display = 'block';
-      document.getElementById('imageErrorBanner').textContent =
-        '⚠️ Cannot upload more than 15 images at a time. Please remove some and try again.';
-    }
+  // ── Final submit mandatory field validation guard ──
+  ['imageForm', 'videoForm'].forEach(formId => {
+    const formEl = document.getElementById(formId);
+    if (!formEl) return;
+    formEl.addEventListener('submit', function(e) {
+      const storeKey = formId === 'imageForm' ? 'images' : 'videos';
+      const purposes = formEl.querySelectorAll('.' + storeKey + '-purpose-input');
+      const dates = formEl.querySelectorAll('.' + storeKey + '-date-input');
+      const places = formEl.querySelectorAll('.' + storeKey + '-place-input');
+
+      if (fileStore[storeKey].length === 0) {
+        e.preventDefault();
+        alert('⚠️ Please select at least one file to upload.');
+        return;
+      }
+
+      let hasMissing = false;
+      let firstMissingInp = null;
+
+      for (let i = 0; i < purposes.length; i++) {
+        const pInp = purposes[i];
+        const dInp = dates[i];
+        const plInp = places[i];
+
+        [pInp, dInp, plInp].forEach(inp => {
+          if (inp && (!inp.value || !inp.value.trim())) {
+            inp.style.border = '2px solid #ef4444';
+            hasMissing = true;
+            if (!firstMissingInp) firstMissingInp = inp;
+          } else if (inp) {
+            inp.style.border = '1px solid var(--border)';
+          }
+        });
+      }
+
+      if (hasMissing) {
+        e.preventDefault();
+        alert('⚠️ Mandatory fields missing! Please fill Purpose, Event Date, and Location for EVERY selected file before uploading.');
+        if (firstMissingInp) firstMissingInp.focus();
+      }
+    });
   });
 </script>
 </body>

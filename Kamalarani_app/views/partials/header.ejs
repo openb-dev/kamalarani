@@ -1,4 +1,6 @@
 <header class="nav" role="banner">
+  <script src="/js/translations.js"></script>
+  <script src="/js/lang.js"></script>
   <!-- Top Tier (Socials, Centered Logo, Donate Button) -->
   <div class="header-top-tier">
     <div class="header-top-inner">
@@ -14,16 +16,22 @@
         </a>
       </div>
 
-      <a href="/" class="brand-centered" aria-label="Kamalarani Foundation — Home">
-        <img src="/images/logo.png" alt="Kamalarani Foundation Logo" class="brand-logo-img-lg">
-        <span class="brand-text-wrap-centered">
-          <span class="brand-name-lg">KAMALARANI FOUNDATION</span>
-          <span class="brand-tagline-lg">সনাতনী সংস্কৃতি ও সমাজকল্যাণ</span>
+      <a href="/" class="brand-centered" aria-label="Kamalarani Foundation — Home" style="display:flex; flex-direction:row; align-items:center; gap:12px; text-decoration:none;">
+        <img src="/images/logo.png" alt="Kamalarani Foundation Logo" class="brand-logo-img-lg" style="height:48px; width:48px; object-fit:contain; flex-shrink:0;">
+        <span class="brand-text-wrap-centered" style="display:flex; flex-direction:column; text-align:left; line-height:1.15;">
+          <span class="brand-name-lg" data-en="KAMALARANI FOUNDATION" data-bn="কমলারাণী ফাউন্ডেশন" style="font-family:'Fraunces',serif; font-size:1.2rem; font-weight:800; color:var(--ink); letter-spacing:0.04em; text-transform:uppercase;">KAMALARANI FOUNDATION</span>
+          <span class="brand-tagline-lg" style="font-family:'Manrope',sans-serif; font-size:0.75rem; font-weight:700; color:var(--vermilion); letter-spacing:0.05em; margin-top:2px;">সনাতনী সংস্কৃতি ও সমাজকল্যাণ</span>
         </span>
       </a>
 
       <div class="header-quick-actions">
-        <a href="/#support" class="header-outline-btn">Donate</a>
+        <!-- Language Switcher Toggle Button (🌐 বাংলা / 🌐 English) -->
+        <button type="button" class="lang-toggle-btn" id="langToggleBtn" aria-label="Switch Language" title="Switch Language (English / বাংলা)">
+          <span class="lang-icon">🌐</span>
+          <span class="lang-text" id="langText">বাংলা</span>
+        </button>
+
+        <a href="/#support" class="header-outline-btn" data-en="Donate" data-bn="দান করুন">Donate</a>
       </div>
     </div>
   </div>
@@ -38,8 +46,8 @@
           <a href="/#about" class="dropdown-toggle">ABOUT ▾</a>
           <div class="dropdown-menu">
             <a href="/#about">About Foundation</a>
-            <a href="/joy-charan-das">Joy Charan Das (Thakur)</a>
-            <a href="/kamalarani-das">Kamalarani Das (কমলা রানী দাস)</a>
+            <a href="/#joy-charan-das">Joy Charan Das (Thakur)</a>
+            <a href="/#kamalarani-das">Kamalarani Das (কমলারাণী দাস)</a>
           </div>
         </div>
         <a href="/gallery">GALLERY</a>

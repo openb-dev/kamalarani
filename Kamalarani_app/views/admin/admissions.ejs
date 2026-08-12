@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="notranslate">
 <head>
   <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/images/logo.png">
   <link rel="apple-touch-icon" href="/images/icon-192.png">
@@ -17,6 +18,90 @@
   <script src="/js/pwa-register.js" defer></script>
   <style>
     .row-pending { background: rgba(240,192,64,0.04); }
+    .print-only-header { display: none; }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        font-family: 'Manrope', sans-serif !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .admin-sidebar, .admin-topbar, .sidebar-toggle, .flash-bar, .page-header, .no-print, .card-header, #filterPillGroup, button, .btn,
+      th:nth-child(2), td:nth-child(2),
+      th:nth-child(4), td:nth-child(4),
+      th:nth-child(13), td:nth-child(13) {
+        display: none !important;
+      }
+      .admin-layout { display: block !important; }
+      .admin-main { margin: 0 !important; padding: 0 !important; }
+      .admin-content { padding: 0 !important; }
+      .card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; background: transparent !important; }
+      .table-wrap { overflow: visible !important; }
+      
+      .print-only-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #B23A2F;
+      }
+      .print-only-header h1 {
+        font-family: 'Fraunces', serif;
+        font-size: 18pt;
+        color: #B23A2F;
+        margin: 0 0 2px 0;
+        letter-spacing: 0.05em;
+      }
+      .print-only-header p {
+        font-size: 9pt;
+        color: #222;
+        margin: 2px 0;
+      }
+      .print-report-meta {
+        font-size: 8pt;
+        color: #444;
+        margin-top: 4px;
+        font-weight: 600;
+      }
+
+      table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        border-collapse: collapse !important;
+        font-size: 7.5pt !important;
+      }
+      th, td {
+        border: 1px solid #777 !important;
+        padding: 4px 5px !important;
+        text-align: left !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+      }
+      th {
+        background: #f0f0f0 !important;
+        font-weight: bold !important;
+        color: #000 !important;
+      }
+
+      /* Specific column width ratios for A4 Portrait print */
+      th:nth-child(1), td:nth-child(1) { width: 3%; }  /* # */
+      th:nth-child(3), td:nth-child(3) { width: 18%; } /* Student Name & ARN */
+      th:nth-child(5), td:nth-child(5) { width: 10%; } /* DOB/Gender */
+      th:nth-child(6), td:nth-child(6) { width: 8%; }  /* Class */
+      th:nth-child(7), td:nth-child(7) { width: 14%; } /* Programme */
+      th:nth-child(8), td:nth-child(8) { width: 9%; }  /* Branch */
+      th:nth-child(9), td:nth-child(9) { width: 16%; } /* Parents/Mobile/Aadhaar */
+      th:nth-child(10), td:nth-child(10) { width: 15%; }/* Full Address */
+      th:nth-child(11), td:nth-child(11) { width: 0%; display:none !important; } /* Date */
+      th:nth-child(12), td:nth-child(12) { width: 7%; display:table-cell !important; } /* Status */
+    }
   </style>
 </head>
 <body>
@@ -36,6 +121,17 @@
     </div>
 
     <div class="admin-content">
+      <!-- Printable Official Statement Header Banner -->
+      <div class="print-only-header">
+        <h1>KAMALARANI FOUNDATION</h1>
+        <p style="font-size:11pt; font-weight:700; color:#111;">OFFICIAL ADMISSIONS SUMMARY STATEMENT &amp; ENROLMENT REPORT</p>
+        <p class="print-report-meta">
+          Registration No: AAETK689KE20221 &nbsp;|&nbsp;
+          Generated On: <%= new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %> &nbsp;|&nbsp;
+          Total Registered Students: <%= apps.length %>
+        </p>
+      </div>
+
       <% if (locals.success && locals.success.length) { %>
         <div class="flash-bar success">✅ <%= locals.success[0] %></div>
       <% } %>
@@ -46,7 +142,7 @@
       <div class="page-header">
         <div class="page-header-left">
           <h1>Admissions</h1>
-          <p>Art &amp; Music class enrollment applications submitted through the public website.</p>
+          <p>Educational, Art &amp; Music class enrollment applications submitted through the public website.</p>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <% const pendingCount = apps.filter(a => a.status === 'pending').length; %>
@@ -60,9 +156,100 @@
         </div>
       </div>
 
+      <!-- Admissions Summary & Analytics Report -->
+      <%
+        const totalApps = apps.length;
+        const countArt = apps.filter(a => (a.programme || '').includes('Art Class')).length;
+        const countMusic = apps.filter(a => (a.programme || '').includes('Music Class')).length;
+        const countBoth = apps.filter(a => (a.programme || '').includes('Both')).length;
+        const countEdu = apps.filter(a => (a.programme || '').includes('Education')).length;
+        const countGita = apps.filter(a => (a.programme || '').includes('Gita Gyaan')).length;
+        const countCultural = apps.filter(a => (a.programme || '').includes('Cultural')).length;
+        const countOther = apps.filter(a => (a.programme || '').includes('Other')).length;
+
+        const countCoochbehar = apps.filter(a => (a.branch || '').toLowerCase() === 'coochbehar').length;
+        const countKolkata = apps.filter(a => (a.branch || '').toLowerCase() === 'kolkata').length;
+
+        const countPending = apps.filter(a => a.status === 'pending').length;
+        const countApproved = apps.filter(a => a.status === 'approved').length;
+        const countRejected = apps.filter(a => a.status === 'rejected').length;
+      %>
+
+      <div class="card no-print" style="margin-bottom:24px; padding: 20px; background: #fff;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px; border-bottom:1px solid #EFE4D2; padding-bottom:12px;">
+          <div>
+            <h3 style="font-size:1.15rem; margin:0; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+              📊 <span>Admissions Summary Report &amp; Analytics</span>
+            </h3>
+            <p style="margin:4px 0 0 0; font-size:0.83rem; color:var(--text-secondary);" id="showingCount">
+              Total Applications: <strong><%= totalApps %></strong> (Pending: <%= countPending %> | Approved: <%= countApproved %> | Rejected: <%= countRejected %>)
+            </p>
+          </div>
+          <button type="button" onclick="window.print()" class="btn btn-outline" style="font-size:0.82rem; padding:6px 14px;">
+            🖨️ Print Summary Report
+          </button>
+        </div>
+
+        <!-- Filter Pill Tabs -->
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;" id="filterPillGroup">
+          <button type="button" class="filter-pill active" data-filter="all">
+            🌐 All (<%= totalApps %>)
+          </button>
+          <button type="button" class="filter-pill" data-filter="Art Class">
+            🎨 Art Class (<%= countArt %>)
+          </button>
+          <button type="button" class="filter-pill" data-filter="Music Class">
+            🎵 Music Class (<%= countMusic %>)
+          </button>
+          <button type="button" class="filter-pill" data-filter="Both">
+            🎨🎵 Both (<%= countBoth %>)
+          </button>
+          <button type="button" class="filter-pill" data-filter="Education">
+            📚 Education (<%= countEdu %>)
+          </button>
+          <button type="button" class="filter-pill" data-filter="Gita Gyaan">
+            📖 Gita Gyaan (<%= countGita %>)
+          </button>
+          <button type="button" class="filter-pill" data-filter="Cultural">
+            🎭 Cultural (<%= countCultural %>)
+          </button>
+          <button type="button" class="filter-pill" data-filter="Other">
+            ✨ Other (<%= countOther %>)
+          </button>
+        </div>
+
+        <!-- Stat Cards Grid Row -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px;">
+          <div style="background:#FDFBF7; border:1px solid #EFE4D2; border-radius:10px; padding:12px; text-align:center;">
+            <span style="font-size:0.75rem; color:var(--text-secondary); display:block; font-weight:700; text-transform:uppercase;">Art Class</span>
+            <strong style="font-size:1.3rem; color:var(--vermilion);"><%= countArt %></strong>
+          </div>
+          <div style="background:#FDFBF7; border:1px solid #EFE4D2; border-radius:10px; padding:12px; text-align:center;">
+            <span style="font-size:0.75rem; color:var(--text-secondary); display:block; font-weight:700; text-transform:uppercase;">Music Class</span>
+            <strong style="font-size:1.3rem; color:var(--vermilion);"><%= countMusic %></strong>
+          </div>
+          <div style="background:#FDFBF7; border:1px solid #EFE4D2; border-radius:10px; padding:12px; text-align:center;">
+            <span style="font-size:0.75rem; color:var(--text-secondary); display:block; font-weight:700; text-transform:uppercase;">Both Art &amp; Music</span>
+            <strong style="font-size:1.3rem; color:var(--vermilion);"><%= countBoth %></strong>
+          </div>
+          <div style="background:#FDFBF7; border:1px solid #EFE4D2; border-radius:10px; padding:12px; text-align:center;">
+            <span style="font-size:0.75rem; color:var(--text-secondary); display:block; font-weight:700; text-transform:uppercase;">Education</span>
+            <strong style="font-size:1.3rem; color:var(--vermilion);"><%= countEdu %></strong>
+          </div>
+          <div style="background:#FDFBF7; border:1px solid #EFE4D2; border-radius:10px; padding:12px; text-align:center;">
+            <span style="font-size:0.75rem; color:var(--text-secondary); display:block; font-weight:700; text-transform:uppercase;">Gita Gyaan</span>
+            <strong style="font-size:1.3rem; color:var(--vermilion);"><%= countGita %></strong>
+          </div>
+          <div style="background:#FDFBF7; border:1px solid #EFE4D2; border-radius:10px; padding:12px; text-align:center;">
+            <span style="font-size:0.75rem; color:var(--text-secondary); display:block; font-weight:700; text-transform:uppercase;">Cultural &amp; Other</span>
+            <strong style="font-size:1.3rem; color:var(--vermilion);"><%= countCultural + countOther %></strong>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
-          <span class="card-title">All Applications</span>
+          <span class="card-title">Applications Table</span>
         </div>
 
         <% if (apps.length === 0) { %>
@@ -92,7 +279,7 @@
               </thead>
               <tbody>
                 <% apps.forEach((app, idx) => { %>
-                  <tr class="<%= app.status === 'pending' ? 'row-pending' : '' %>">
+                  <tr class="app-row <%= app.status === 'pending' ? 'row-pending' : '' %>" data-programme="<%= (app.programme || '').toLowerCase() %>" data-branch="<%= (app.branch || '').toLowerCase() %>" data-status="<%= (app.status || '').toLowerCase() %>">
                     <td style="color:var(--text-muted);font-size:0.8rem;"><%= idx + 1 %></td>
                     <td>
                       <% if (app.passport_photo) { %>
@@ -129,15 +316,9 @@
                     </td>
                     <td style="font-size:0.85rem;font-weight:600;color:var(--text-primary);"><%= app.class_applying_for || '—' %></td>
                     <td>
-                      <% if (app.programme === 'Art Class') { %>
-                        <span class="badge" style="background:rgba(255,160,60,.15);color:#f0a03c;">🎨 Art</span>
-                      <% } else if (app.programme === 'Music Class') { %>
-                        <span class="badge" style="background:rgba(120,80,220,.15);color:#8a5cf6;">🎵 Music</span>
-                      <% } else if (app.programme === 'Both') { %>
-                        <span class="badge" style="background:rgba(64,190,120,.15);color:#3db87a;">🎨🎵 Both</span>
-                      <% } else { %>
-                        <span style="color:var(--text-muted);font-size:0.82rem;">—</span>
-                      <% } %>
+                      <span class="badge" style="background:rgba(178,58,47,0.1); color:var(--vermilion); font-weight:700; padding:4px 8px; font-size:0.8rem;">
+                        <%= app.programme || '—' %>
+                      </span>
                     </td>
                     <td style="font-size:0.85rem;font-weight:600;">
                       <% if (app.branch === 'Coochbehar') { %>
@@ -149,15 +330,27 @@
                       <% } %>
                     </td>
                     <td style="font-size:0.82rem;">
-                      <div><%= app.father_name ? '👨 ' + app.father_name : '' %></div>
-                      <div><%= app.mother_name ? '👩 ' + app.mother_name : '' %></div>
-                      <% if (app.occupation) { %>
-                        <div style="font-size:0.75rem;color:var(--text-muted);">💼 <%= app.occupation %></div>
-                      <% } %>
-                      <a href="tel:<%= app.parent_mobile %>" style="color:var(--info);font-weight:600;">📞 <%= app.parent_mobile %></a>
+                      <% if (app.father_name) { %><div>👨 <%= app.father_name %></div><% } %>
+                      <% if (app.mother_name) { %><div>👩 <%= app.mother_name %></div><% } %>
+                      <% if (app.occupation) { %><div style="font-size:0.75rem;color:var(--text-muted);">💼 <%= app.occupation %></div><% } %>
+                      <% if (app.parent_mobile) { %><div><a href="tel:<%= app.parent_mobile %>" style="color:var(--info);font-weight:600;">📞 <%= app.parent_mobile %></a></div><% } %>
+                      <% if (app.mother_mobile) { %><div><a href="tel:<%= app.mother_mobile %>" style="color:var(--info);font-weight:600;">📞 <%= app.mother_mobile %></a></div><% } %>
+                      <% if (app.aadhaar_no) { %><div style="font-size:0.75rem;color:var(--text-muted);">🆔 <%= app.aadhaar_no %></div><% } %>
                     </td>
-                    <td class="td-truncate" style="max-width:160px;font-size:0.8rem;color:var(--text-muted);">
-                      <%= app.address || '—' %>
+                    <td style="font-size:0.8rem;color:var(--text-muted);">
+                      <%
+                        const addrParts = [
+                          app.village_locality ? ('Vill/Loc: ' + app.village_locality) : null,
+                          app.po ? ('P.O.: ' + app.po) : null,
+                          app.ps ? ('P.S.: ' + app.ps) : null,
+                          app.district ? ('Dist: ' + app.district) : null,
+                          app.state ? app.state : null,
+                          app.pin_code ? ('PIN: ' + app.pin_code) : null,
+                          app.address ? app.address : null
+                        ].filter(Boolean);
+                        const fullAddress = addrParts.join(', ');
+                      %>
+                      <%= fullAddress || '—' %>
                     </td>
                     <td style="white-space:nowrap;font-size:0.8rem;">
                       <%= new Date(app.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
@@ -194,6 +387,51 @@
     </div>
   </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const pills = document.querySelectorAll('#filterPillGroup .filter-pill');
+  const tableRows = document.querySelectorAll('tbody tr.app-row');
+  const showingCounter = document.getElementById('showingCount');
+
+  pills.forEach(pill => {
+    pill.addEventListener('click', function() {
+      pills.forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+
+      const filterVal = this.getAttribute('data-filter');
+      const filterLower = filterVal.toLowerCase();
+      let visibleCount = 0;
+
+      tableRows.forEach(row => {
+        const prog = (row.getAttribute('data-programme') || '').toLowerCase();
+        const rowText = (row.innerText || '').toLowerCase();
+
+        let isMatch = false;
+        if (filterVal === 'all') {
+          isMatch = true;
+        } else {
+          isMatch = prog.includes(filterLower) || rowText.includes(filterLower);
+        }
+
+        if (isMatch) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      if (showingCounter) {
+        if (filterVal === 'all') {
+          showingCounter.innerHTML = 'Total Applications: <strong>' + visibleCount + '</strong>';
+        } else {
+          showingCounter.innerHTML = 'Showing <strong>' + visibleCount + '</strong> application(s) filtered by: <span style="color:var(--vermilion);font-weight:700;">' + filterVal + '</span>';
+        }
+      }
+    });
+  });
+});
+</script>
 <script src="/js/admin.js"></script>
 </body>
 </html>

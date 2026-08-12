@@ -643,14 +643,9 @@ table select {
 }
 
 .datetime-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-@media (max-width: 480px) {
-  .datetime-grid {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .checkbox-row-card {
@@ -723,6 +718,29 @@ input[type="datetime-local"] {
   transition: all 0.2s ease;
 }
 .pwa-install-btn:hover {
-  background: var(--marigold);
-  color: #fff;
+  background: var(--marigold-deep);
+  transform: translateY(-1px);
+}
+
+/* ===== Admissions Filter Pills ===== */
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.filter-pill:hover {
+  background: var(--temple-cream-2);
+  color: var(--vermilion);
+  border-color: var(--gold-line);
+}
+.filter-pill.active {
+  background: var(--vermilion);
+  color: #ffffff;
+  border-color: var(--vermilion);
 }

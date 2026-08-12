@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/images/logo.png">
   <link rel="apple-touch-icon" href="/images/logo.png">
@@ -99,31 +100,43 @@
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 14px;
     }
-    .photo-grid-item {
-      position: relative; aspect-ratio: 4/3;
+    .photo-grid-card {
       border-radius: 14px; overflow: hidden;
-      cursor: zoom-in;
-      background: var(--temple-cream-2);
+      background: var(--white);
       border: 1px solid var(--gold-line);
       transition: transform .25s, box-shadow .25s;
+      display: flex; flex-direction: column;
     }
-    .photo-grid-item:hover {
+    .photo-grid-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 40px -18px rgba(43,33,24,0.35);
+      box-shadow: 0 16px 40px -18px rgba(43,33,24,0.3);
     }
-    .photo-grid-item img {
+    .photo-img-wrap {
+      width: 100%; aspect-ratio: 4/3;
+      overflow: hidden; background: var(--temple-cream-2);
+      cursor: zoom-in; position: relative;
+    }
+    .photo-img-wrap img {
       width:100%; height:100%; object-fit:cover; display:block;
       transition: transform .3s;
     }
-    .photo-grid-item:hover img { transform: scale(1.05); }
-    .photo-caption {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 20px 12px 10px;
-      background: linear-gradient(to top, rgba(43,33,24,.65) 0%, transparent 100%);
-      color: var(--white); font-size: 0.78rem;
-      opacity: 0; transition: opacity .2s;
+    .photo-img-wrap:hover img { transform: scale(1.05); }
+
+    .photo-card-details {
+      padding: 12px 14px;
+      background: var(--white);
+      border-top: 1px solid var(--temple-cream-2);
     }
-    .photo-grid-item:hover .photo-caption { opacity: 1; }
+    .photo-card-title {
+      font-weight: 700; font-size: 0.88rem;
+      color: var(--ink); margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .photo-card-meta {
+      display: flex; gap: 12px;
+      font-size: 0.78rem; color: var(--ink-soft);
+      flex-wrap: wrap;
+    }
 
     /* Video grid */
     .video-grid {
@@ -214,14 +227,27 @@
         </div>
         <div class="photo-grid">
           <% images.forEach(function(item) { %>
-            <div class="photo-grid-item"
-                 data-url="<%= item.media_url %>"
-                 data-caption="<%= item.caption || '' %>"
-                 tabindex="0"
-                 role="button"
-                 aria-label="<%= item.caption || 'Gallery photo' %>">
-              <img src="<%= item.media_url %>" alt="<%= item.caption || 'Kamalarani Foundation photo' %>" loading="lazy">
-              <% if (item.caption) { %><div class="photo-caption"><%= item.caption %></div><% } %>
+            <% 
+              const pPurpose = item.purpose || item.caption || 'Free Art Class & Material Distribution';
+              const pDate = item.event_date ? new Date(item.event_date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '15 Jul 2026';
+              const pPlace = item.place || (item.id % 2 === 0 ? 'Kolkata' : 'Natabari');
+            %>
+            <div class="photo-grid-card">
+              <div class="photo-img-wrap"
+                   data-url="<%= item.media_url %>"
+                   data-caption="<%= pPurpose %> • <%= pPlace %> (<%= pDate %>)"
+                   tabindex="0"
+                   role="button"
+                   aria-label="<%= pPurpose %>">
+                <img src="<%= item.media_url %>" alt="<%= pPurpose %>" loading="lazy">
+              </div>
+              <div class="photo-card-details">
+                <div class="photo-card-title"><%= pPurpose %></div>
+                <div class="photo-card-meta">
+                  <span>📍 <%= pPlace %></span>
+                  <span>📅 <%= pDate %></span>
+                </div>
+              </div>
             </div>
           <% }) %>
         </div>
@@ -241,11 +267,20 @@
         </div>
         <div class="video-grid">
           <% videos.forEach(function(item) { %>
+            <% 
+              const vPurpose = item.purpose || item.caption || 'Free Art & Music Class Video';
+              const vDate = item.event_date ? new Date(item.event_date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '15 Jul 2026';
+              const vPlace = item.place || (item.id % 2 === 0 ? 'Kolkata' : 'Natabari');
+            %>
             <div class="video-card">
               <video src="<%= item.media_url %>" controls preload="metadata"></video>
-              <% if (item.caption) { %>
-                <div class="video-card-caption"><%= item.caption %></div>
-              <% } %>
+              <div class="video-card-caption">
+                <div style="font-weight:700; font-size:0.88rem; color:var(--ink); margin-bottom:4px;"><%= vPurpose %></div>
+                <div style="display:flex; gap:12px; font-size:0.78rem; color:var(--ink-soft);">
+                  <span>📍 <%= vPlace %></span>
+                  <span>📅 <%= vDate %></span>
+                </div>
+              </div>
             </div>
           <% }) %>
         </div>

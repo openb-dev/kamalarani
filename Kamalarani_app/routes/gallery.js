@@ -152,12 +152,37 @@ router.post(
         return res.redirect('/admin/gallery');
       }
 
-      const caption   = (req.body.caption || '').trim() || null;
-      const adminId   = req.session.admin ? req.session.admin.id : null;
-      const savedFiles = [];
+      const rawPurposes   = req.body.purposes || req.body.purpose || [];
+      const rawEventDates = req.body.event_dates || req.body.event_date || [];
+      const rawPlaces     = req.body.places || req.body.place || [];
+
+      const purposes   = Array.isArray(rawPurposes) ? rawPurposes : [rawPurposes];
+      const eventDates = Array.isArray(rawEventDates) ? rawEventDates : [rawEventDates];
+      const places     = Array.isArray(rawPlaces) ? rawPlaces : [rawPlaces];
+
+      const adminId     = req.session.admin ? req.session.admin.id : null;
+      const savedFiles  = [];
       const failedFiles = [];
 
-      for (const file of req.files) {
+      // ── Strict mandatory fields validation guard ──
+      for (let i = 0; i < req.files.length; i++) {
+        const p  = (purposes[i] || '').trim();
+        const d  = (eventDates[i] || '').trim();
+        const pl = (places[i] || '').trim();
+
+        if (!p || !d || !pl) {
+          req.flash('error', `Upload blocked: Mandatory fields missing for photo #${i + 1} (${req.files[i].originalname}). Purpose, Event Date, and Location are strictly required for every photo.`);
+          return res.redirect('/admin/gallery');
+        }
+      }
+
+      for (let i = 0; i < req.files.length; i++) {
+        const file = req.files[i];
+        const purpose   = (purposes[i] || '').trim();
+        const eventDate = (eventDates[i] || '').trim();
+        const place     = (places[i] || '').trim();
+        const caption   = purpose;
+
         try {
           const compressed = await compressImageBuffer(file.buffer);
           const filename   = `img-${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
@@ -171,8 +196,8 @@ router.post(
 
           const mediaUrl = '/uploads/gallery/images/' + filename;
           await pool.query(
-            'INSERT INTO gallery_items (media_type, media_url, caption, file_name, uploaded_by) VALUES (?, ?, ?, ?, ?)',
-            ['image', mediaUrl, caption, filename, adminId]
+            'INSERT INTO gallery_items (media_type, media_url, caption, purpose, event_date, place, file_name, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            ['image', mediaUrl, caption, purpose, eventDate, place, filename, adminId]
           );
           savedFiles.push(filename);
         } catch (fileErr) {
@@ -219,11 +244,35 @@ router.post(
         return res.redirect('/admin/gallery');
       }
 
-      const caption  = (req.body.caption || '').trim() || null;
-      const adminId  = req.session.admin ? req.session.admin.id : null;
+      const rawPurposes   = req.body.purposes || req.body.purpose || [];
+      const rawEventDates = req.body.event_dates || req.body.event_date || [];
+      const rawPlaces     = req.body.places || req.body.place || [];
 
-      for (const file of req.files) {
-        // Auto-compress if over threshold
+      const purposes   = Array.isArray(rawPurposes) ? rawPurposes : [rawPurposes];
+      const eventDates = Array.isArray(rawEventDates) ? rawEventDates : [rawEventDates];
+      const places     = Array.isArray(rawPlaces) ? rawPlaces : [rawPlaces];
+
+      const adminId = req.session.admin ? req.session.admin.id : null;
+
+      // ── Strict mandatory fields validation guard ──
+      for (let i = 0; i < req.files.length; i++) {
+        const p  = (purposes[i] || '').trim();
+        const d  = (eventDates[i] || '').trim();
+        const pl = (places[i] || '').trim();
+
+        if (!p || !d || !pl) {
+          req.flash('error', `Upload blocked: Mandatory fields missing for video #${i + 1} (${req.files[i].originalname}). Purpose, Event Date, and Location are strictly required for every video.`);
+          return res.redirect('/admin/gallery');
+        }
+      }
+
+      for (let i = 0; i < req.files.length; i++) {
+        const file = req.files[i];
+        const purpose   = (purposes[i] || '').trim();
+        const eventDate = (eventDates[i] || '').trim();
+        const place     = (places[i] || '').trim();
+        const caption   = purpose;
+
         if (file.size > VIDEO_COMPRESS_THRESHOLD && ffmpegAvailable) {
           console.log(`[GALLERY] Compressing ${file.filename} (${(file.size / 1024 / 1024).toFixed(1)} MB)…`);
           await compressVideo(path.join(videoUploadDir, file.filename));
@@ -232,8 +281,8 @@ router.post(
 
         const mediaUrl = '/uploads/gallery/videos/' + file.filename;
         await pool.query(
-          'INSERT INTO gallery_items (media_type, media_url, caption, file_name, uploaded_by) VALUES (?, ?, ?, ?, ?)',
-          ['video', mediaUrl, caption, file.filename, adminId]
+          'INSERT INTO gallery_items (media_type, media_url, caption, purpose, event_date, place, file_name, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          ['video', mediaUrl, caption, purpose, eventDate, place, file.filename, adminId]
         );
       }
 

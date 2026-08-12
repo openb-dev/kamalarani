@@ -122,6 +122,32 @@
     display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex: 1;
   }
 
+  .lang-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    height: 34px;
+    border: 1.5px solid var(--vermilion);
+    border-radius: 4px;
+    color: var(--vermilion);
+    background: transparent;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    outline: none;
+    box-shadow: 0 1px 4px rgba(43,33,24,0.06);
+  }
+  .lang-toggle-btn:hover {
+    background: var(--vermilion);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(178,58,47,0.25);
+  }
+
   .header-outline-btn {
     padding: 6px 16px;
     border: 1.5px solid var(--vermilion);
@@ -1011,3 +1037,109 @@
   color: var(--vermilion) !important;
 }
 
+/* ===== Founders Feature on Homepage (below About) ===== */
+.founders-feature {
+  background: var(--temple-cream-2);
+  padding: 64px 0;
+  border-top: 1px solid var(--gold-line);
+  border-bottom: 1px solid var(--gold-line);
+}
+.founders-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 36px;
+}
+@media (max-width: 768px) {
+  .founders-feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.founder-feature-card {
+  background: var(--white);
+  border: 1.5px solid var(--gold-line);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(43,33,24,0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.founder-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px rgba(43,33,24,0.10);
+}
+@media (max-width: 480px) {
+  .founder-feature-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+.founder-feature-thumb {
+  width: 120px;
+  height: 140px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid var(--gold-line);
+  background: #EFE4D2;
+}
+.founder-feature-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+.founder-feature-info {
+  flex: 1;
+}
+.founder-feature-role {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--vermilion);
+  background: rgba(178,58,47,0.08);
+  padding: 3px 10px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.founder-feature-info h3 {
+  font-size: 1.35rem;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.founder-feature-info .bengali-title {
+  font-size: 1rem;
+  color: var(--marigold-deep);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+.founder-feature-info p {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+.founder-feature-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--vermilion);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.founder-feature-btn:hover {
+  color: var(--marigold-deep);
+  text-decoration: underline;
+}
+
+/* Bengali toggle — natural script for brand name */
+html.lang-bn .brand-name-lg {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}

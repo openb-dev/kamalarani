@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="/images/logo.png">
 <link rel="apple-touch-icon" href="/images/logo.png">
@@ -888,11 +889,33 @@
   });
 
   /* ── Constants ──────────────────────────────────────────────── */
-  const MONTH_NAMES = [
+  const MONTH_NAMES_EN = [
     'January','February','March','April','May','June',
     'July','August','September','October','November','December'
   ];
-  const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTH_NAMES_BN = [
+    'জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন',
+    'জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'
+  ];
+  const DOW_SHORT_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const DOW_SHORT_BN = ['রবি','সোম','মঙ্গল','বুধ','বৃহ','শুক্র','শনি'];
+
+  function kfIsBn() {
+    return (localStorage.getItem('kf_lang') || 'en') === 'bn';
+  }
+  function kfLocale() {
+    return kfIsBn() ? 'bn-IN' : 'en-IN';
+  }
+  function monthName(i) {
+    return (kfIsBn() ? MONTH_NAMES_BN : MONTH_NAMES_EN)[i];
+  }
+  function eventWord(n) {
+    if (kfIsBn()) return n + 'টি ইভেন্ট';
+    return n + (n === 1 ? ' event' : ' events');
+  }
+  function noEventsLabel() {
+    return kfIsBn() ? 'কোনো ইভেন্ট নেই' : 'No events';
+  }
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -943,18 +966,18 @@
   }
 
   function formatDateShort(d) {
-    return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+    return d.toLocaleDateString(kfLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
   }
   function formatTime(d) {
     var h = d.getHours(), m = d.getMinutes();
     if (h === 0 && m === 0) return '';
-    return d.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true });
+    return d.toLocaleTimeString(kfLocale(), { hour: 'numeric', minute: '2-digit', hour12: true });
   }
   function daysFromNow(d) {
     var diff = Math.ceil((d - today) / 86400000);
-    if (diff === 0) return 'Today';
-    if (diff === 1) return 'Tomorrow';
-    return 'In ' + diff + ' days';
+    if (diff === 0) return kfIsBn() ? 'আজ' : 'Today';
+    if (diff === 1) return kfIsBn() ? 'আগামীকাল' : 'Tomorrow';
+    return kfIsBn() ? diff + ' দিনে' : 'In ' + diff + ' days';
   }
 
   /* ── DOM refs (archive) ─────────────────────────────────────── */
@@ -971,11 +994,13 @@
       return ev.dateObj >= today;
     }).sort(function(a, b) { return a.dateObj - b.dateObj; });
 
-    upcomingCountPill.textContent = upcoming.length + (upcoming.length === 1 ? ' event' : ' events');
+    upcomingCountPill.textContent = eventWord(upcoming.length);
 
     if (upcoming.length === 0) {
       upcomingStrip.innerHTML =
-        '<div class="no-upcoming">🗓️ &nbsp;No upcoming events right now — check back soon.</div>';
+        '<div class="no-upcoming">🗓️ &nbsp;' +
+        (kfIsBn() ? 'এখন কোনো আসন্ন ইভেন্ট নেই — শীঘ্রই আবার দেখুন।' : 'No upcoming events right now — check back soon.') +
+        '</div>';
       return;
     }
 
@@ -1014,7 +1039,7 @@
     }
 
     archiveSection.style.display = '';
-    archiveCountPill.textContent = past.length + (past.length === 1 ? ' event' : ' events');
+    archiveCountPill.textContent = eventWord(past.length);
     archiveGrid.innerHTML = '';
 
     past.forEach(function(ev, i) {
@@ -1025,11 +1050,11 @@
 
       /* How long ago */
       var daysAgo = Math.round((today - ev.dateObj) / 86400000);
-      var agoStr  = daysAgo === 0 ? 'Yesterday'
-                  : daysAgo === 1 ? '1 day ago'
-                  : daysAgo < 30  ? daysAgo + ' days ago'
-                  : daysAgo < 365 ? Math.round(daysAgo / 30) + ' mo ago'
-                  : Math.round(daysAgo / 365) + ' yr ago';
+      var agoStr  = daysAgo === 0 ? (kfIsBn() ? 'গতকাল' : 'Yesterday')
+                  : daysAgo === 1 ? (kfIsBn() ? '১ দিন আগে' : '1 day ago')
+                  : daysAgo < 30  ? (kfIsBn() ? daysAgo + ' দিন আগে' : daysAgo + ' days ago')
+                  : daysAgo < 365 ? (kfIsBn() ? Math.round(daysAgo / 30) + ' মাস আগে' : Math.round(daysAgo / 30) + ' mo ago')
+                  : (kfIsBn() ? Math.round(daysAgo / 365) + ' বছর আগে' : Math.round(daysAgo / 365) + ' yr ago');
 
       var card = document.createElement('article');
       card.className = 'past-card' + (i >= ARCHIVE_PAGE_SIZE ? ' archive-hidden' : '');
@@ -1045,7 +1070,9 @@
     /* Show toggle only if more than page size */
     if (past.length > ARCHIVE_PAGE_SIZE) {
       archiveToggleWrap.style.display = '';
-      archiveToggleLabel.textContent  = 'Show all ' + past.length + ' past events';
+      archiveToggleLabel.textContent  = kfIsBn()
+        ? 'সমস্ত ' + past.length + 'টি অতীত ইভেন্ট দেখুন'
+        : 'Show all ' + past.length + ' past events';
       archiveToggleBtn.classList.remove('expanded');
       archiveToggleBtn.setAttribute('aria-expanded', 'false');
       archiveExpanded = false;
@@ -1065,8 +1092,8 @@
     archiveToggleBtn.setAttribute('aria-expanded', archiveExpanded ? 'true' : 'false');
     archiveToggleBtn.classList.toggle('expanded', archiveExpanded);
     archiveToggleLabel.textContent = archiveExpanded
-      ? 'Show fewer past events'
-      : 'Show all past events';
+      ? (kfIsBn() ? 'কম অতীত ইভেন্ট দেখুন' : 'Show fewer past events')
+      : (kfIsBn() ? 'সমস্ত অতীত ইভেন্ট দেখুন' : 'Show all past events');
     if (!archiveExpanded) {
       archiveSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -1093,9 +1120,9 @@
       tile.setAttribute('role', 'listitem');
       tile.setAttribute('tabindex', '0');
       tile.setAttribute('aria-label',
-        MONTH_NAMES[m] + ' ' + currentYear +
-        (hasEvents ? ' — ' + evs.length + ' event' + (evs.length > 1 ? 's' : '') : ' — no events') +
-        (isActive ? ', currently selected' : ''));
+        monthName(m) + ' ' + currentYear +
+        (hasEvents ? ' — ' + eventWord(evs.length) : ' — ' + noEventsLabel()) +
+        (isActive ? (kfIsBn() ? ', বর্তমানে নির্বাচিত' : ', currently selected') : ''));
       tile.dataset.month = m;
 
       var dots = '';
@@ -1107,9 +1134,9 @@
       }
 
       tile.innerHTML =
-        '<span class="month-name">' + MONTH_NAMES[m] + '</span>' +
+        '<span class="month-name">' + monthName(m) + '</span>' +
         '<span class="month-event-count">' +
-          (hasEvents ? evs.length + ' event' + (evs.length > 1 ? 's' : '') : 'No events') +
+          (hasEvents ? eventWord(evs.length) : noEventsLabel()) +
         '</span>' + dots;
 
       tile.addEventListener('click', function() {
@@ -1130,10 +1157,10 @@
   function renderMonthCalendar(year, monthIdx) {
     /* Day-of-week headers */
     calDowHeader.innerHTML = '';
-    DOW_SHORT.forEach(function(d) {
+    DOW_SHORT_EN.forEach(function(_, i) {
       var h = document.createElement('div');
       h.className = 'cal-dow';
-      h.textContent = d;
+      h.textContent = (kfIsBn() ? DOW_SHORT_BN : DOW_SHORT_EN)[i];
       calDowHeader.appendChild(h);
     });
 
@@ -1181,7 +1208,7 @@
         if (dayEvs.length > maxChips) {
           var more = document.createElement('span');
           more.className = 'cal-day-more';
-          more.textContent = '+' + (dayEvs.length - maxChips) + ' more';
+          more.textContent = kfIsBn() ? '+' + (dayEvs.length - maxChips) + ' আরও' : '+' + (dayEvs.length - maxChips) + ' more';
           chipsWrap.appendChild(more);
         }
         cell.appendChild(chipsWrap);
@@ -1210,8 +1237,8 @@
   /* ── DAY DETAIL DRAWER ──────────────────────────────────────── */
   function showDayDrawer(year, monthIdx, day, evs) {
     var dateObj = new Date(year, monthIdx, day);
-    var dateStr = dateObj.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    dayDetailHeading.innerHTML = '📅 Events on <span>' + dateStr + '</span>';
+    var dateStr = dateObj.toLocaleDateString(kfLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    dayDetailHeading.innerHTML = (kfIsBn() ? '📅 ইভেন্ট — ' : '📅 Events on ') + '<span>' + dateStr + '</span>';
     dayDetailList.innerHTML = '';
 
     evs.forEach(function(ev, i) {
@@ -1221,9 +1248,9 @@
       var item = document.createElement('div');
       item.className = 'day-detail-item';
       item.style.animationDelay = (i * 0.07) + 's';
-      var timeDisplay = timeStr ? timeStr + (endStr ? ' – ' + endStr : '') : (endStr ? 'Ends ' + endStr : '');
+      var timeDisplay = timeStr ? timeStr + (endStr ? ' – ' + endStr : '') : (endStr ? (kfIsBn() ? 'শেষ ' + endStr : 'Ends ' + endStr) : '');
       var badge = '<span class="day-detail-badge' + (isUpcoming ? '' : ' past') + '">' +
-        (isUpcoming ? 'Upcoming' : 'Past') + '</span>';
+        (isUpcoming ? (kfIsBn() ? 'আসন্ন' : 'Upcoming') : (kfIsBn() ? 'অতীত' : 'Past')) + '</span>';
       var metaHtml = ev.location ? '<span>📍 ' + ev.location + '</span>' : '';
       var descHtml = ev.description ? '<div class="day-detail-item-desc">' + ev.description + '</div>' : '';
       item.innerHTML =
@@ -1245,10 +1272,12 @@
   /* ── OPEN PANEL ─────────────────────────────────────────────── */
   function openPanel(monthIdx) {
     var evs = eventsForMonth(currentYear, monthIdx);
-    eventsPanelTitle.innerHTML =
-      'Events in <em>' + MONTH_NAMES[monthIdx] + ' ' + currentYear + '</em>';
-    eventsPanelSub.textContent =
-      evs.length + ' event' + (evs.length !== 1 ? 's' : '') + ' scheduled — click a highlighted date to view details';
+    eventsPanelTitle.innerHTML = kfIsBn()
+      ? '<em>' + monthName(monthIdx) + ' ' + currentYear + '</em>-এ ইভেন্ট'
+      : 'Events in <em>' + monthName(monthIdx) + ' ' + currentYear + '</em>';
+    eventsPanelSub.textContent = kfIsBn()
+      ? eventWord(evs.length) + ' নির্ধারিত — বিস্তারিত দেখতে হাইলাইট করা তারিখে ক্লিক করুন'
+      : evs.length + ' event' + (evs.length !== 1 ? 's' : '') + ' scheduled — click a highlighted date to view details';
 
     dayDetailDrawer.classList.remove('open');
     selectedDay = null;
@@ -1296,6 +1325,18 @@
     renderMonthGrid();
     openPanel(today.getMonth());
   }
+
+  function refreshCalendarLocale() {
+    renderUpcoming();
+    renderArchive();
+    var savedMonth = selectedMonth;
+    renderMonthGrid();
+    if (savedMonth !== null) {
+      openPanel(savedMonth);
+    }
+  }
+
+  window.addEventListener('kf-lang-change', refreshCalendarLocale);
 
 })();
 </script>

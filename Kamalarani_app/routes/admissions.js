@@ -146,6 +146,7 @@ router.post('/admissions', (req, res) => {
       const motherMobile     = String(body.mother_mobile || '').trim() || null;
       const email            = String(body.email || '').trim() || null;
       const aadhaarNo        = String(body.aadhaar_no || '').trim() || null;
+      const remarks          = String(body.remarks || '').trim() || null;
 
       const villageLocality  = String(body.village_locality || '').trim() || null;
       const po               = String(body.po || '').trim() || null;
@@ -154,9 +155,12 @@ router.post('/admissions', (req, res) => {
       const state            = String(body.state || 'West Bengal').trim() || 'West Bengal';
       const pinCode          = String(body.pin_code || '').trim() || null;
 
-      const address = `${villageLocality || ''}, P.O. ${po || ''}, P.S. ${ps || ''}, Dist. ${district || ''}, ${state} - ${pinCode || ''}`
+      let address = `${villageLocality || ''}, P.O. ${po || ''}, P.S. ${ps || ''}, Dist. ${district || ''}, ${state} - ${pinCode || ''}`
         .replace(/^,\s*/, '')
         .trim();
+      if (remarks) {
+        address += ` [Remarks: ${remarks}]`;
+      }
 
       const passportFile  = req.files && req.files.passport_photo ? req.files.passport_photo[0] : null;
       const idProofFile   = req.files && req.files.id_proof ? req.files.id_proof[0] : null;
