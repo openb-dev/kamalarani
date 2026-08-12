@@ -143,9 +143,17 @@
   let currentLang = localStorage.getItem('kf_lang') || 'en';
 
   function updateButtonUI() {
-    const btnText = document.getElementById('langText');
-    if (btnText) {
-      btnText.textContent = currentLang === 'en' ? 'বাংলা' : 'English';
+    const toggleBtn = document.getElementById('langToggleBtn');
+    if (toggleBtn) {
+      const isBn = currentLang === 'bn';
+      toggleBtn.classList.toggle('is-bn', isBn);
+      toggleBtn.setAttribute('aria-pressed', isBn ? 'true' : 'false');
+      toggleBtn.setAttribute(
+        'title',
+        isBn
+          ? 'Switch Language (বাংলা → English)'
+          : 'Switch Language (English → বাংলা)'
+      );
     }
     document.documentElement.lang = currentLang === 'bn' ? 'bn' : 'en';
     document.documentElement.classList.toggle('lang-bn', currentLang === 'bn');

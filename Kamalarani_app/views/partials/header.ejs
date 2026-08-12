@@ -25,13 +25,21 @@
       </a>
 
       <div class="header-quick-actions">
-        <!-- Language Switcher Toggle Button (🌐 বাংলা / 🌐 English) -->
-        <button type="button" class="lang-toggle-btn" id="langToggleBtn" aria-label="Switch Language" title="Switch Language (English / বাংলা)">
-          <span class="lang-icon">🌐</span>
-          <span class="lang-text" id="langText">বাংলা</span>
-        </button>
-
         <a href="/#support" class="header-outline-btn" data-en="Donate" data-bn="দান করুন">Donate</a>
+        <!-- Language Switcher Toggle Button -->
+        <button
+          type="button"
+          class="lang-toggle-btn"
+          id="langToggleBtn"
+          aria-label="Switch Language"
+          aria-pressed="false"
+          title="Switch Language (English / বাংলা)"
+        >
+          <span class="lang-toggle-pill" aria-hidden="true"></span>
+          <span class="lang-opt lang-opt-en">English</span>
+          <span class="lang-separator" aria-hidden="true">/</span>
+          <span class="lang-opt lang-opt-bn">বাংলা</span>
+        </button>
       </div>
     </div>
   </div>
