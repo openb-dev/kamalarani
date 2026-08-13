@@ -127,8 +127,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    width: 132px;
+    gap: 4px;
+    width: 100px;
     height: 34px;
     padding: 3px;
     border: 1.5px solid var(--vermilion);
@@ -1185,3 +1185,212 @@ html.lang-bn .brand-name-lg {
   text-transform: none;
   letter-spacing: 0.02em;
 }
+
+/* ─────────────────────────────────────────────
+   EVENT HISTORY BUTTON & DETAIL PAGE
+───────────────────────────────────────────── */
+.event-history-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--marigold-deep);
+  background: rgba(232, 145, 45, 0.08);
+  border: 1px solid rgba(232, 145, 45, 0.3);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.event-history-btn:hover {
+  background: var(--marigold);
+  color: #fff;
+  border-color: var(--marigold);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(232, 145, 45, 0.25);
+}
+
+.upcoming-card .event-history-btn {
+  color: var(--marigold);
+  background: rgba(255, 253, 248, 0.1);
+  border-color: rgba(255, 253, 248, 0.25);
+}
+.upcoming-card .event-history-btn:hover {
+  background: var(--marigold);
+  color: var(--ink);
+  border-color: var(--marigold);
+}
+
+.past-card .event-history-btn {
+  color: #4b5563;
+  background: rgba(107, 114, 128, 0.08);
+  border-color: rgba(107, 114, 128, 0.25);
+}
+.past-card .event-history-btn:hover {
+  background: #4b5563;
+  color: #ffffff;
+  border-color: #4b5563;
+}
+
+.day-detail-history-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 4px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--vermilion);
+  background: rgba(178, 58, 47, 0.06);
+  border: 1px solid rgba(178, 58, 47, 0.2);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.day-detail-history-btn:hover {
+  background: var(--vermilion);
+  color: #fff;
+}
+
+/* Event History Detail Page */
+.event-history-page {
+  padding: 50px 0 80px;
+  background: var(--temple-cream);
+  min-height: calc(100vh - 200px);
+}
+.event-history-nav {
+  margin-bottom: 24px;
+}
+.event-history-card {
+  background: #ffffff;
+  border: 1.5px solid var(--gold-line);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+@media (max-width: 600px) {
+  .event-history-card {
+    padding: 20px;
+  }
+}
+.event-history-header {
+  border-bottom: 1.5px solid var(--temple-cream-2);
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+}
+.event-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+.event-status-pill.upcoming {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.event-status-pill.live {
+  background: #dcfce7;
+  color: #166534;
+}
+.event-status-pill.past {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.event-history-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.event-history-title-bn {
+  font-size: 1.15rem;
+  color: var(--marigold-deep);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+.event-history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+.event-history-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.event-history-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+}
+@media (max-width: 900px) {
+  .event-history-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.event-history-desc-box {
+  line-height: 1.7;
+  font-size: 1.02rem;
+  color: #374151;
+}
+.event-history-sidebar {
+  background: var(--temple-cream);
+  border: 1px solid var(--gold-line);
+  border-radius: 16px;
+  padding: 24px;
+}
+.audit-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  padding-left: 20px;
+  margin-top: 16px;
+}
+.audit-timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: var(--gold-line);
+}
+.audit-timeline-item {
+  position: relative;
+}
+.audit-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--marigold);
+  border: 2px solid #ffffff;
+}
+.audit-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+}
+.audit-val {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+

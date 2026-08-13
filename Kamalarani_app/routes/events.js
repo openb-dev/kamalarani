@@ -29,6 +29,31 @@ router.get('/api/events', async (req, res) => {
   }
 });
 
+// View Event History
+router.get('/events/:id/history', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT e.*, a.name AS creator_name 
+       FROM events e 
+       LEFT JOIN admins a ON e.created_by = a.id 
+       WHERE e.id = ?`,
+      [req.params.id]
+    );
+
+    if (!rows.length) {
+      req.flash('error', 'Event history not found.');
+      return res.status(404).render('404');
+    }
+
+    res.render('event-history', { event: rows[0] });
+  } catch (err) {
+    console.error('[EVENT HISTORY ERROR]', err);
+    req.flash('error', 'Failed to load event history.');
+    res.redirect('/calendar');
+  }
+});
+
+
 
 // Admin: list all events
 router.get('/admin/events', requireAdminSession, async (req, res) => {
@@ -58,10 +83,13 @@ router.get('/admin/events/:id/edit', requireAdminSession, async (req, res) => {
 // Admin: create event
 router.post('/admin/events', requireAdminSession, async (req, res) => {
   const title = (req.body.title || '').trim();
+  const titleBn = (req.body.title_bn || '').trim() || null;
   const description = (req.body.description || '').trim() || null;
+  const descriptionBn = (req.body.description_bn || '').trim() || null;
   const eventDate = (req.body.event_date || '').trim();
   const endDate = (req.body.end_date || '').trim() || null;
   const location = (req.body.location || '').trim();
+  const locationBn = (req.body.location_bn || '').trim() || null;
   const isPublished = req.body.is_published === 'on';
 
   if (!title) {
@@ -81,9 +109,9 @@ router.post('/admin/events', requireAdminSession, async (req, res) => {
 
   try {
     await pool.query(
-      `INSERT INTO events (title, description, event_date, end_date, location, is_published, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [title, description, eventDate, endDate, location, isPublished, req.session.admin.id]
+      `INSERT INTO events (title, title_bn, description, description_bn, event_date, end_date, location, location_bn, is_published, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [title, titleBn, description, descriptionBn, eventDate, endDate, location, locationBn, isPublished, req.session.admin.id]
     );
     req.flash('success', 'Event created successfully.');
   } catch (err) {
@@ -96,10 +124,13 @@ router.post('/admin/events', requireAdminSession, async (req, res) => {
 // Admin: update event
 router.put('/admin/events/:id', requireAdminSession, async (req, res) => {
   const title = (req.body.title || '').trim();
+  const titleBn = (req.body.title_bn || '').trim() || null;
   const description = (req.body.description || '').trim() || null;
+  const descriptionBn = (req.body.description_bn || '').trim() || null;
   const eventDate = (req.body.event_date || '').trim();
   const endDate = (req.body.end_date || '').trim() || null;
   const location = (req.body.location || '').trim();
+  const locationBn = (req.body.location_bn || '').trim() || null;
   const isPublished = req.body.is_published === 'on';
 
   if (!title) {
@@ -119,8 +150,8 @@ router.put('/admin/events/:id', requireAdminSession, async (req, res) => {
 
   try {
     await pool.query(
-      `UPDATE events SET title=?, description=?, event_date=?, end_date=?, location=?, is_published=? WHERE id=?`,
-      [title, description, eventDate, endDate, location, isPublished, req.params.id]
+      `UPDATE events SET title=?, title_bn=?, description=?, description_bn=?, event_date=?, end_date=?, location=?, location_bn=?, is_published=? WHERE id=?`,
+      [title, titleBn, description, descriptionBn, eventDate, endDate, location, locationBn, isPublished, req.params.id]
     );
     req.flash('success', 'Event updated successfully.');
   } catch (err) {

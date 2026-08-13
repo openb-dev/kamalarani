@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/images/logo.png">
+<link rel="apple-touch-icon" href="/images/logo.png">
+
+<!-- Primary SEO -->
+<title><%= event.title %> — Event History | Kamalarani Foundation</title>
+<meta name="description" content="View history, details, audit records, and timeline for <%= event.title %> organised by Kamalarani Foundation.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Kamalarani Foundation">
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<%- include('partials/header') %>
+
+<main id="main-content" class="event-history-page">
+  <div class="wrap">
+    
+    <!-- Navigation Back -->
+    <div class="event-history-nav">
+      <a href="/calendar" class="btn btn-ghost" data-en="← Back to Calendar" data-bn="← ক্যালেন্ডারে ফিরুন">← Back to Calendar</a>
+    </div>
+
+    <%
+      const now = new Date();
+      const startDate = new Date(event.event_date);
+      const endDate = event.end_date ? new Date(event.end_date) : null;
+      let statusClass = 'upcoming';
+      let statusTextEn = 'Upcoming Event';
+      let statusTextBn = 'আসন্ন ইভেন্ট';
+
+      if (endDate && now >= startDate && now <= endDate) {
+        statusClass = 'live';
+        statusTextEn = 'Live Now';
+        statusTextBn = 'বর্তমানে লাইভ';
+      } else if ((endDate && now > endDate) || (!endDate && now > startDate)) {
+        statusClass = 'past';
+        statusTextEn = 'Past Event';
+        statusTextBn = 'অতীত ইভেন্ট';
+      }
+
+      function formatFullDate(d) {
+        if (!d) return '';
+        return new Date(d).toLocaleString('en-IN', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      }
+    %>
+
+    <article class="event-history-card">
+      <header class="event-history-header">
+        <span class="event-status-pill <%= statusClass %>" data-en="<%= statusTextEn %>" data-bn="<%= statusTextBn %>">
+          ● <%= statusTextEn %>
+        </span>
+
+        <h1 class="event-history-title" data-en="<%= event.title %>" data-bn="<%= event.title_bn || event.title %>">
+          <%= event.title %>
+        </h1>
+
+        <% if (event.title_bn && event.title_bn !== event.title) { %>
+          <div class="event-history-title-bn"><%= event.title_bn %></div>
+        <% } %>
+
+        <div class="event-history-meta">
+          <div class="event-history-meta-item">
+            📅 <strong>Date:</strong> 
+            <time datetime="<%= new Date(event.event_date).toISOString() %>">
+              <%= formatFullDate(event.event_date) %>
+            </time>
+            <% if (event.end_date) { %>
+              &nbsp;–&nbsp;
+              <time datetime="<%= new Date(event.end_date).toISOString() %>">
+                <%= formatFullDate(event.end_date) %>
+              </time>
+            <% } %>
+          </div>
+
+          <% if (event.location || event.location_bn) { %>
+            <div class="event-history-meta-item">
+              📍 <strong>Location:</strong>
+              <span data-en="<%= event.location %>" data-bn="<%= event.location_bn || event.location %>">
+                <%= event.location %>
+              </span>
+            </div>
+          <% } %>
+        </div>
+      </header>
+
+      <div class="event-history-grid">
+        <!-- Event Content & Description -->
+        <div class="event-history-main">
+          <% if (event.cover_image_url) { %>
+            <div style="margin-bottom: 24px; border-radius: 12px; overflow: hidden; max-height: 400px;">
+              <img src="<%= event.cover_image_url %>" alt="<%= event.title %>" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+          <% } %>
+
+          <h2 style="font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: 12px;" data-en="Event Description" data-bn="ইভেন্টের বিবরণ">
+            Event Description
+          </h2>
+
+          <div class="event-history-desc-box" data-en="<%= event.description || 'No description provided for this event.' %>" data-bn="<%= event.description_bn || event.description || 'এই ইভেন্টের জন্য কোনো বিবরণ দেওয়া হয়নি।' %>">
+            <%= event.description || 'No description provided for this event.' %>
+          </div>
+
+          <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--temple-cream-2);">
+            <button type="button" class="btn btn-outline btn-sm" id="shareBtn" data-en="🔗 Share Event Link" data-bn="🔗 ইভেন্ট লিংক শেয়ার করুন">
+              🔗 Share Event Link
+            </button>
+            <span id="shareMsg" style="margin-left: 10px; font-size: 0.85rem; color: var(--marigold-deep); display: none;"></span>
+          </div>
+        </div>
+
+        <!-- Sidebar: Audit Log & Event History Timeline -->
+        <aside class="event-history-sidebar">
+          <h3 style="font-family: 'Fraunces', serif; font-size: 1.15rem; margin-bottom: 14px;" data-en="📜 Audit Log & History" data-bn="📜 অডিট লগ ও ইতিহাস">
+            📜 Audit Log & History
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--ink-soft); margin-bottom: 16px;" data-en="Audit trail records and lifecycle logs for this event." data-bn="এই ইভেন্টের অডিট ট্রেইল রেকর্ড এবং জীবনচক্র লগ।">
+            Audit trail records and lifecycle logs for this event.
+          </p>
+
+          <div class="audit-timeline">
+            <div class="audit-timeline-item">
+              <div class="audit-label" data-en="Event ID" data-bn="ইভেন্ট আইডি">Event ID</div>
+              <div class="audit-val">#<%= event.id %></div>
+            </div>
+
+            <div class="audit-timeline-item">
+              <div class="audit-label" data-en="Publication Status" data-bn="প্রকাশের অবস্থা">Publication Status</div>
+              <div class="audit-val">
+                <% if (event.is_published) { %>
+                  <span style="color:#166534; font-weight:700;" data-en="✓ Published" data-bn="✓ প্রকাশিত">✓ Published</span>
+                <% } else { %>
+                  <span style="color:#991b1b; font-weight:700;" data-en="⚠ Draft" data-bn="⚠ খসড়া">⚠ Draft</span>
+                <% } %>
+              </div>
+            </div>
+
+            <div class="audit-timeline-item">
+              <div class="audit-label" data-en="Created On" data-bn="তৈরি করা হয়েছে">Created On</div>
+              <div class="audit-val">
+                <%= event.created_at ? formatFullDate(event.created_at) : 'N/A' %>
+              </div>
+            </div>
+
+            <div class="audit-timeline-item">
+              <div class="audit-label" data-en="Organized / Created By" data-bn="তৈরি করেছেন">Organized / Created By</div>
+              <div class="audit-val">
+                <%= event.creator_name || 'Kamalarani Foundation Admin' %>
+              </div>
+            </div>
+
+            <div class="audit-timeline-item">
+              <div class="audit-label" data-en="Last Modified" data-bn="সর্বশেষ আপডেট">Last Modified</div>
+              <div class="audit-val">
+                <%= event.updated_at ? formatFullDate(event.updated_at) : (event.created_at ? formatFullDate(event.created_at) : 'N/A') %>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var shareBtn = document.getElementById('shareBtn');
+  var shareMsg = document.getElementById('shareMsg');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', function() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(window.location.href).then(function() {
+          shareMsg.textContent = (localStorage.getItem('kf_lang') === 'bn') ? 'লিংক কপি হয়েছে!' : 'Link Copied!';
+          shareMsg.style.display = 'inline';
+          setTimeout(function() { shareMsg.style.display = 'none'; }, 2500);
+        });
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>

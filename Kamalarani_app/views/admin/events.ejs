@@ -75,15 +75,27 @@
               <form action="/admin/events" method="POST" class="event-form-stack">
             <% } %>
               <div class="field">
-                <label for="evTitle">Event Title *</label>
+                <label for="evTitle">Event Title (English) *</label>
                 <input type="text" id="evTitle" name="title" required
                   value="<%= editEvent ? editEvent.title : '' %>"
-                  placeholder="e.g. Art Class — Material Distribution Day">
+                  placeholder="e.g. Jhulan Yatra of Lord Sri Krishna">
               </div>
 
               <div class="field">
-                <label for="evDesc">Description</label>
+                <label for="evTitleBn">Event Title (Bengali)</label>
+                <input type="text" id="evTitleBn" name="title_bn"
+                  value="<%= editEvent ? (editEvent.title_bn || '') : '' %>"
+                  placeholder="যেমন: ভগবান শ্রীকৃষ্ণের ঝুলন যাত্রা অনুষ্ঠান">
+              </div>
+
+              <div class="field">
+                <label for="evDesc">Description (English)</label>
                 <textarea id="evDesc" name="description" placeholder="Brief description of the event..."><%= editEvent ? (editEvent.description || '') : '' %></textarea>
+              </div>
+
+              <div class="field">
+                <label for="evDescBn">Description (Bengali)</label>
+                <textarea id="evDescBn" name="description_bn" placeholder="অনুষ্ঠানের সংক্ষিপ্ত বিবরণ..."><%= editEvent ? (editEvent.description_bn || '') : '' %></textarea>
               </div>
 
               <div class="datetime-grid">
@@ -100,10 +112,17 @@
               </div>
 
               <div class="field">
-                <label for="evLocation">Location *</label>
+                <label for="evLocation">Location (English) *</label>
                 <input type="text" id="evLocation" name="location" required
                   value="<%= editEvent ? (editEvent.location || '') : '' %>"
                   placeholder="e.g. Sri Sri Radha-Govinda Thakurbari, Natabari">
+              </div>
+
+              <div class="field">
+                <label for="evLocationBn">Location (Bengali)</label>
+                <input type="text" id="evLocationBn" name="location_bn"
+                  value="<%= editEvent ? (editEvent.location_bn || '') : '' %>"
+                  placeholder="যেমন: শ্রী শ্রী রাধা-গোবিন্দ ঠাকুরবাড়ি, নাটাবাড়ি">
               </div>
 
               <div class="checkbox-row-card">
@@ -165,6 +184,7 @@
                       </td>
                       <td style="text-align:right;">
                         <div style="display:inline-flex;gap:6px;">
+                          <a href="/events/<%= ev.id %>/history" class="btn btn-ghost btn-sm" target="_blank" title="View History">📜 History</a>
                           <a href="/admin/events/<%= ev.id %>/edit" class="btn btn-ghost btn-sm">✏️ Edit</a>
                           <form action="/admin/events/<%= ev.id %>?_method=DELETE" method="POST" style="display:inline;" onsubmit="return confirm('Delete this event?')">
                             <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>

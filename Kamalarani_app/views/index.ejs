@@ -333,26 +333,87 @@
   <div class="wrap">
     <div class="section-head">
       <h2 id="events-heading">Upcoming Events</h2>
-      <p>What's happening next at Kamalarani Foundation.</p>
+      <% 
+        var monthNamesEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        var monthNamesBn = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+        var um = locals.upcomingEventsMonth;
+        var monthLabelEn = um ? (monthNamesEn[um.month - 1] + ' ' + um.year) : '';
+        var monthLabelBn = um ? (monthNamesBn[um.month - 1] + ' ' + um.year) : '';
+      %>
+      <% if (um) { %>
+        <p data-en="Programmes for <%= monthLabelEn %> at Kamalarani Foundation." data-bn="কমলারাণী ফাউন্ডেশনের <%= monthLabelBn %> মাসের অনুষ্ঠান।">Programmes for <%= monthLabelEn %> at Kamalarani Foundation.</p>
+      <% } else { %>
+        <p>What's happening next at Kamalarani Foundation.</p>
+      <% } %>
     </div>
-    <% if (events && events.length) { %>
+    <% 
+      var listToRender = (locals.allUpcomingEvents && locals.allUpcomingEvents.length) ? locals.allUpcomingEvents : (events || []);
+      var targetMonthIds = (events || []).map(function(e){ return e.id; });
+      var hasExtra = listToRender.length > targetMonthIds.length;
+    %>
+    <% if (listToRender && listToRender.length) { %>
       <div class="offer-grid">
-        <% events.forEach(function(ev){ %>
-          <article class="offer-card">
-            <h3><%= ev.title %></h3>
-            <p><time datetime="<%= new Date(ev.event_date).toISOString() %>"><%= new Date(ev.event_date).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %></time><% if (ev.location) { %> · <span><%= ev.location %></span><% } %></p>
-            <% if (ev.description) { %><p><%= ev.description %></p><% } %>
+        <% listToRender.forEach(function(ev){ %>
+          <% var isCurrentMonth = targetMonthIds.indexOf(ev.id) !== -1; %>
+          <article class="offer-card event-bilingual-card <%= !isCurrentMonth ? 'event-card-extra' : '' %>" <% if (!isCurrentMonth) { %>style="display:none;"<% } %>>
+            <h3
+              data-en="<%= ev.title %>"
+              data-bn="<%= ev.title_bn || ev.title %>"
+            ><%= ev.title %></h3>
+            <p>
+              <time datetime="<%= new Date(ev.event_date).toISOString() %>"><%= new Date(ev.event_date).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %></time><% if (ev.end_date) { %> – <time datetime="<%= new Date(ev.end_date).toISOString() %>"><%= new Date(ev.end_date).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %></time><% } %><% if (ev.location) { %> · <span data-en="<%= ev.location %>" data-bn="<%= ev.location_bn || ev.location %>"><%= ev.location %></span><% } %>
+            </p>
+            <% if (ev.description || ev.description_bn) { %>
+              <p
+                data-en="<%= ev.description || ev.description_bn || '' %>"
+                data-bn="<%= ev.description_bn || ev.description || '' %>"
+              ><%= ev.description || ev.description_bn || '' %></p>
+            <% } %>
+            <div>
+              <a href="/events/<%= ev.id %>/history" class="event-history-btn" data-en="📜 View History" data-bn="📜 ইতিহাস দেখুন">📜 View History</a>
+            </div>
           </article>
         <% }) %>
       </div>
     <% } else { %>
-      <p style="text-align:center;color:var(--ink-soft);">No upcoming events right now — check back soon or <a href="/calendar">view the full calendar</a>.</p>
+      <p style="text-align:center;color:var(--ink-soft);" data-en="No upcoming events right now — check back soon or view the full calendar" data-bn="এখন কোনো আসন্ন ইভেন্ট নেই — শীঘ্রই আবার দেখুন বা সম্পূর্ণ ক্যালেন্ডার দেখুন">No events scheduled right now — check back soon or <a href="/calendar">view the full calendar</a>.</p>
     <% } %>
-    <div style="text-align:center;margin-top:28px;">
-      <a href="/calendar" class="btn btn-ghost">View Full Event Calendar →</a>
+    <div style="text-align:center;margin-top:28px;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;">
+      <% if (hasExtra) { %>
+        <button id="view-full-events-btn" type="button" class="btn btn-primary" data-en="View Full Events" data-bn="সমস্ত ইভেন্ট দেখুন">View Full Events</button>
+      <% } else if (listToRender && listToRender.length) { %>
+        <button id="view-full-events-btn" type="button" class="btn btn-primary" style="display:none;" data-en="View Full Events" data-bn="সমস্ত ইভেন্ট দেখুন">View Full Events</button>
+      <% } %>
+      <a href="/calendar" class="btn btn-ghost" data-en="View Full Event Calendar →" data-bn="সম্পূর্ণ ইভেন্ট ক্যালেন্ডার দেখুন →">View Full Event Calendar →</a>
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('view-full-events-btn');
+    if (btn) {
+      var isExpanded = false;
+      btn.addEventListener('click', function() {
+        isExpanded = !isExpanded;
+        var extraCards = document.querySelectorAll('.event-card-extra');
+        extraCards.forEach(function(card) {
+          card.style.display = isExpanded ? 'block' : 'none';
+        });
+        var isBn = (localStorage.getItem('kf_lang') || 'en') === 'bn';
+        if (isExpanded) {
+          btn.setAttribute('data-en', 'Show Less');
+          btn.setAttribute('data-bn', 'কম ইভেন্ট দেখুন');
+          btn.textContent = isBn ? 'কম ইভেন্ট দেখুন' : 'Show Less';
+        } else {
+          btn.setAttribute('data-en', 'View Full Events');
+          btn.setAttribute('data-bn', 'সমস্ত ইভেন্ট দেখুন');
+          btn.textContent = isBn ? 'সমস্ত ইভেন্ট দেখুন' : 'View Full Events';
+        }
+      });
+    }
+  });
+</script>
 
 <section class="gallery" id="gallery" aria-labelledby="gallery-heading">
   <div class="wrap">

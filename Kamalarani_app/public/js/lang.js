@@ -151,8 +151,8 @@
       toggleBtn.setAttribute(
         'title',
         isBn
-          ? 'Switch Language (বাংলা → English)'
-          : 'Switch Language (English → বাংলা)'
+          ? 'Switch Language (বাংলা → ENG)'
+          : 'Switch Language (ENG → বাংলা)'
       );
     }
     document.documentElement.lang = currentLang === 'bn' ? 'bn' : 'en';

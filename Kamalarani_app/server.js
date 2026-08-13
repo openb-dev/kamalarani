@@ -83,14 +83,47 @@ app.use('/', require('./routes/admissions'));
 // Homepage
 app.get('/', async (req, res) => {
   try {
-    const [events]  = await pool.query(
-      "SELECT * FROM events WHERE is_published = TRUE AND event_date >= NOW() ORDER BY event_date ASC LIMIT 3"
+    // Upcoming Events: show only the current month's events.
+    // From day 30 (or the last day of shorter months), preview the next month.
+    const now = new Date();
+    const day = now.getDate();
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const switchToNextMonth = day >= 30 || day === lastDayOfMonth;
+
+    let year = now.getFullYear();
+    let month = now.getMonth(); // 0-based
+    if (switchToNextMonth) {
+      month += 1;
+      if (month > 11) {
+        month = 0;
+        year += 1;
+      }
+    }
+    const sqlMonth = month + 1; // MySQL MONTH() is 1-based
+
+    const [allUpcomingEvents] = await pool.query(
+      `SELECT * FROM events
+       WHERE is_published = TRUE
+         AND COALESCE(end_date, event_date) >= CURDATE()
+       ORDER BY event_date ASC`
     );
+
+    // Filter events for current upcoming target month
+    let monthEvents = (allUpcomingEvents || []).filter(ev => {
+      const d = new Date(ev.event_date);
+      return d.getFullYear() === year && (d.getMonth() + 1) === sqlMonth;
+    });
+
     const [gallery] = await pool.query("SELECT * FROM gallery_items ORDER BY created_at DESC LIMIT 50");
-    res.render('index', { events, gallery });
+    res.render('index', {
+      events: monthEvents,
+      allUpcomingEvents: allUpcomingEvents || [],
+      gallery,
+      upcomingEventsMonth: { year, month: sqlMonth }
+    });
   } catch (err) {
     console.error(err);
-    res.render('index', { events: [], gallery: [] });
+    res.render('index', { events: [], allUpcomingEvents: [], gallery: [], upcomingEventsMonth: null });
   }
 });
 

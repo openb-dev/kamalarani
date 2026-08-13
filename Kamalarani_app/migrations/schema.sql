@@ -17,10 +17,13 @@ CREATE TABLE IF NOT EXISTS admins (
 CREATE TABLE IF NOT EXISTS events (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
+  title_bn VARCHAR(255) NULL,
   description TEXT,
+  description_bn TEXT NULL,
   event_date DATETIME NOT NULL,
   end_date DATETIME NULL,
   location VARCHAR(500),
+  location_bn VARCHAR(500) NULL,
   cover_image_url TEXT,
   is_published BOOLEAN DEFAULT TRUE,
   created_by INT,

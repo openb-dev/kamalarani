@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="notranslate">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="google" content="notranslate">
@@ -13,23 +13,25 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="KF CMS">
   <meta name="robots" content="noindex, nofollow">
-  <title>Admin Login — Kamalarani Foundation</title>
+  <title data-en="Admin Login — Kamalarani Foundation" data-bn="অ্যাডমিন লগইন — কমলারাণী ফাউন্ডেশন">Admin Login — Kamalarani Foundation</title>
   <link rel="stylesheet" href="/css/admin.css">
   <script src="/js/pwa-register.js" defer></script>
+
 </head>
 <body>
 <div class="login-page">
   <div class="login-card">
+
     <div class="login-logo">
       <img src="/images/logo.png" alt="Kamalarani Foundation Logo" class="login-logo-img">
       <div class="logo-text">
-        <h2>Kamalarani Foundation</h2>
-        <p>Content Management System</p>
+        <h2 data-en="Kamalarani Foundation" data-bn="কমলারাণী ফাউন্ডেশন">Kamalarani Foundation</h2>
+        <p data-en="Content Management System" data-bn="কনটেন্ট ম্যানেজমেন্ট সিস্টেম">Content Management System</p>
       </div>
     </div>
 
-    <h1>Welcome back</h1>
-    <p class="login-sub">Sign in to manage your foundation's content.</p>
+    <h1 data-en="Welcome back" data-bn="স্বাগতম">Welcome back</h1>
+    <p class="login-sub" data-en="Sign in to manage your foundation's content." data-bn="আপনার ফাউন্ডেশনের কন্টেন্ট পরিচালনার জন্য সাইন ইন করুন।">Sign in to manage your foundation's content.</p>
 
     <% if (locals.error && locals.error.length) { %>
       <div class="login-error">⚠️ <%= locals.error[0] %></div>
@@ -37,21 +39,21 @@
 
     <form action="/admin/login" method="POST" novalidate>
       <div class="login-field">
-        <label for="loginEmail">Email Address</label>
-        <input type="email" id="loginEmail" name="email" placeholder="admin@kamalaranifoundation.org" required autocomplete="email">
+        <label for="loginEmail" data-en="Email Address" data-bn="ইমেল অ্যাড্রেস">Email Address</label>
+        <input type="email" id="loginEmail" name="email" placeholder="admin@kamalaranifoundation.org" data-en-placeholder="admin@kamalaranifoundation.org" data-bn-placeholder="admin@kamalaranifoundation.org" required autocomplete="email">
       </div>
       <div class="login-field">
-        <label for="loginPassword">Password</label>
+        <label for="loginPassword" data-en="Password" data-bn="পাসওয়ার্ড">Password</label>
         <input type="password" id="loginPassword" name="password" placeholder="••••••••••" required autocomplete="current-password">
       </div>
-      <button type="submit" class="login-submit">Sign In to Dashboard</button>
+      <button type="submit" class="login-submit" data-en="Sign In to Dashboard" data-bn="ড্যাশবোর্ডে সাইন ইন করুন">Sign In to Dashboard</button>
     </form>
 
     <div class="login-back">
-      <button id="pwaInstallBtn" type="button" class="pwa-install-btn" style="display:none;">
+      <button id="pwaInstallBtn" type="button" class="pwa-install-btn" style="display:none;" data-en="📲 Install App on Device" data-bn="📲 ডিভাইসে অ্যাপ ইনস্টল করুন">
         📲 Install App on Device
       </button>
-      <a href="/">← View Website</a>
+      <a href="/" data-en="← View Website" data-bn="← ওয়েবসাইট দেখুন">← View Website</a>
     </div>
   </div>
 </div>

@@ -802,6 +802,9 @@
     <div class="upcoming-strip" id="upcomingStrip">
       <!-- Injected by JS -->
     </div>
+    <div style="text-align:center; margin-top:20px;" id="upcomingToggleWrap">
+      <button type="button" class="btn btn-primary" id="viewFullUpcomingBtn" style="display:none;" data-en="View Full Events" data-bn="সমস্ত ইভেন্ট দেখুন">View Full Events</button>
+    </div>
   </div>
 
   <hr class="cal-divider">
@@ -872,12 +875,15 @@
   /* ── Raw data from server ───────────────────────────────────── */
   const RAW_EVENTS = <%- JSON.stringify(events.map(function(ev) {
     return {
-      id:          ev.id,
-      title:       ev.title,
-      description: ev.description || '',
-      location:    ev.location    || '',
-      event_date:  ev.event_date,
-      end_date:    ev.end_date || null
+      id:             ev.id,
+      title:          ev.title,
+      title_bn:       ev.title_bn || '',
+      description:    ev.description || '',
+      description_bn: ev.description_bn || '',
+      location:       ev.location || '',
+      location_bn:    ev.location_bn || '',
+      event_date:     ev.event_date,
+      end_date:       ev.end_date || null
     };
   })) %>;
 
@@ -980,6 +986,21 @@
     return kfIsBn() ? diff + ' দিনে' : 'In ' + diff + ' days';
   }
 
+  function eventTitleHtml(ev, titleClass) {
+    var title = kfIsBn() ? (ev.title_bn || ev.title) : ev.title;
+    return '<div class="' + titleClass + '">' + title + '</div>';
+  }
+
+  function eventMetaHtml(ev) {
+    var loc = kfIsBn() ? (ev.location_bn || ev.location) : ev.location;
+    return loc ? '<span>📍 ' + loc + '</span>' : '';
+  }
+
+  function eventDescHtml(ev, descClass) {
+    var desc = kfIsBn() ? (ev.description_bn || ev.description) : (ev.description || ev.description_bn);
+    return desc ? '<div class="' + descClass + '">' + desc + '</div>' : '';
+  }
+
   /* ── DOM refs (archive) ─────────────────────────────────────── */
   var archiveSection    = document.getElementById('archiveSection');
   var archiveCountPill  = document.getElementById('archiveCountPill');
@@ -988,39 +1009,105 @@
   var archiveToggleBtn  = document.getElementById('archiveToggleBtn');
   var archiveToggleLabel= document.getElementById('archiveToggleLabel');
 
-  /* ── UPCOMING STRIP (all future events) ─────────────────────── */
+  /* ── UPCOMING STRIP (current month only; from day 30 → next month) ── */
+  function getUpcomingMonthWindow() {
+    var day = today.getDate();
+    var lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    var year = today.getFullYear();
+    var month = today.getMonth(); // 0-based
+    if (day >= 30 || day === lastDay) {
+      month += 1;
+      if (month > 11) {
+        month = 0;
+        year += 1;
+      }
+    }
+    return { year: year, month: month };
+  }
+
+  function eventEndDate(ev) {
+    return ev.endObj || ev.dateObj;
+  }
+
+  var upcomingExpanded = false;
+
   function renderUpcoming() {
-    var upcoming = EVENTS.filter(function(ev) {
-      return ev.dateObj >= today;
+    var win = getUpcomingMonthWindow();
+
+    var allUpcoming = EVENTS.filter(function(ev) {
+      var end = eventEndDate(ev);
+      return end >= today;
     }).sort(function(a, b) { return a.dateObj - b.dateObj; });
 
-    upcomingCountPill.textContent = eventWord(upcoming.length);
+    var monthUpcoming = allUpcoming.filter(function(ev) {
+      return ev.dateObj.getFullYear() === win.year &&
+             ev.dateObj.getMonth() === win.month;
+    });
 
-    if (upcoming.length === 0) {
+    var displayEvents = upcomingExpanded ? allUpcoming : monthUpcoming;
+
+    upcomingCountPill.textContent = eventWord(displayEvents.length);
+
+    var viewFullBtn = document.getElementById('viewFullUpcomingBtn');
+
+    if (displayEvents.length === 0) {
       upcomingStrip.innerHTML =
         '<div class="no-upcoming">🗓️ &nbsp;' +
-        (kfIsBn() ? 'এখন কোনো আসন্ন ইভেন্ট নেই — শীঘ্রই আবার দেখুন।' : 'No upcoming events right now — check back soon.') +
+        (kfIsBn() ? 'এই মাসে কোনো আসন্ন ইভেন্ট নেই — শীঘ্রই আবার দেখুন।' : 'No upcoming events for this month — check back soon.') +
         '</div>';
+      if (viewFullBtn) {
+        if (allUpcoming.length > 0) {
+          viewFullBtn.style.display = 'inline-block';
+          viewFullBtn.setAttribute('data-en', 'View Full Events');
+          viewFullBtn.setAttribute('data-bn', 'সমস্ত ইভেন্ট দেখুন');
+          viewFullBtn.textContent = kfIsBn() ? 'সমস্ত ইভেন্ট দেখুন' : 'View Full Events';
+        } else {
+          viewFullBtn.style.display = 'none';
+        }
+      }
       return;
     }
 
     upcomingStrip.innerHTML = '';
-    upcoming.forEach(function(ev, i) {
+    displayEvents.forEach(function(ev, i) {
       var timeStr = formatTime(ev.dateObj);
       var days    = daysFromNow(ev.dateObj);
       var card = document.createElement('article');
       card.className = 'upcoming-card';
       card.style.animationDelay = (i * 0.05) + 's';
       var dateLabel = formatDateShort(ev.dateObj) + (timeStr ? ' · ' + timeStr : '');
-      var metaHtml = ev.location ? '<span>📍 ' + ev.location + '</span>' : '';
-      var descHtml = ev.description ? '<div class="upcoming-card-desc">' + ev.description + '</div>' : '';
+      var metaHtml = eventMetaHtml(ev);
+      var descHtml = eventDescHtml(ev, 'upcoming-card-desc');
+      var historyBtnHtml = '<div><a href="/events/' + ev.id + '/history" class="event-history-btn" data-en="📜 View History" data-bn="📜 ইতিহাস দেখুন">' + (kfIsBn() ? '📜 ইতিহাস দেখুন' : '📜 View History') + '</a></div>';
       card.innerHTML =
         '<span class="upcoming-days-badge">' + days + '</span>' +
         '<div class="upcoming-card-day">' + dateLabel + '</div>' +
-        '<div class="upcoming-card-title">' + ev.title + '</div>' +
+        eventTitleHtml(ev, 'upcoming-card-title') +
         '<div class="upcoming-card-meta">' + metaHtml + '</div>' +
-        descHtml;
+        descHtml +
+        historyBtnHtml;
       upcomingStrip.appendChild(card);
+    });
+
+    if (viewFullBtn) {
+      if (allUpcoming.length > monthUpcoming.length || upcomingExpanded) {
+        viewFullBtn.style.display = 'inline-block';
+        viewFullBtn.setAttribute('data-en', upcomingExpanded ? 'Show Less' : 'View Full Events');
+        viewFullBtn.setAttribute('data-bn', upcomingExpanded ? 'কম ইভেন্ট দেখুন' : 'সমস্ত ইভেন্ট দেখুন');
+        viewFullBtn.textContent = kfIsBn()
+          ? (upcomingExpanded ? 'কম ইভেন্ট দেখুন' : 'সমস্ত ইভেন্ট দেখুন')
+          : (upcomingExpanded ? 'Show Less' : 'View Full Events');
+      } else {
+        viewFullBtn.style.display = 'none';
+      }
+    }
+  }
+
+  var viewFullBtn = document.getElementById('viewFullUpcomingBtn');
+  if (viewFullBtn) {
+    viewFullBtn.addEventListener('click', function() {
+      upcomingExpanded = !upcomingExpanded;
+      renderUpcoming();
     });
   }
 
@@ -1045,8 +1132,8 @@
     past.forEach(function(ev, i) {
       var timeStr  = formatTime(ev.dateObj);
       var dateLabel = formatDateShort(ev.dateObj) + (timeStr ? ' · ' + timeStr : '');
-      var metaHtml  = ev.location ? '<span>📍 ' + ev.location + '</span>' : '';
-      var descHtml  = ev.description ? '<div class="past-card-desc">' + ev.description + '</div>' : '';
+      var metaHtml  = eventMetaHtml(ev);
+      var descHtml  = eventDescHtml(ev, 'past-card-desc');
 
       /* How long ago */
       var daysAgo = Math.round((today - ev.dateObj) / 86400000);
@@ -1058,12 +1145,14 @@
 
       var card = document.createElement('article');
       card.className = 'past-card' + (i >= ARCHIVE_PAGE_SIZE ? ' archive-hidden' : '');
+      var historyBtnHtml = '<div><a href="/events/' + ev.id + '/history" class="event-history-btn" data-en="📜 View History" data-bn="📜 ইতিহাস দেখুন">' + (kfIsBn() ? '📜 ইতিহাস দেখুন' : '📜 View History') + '</a></div>';
       card.innerHTML =
         '<span class="past-card-date-badge">' + agoStr + '</span>' +
         '<div class="past-card-day">📅 ' + dateLabel + '</div>' +
-        '<div class="past-card-title">' + ev.title + '</div>' +
+        eventTitleHtml(ev, 'past-card-title') +
         '<div class="past-card-meta">' + metaHtml + '</div>' +
-        descHtml;
+        descHtml +
+        historyBtnHtml;
       archiveGrid.appendChild(card);
     });
 
@@ -1202,7 +1291,7 @@
         dayEvs.slice(0, maxChips).forEach(function(ev) {
           var chip = document.createElement('span');
           chip.className = 'cal-day-event-chip';
-          chip.textContent = ev.title;
+          chip.textContent = kfIsBn() ? (ev.title_bn || ev.title) : ev.title;
           chipsWrap.appendChild(chip);
         });
         if (dayEvs.length > maxChips) {
@@ -1251,15 +1340,17 @@
       var timeDisplay = timeStr ? timeStr + (endStr ? ' – ' + endStr : '') : (endStr ? (kfIsBn() ? 'শেষ ' + endStr : 'Ends ' + endStr) : '');
       var badge = '<span class="day-detail-badge' + (isUpcoming ? '' : ' past') + '">' +
         (isUpcoming ? (kfIsBn() ? 'আসন্ন' : 'Upcoming') : (kfIsBn() ? 'অতীত' : 'Past')) + '</span>';
-      var metaHtml = ev.location ? '<span>📍 ' + ev.location + '</span>' : '';
-      var descHtml = ev.description ? '<div class="day-detail-item-desc">' + ev.description + '</div>' : '';
+      var metaHtml = eventMetaHtml(ev);
+      var descHtml = eventDescHtml(ev, 'day-detail-item-desc');
+      var historyBtnHtml = '<div><a href="/events/' + ev.id + '/history" class="day-detail-history-btn" data-en="📜 View History" data-bn="📜 ইতিহাস দেখুন">' + (kfIsBn() ? '📜 ইতিহাস দেখুন' : '📜 View History') + '</a></div>';
       item.innerHTML =
         (timeDisplay
           ? '<div class="day-detail-item-time">' + timeDisplay + badge + '</div>'
           : '<div style="margin-bottom:6px;">' + badge + '</div>') +
-        '<div class="day-detail-item-title">' + ev.title + '</div>' +
+        eventTitleHtml(ev, 'day-detail-item-title') +
         '<div class="day-detail-item-meta">' + metaHtml + '</div>' +
-        descHtml;
+        descHtml +
+        historyBtnHtml;
       dayDetailList.appendChild(item);
     });
 

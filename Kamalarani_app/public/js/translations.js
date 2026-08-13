@@ -19,6 +19,7 @@ window.KF_TRANSLATIONS = {
   "☰ Menu": "☰ মেনু",
   "Skip to main content": "মূল বিষয়বস্তুতে যান",
   "Switch Language": "ভাষা পরিবর্তন",
+  "Switch Language (ENG / বাংলা)": "ভাষা পরিবর্তন (ইংরেজি / বাংলা)",
   "Switch Language (English / বাংলা)": "ভাষা পরিবর্তন (ইংরেজি / বাংলা)",
 
   /* Hero slide 1 */
@@ -74,6 +75,8 @@ window.KF_TRANSLATIONS = {
   "What's happening next at Kamalarani Foundation.": "কমলারাণী ফাউন্ডেশনে আগামী কী ঘটছে।",
   "No upcoming events right now — check back soon or view the full calendar": "এখন কোনো আসন্ন ইভেন্ট নেই — শীঘ্রই আবার দেখুন বা সম্পূর্ণ ক্যালেন্ডার দেখুন",
   "view the full calendar": "সম্পূর্ণ ক্যালেন্ডার দেখুন",
+  "View Full Events": "সমস্ত ইভেন্ট দেখুন",
+  "Show Less": "কম ইভেন্ট দেখুন",
   "View Full Event Calendar →": "সম্পূর্ণ ইভেন্ট ক্যালেন্ডার দেখুন →",
   "From Our Classes": "আমাদের ক্লাস থেকে",
   "Moments from our free art classes and material distribution days.": "বিনামূল্যে শিল্প ক্লাস ও সামগ্রী বিতরণের মুহূর্ত।",
@@ -461,9 +464,44 @@ window.KF_TRANSLATIONS = {
   "Kamalarani Foundation Logo": "কমলারাণী ফাউন্ডেশন লোগো",
   "Kamalarani Foundation — Home": "কমলারাণী ফাউন্ডেশন — হোম",
 
+  /* Admin Login */
+  "Admin Login — Kamalarani Foundation": "অ্যাডমিন লগইন — কমলারাণী ফাউন্ডেশন",
+  "Welcome back": "স্বাগতম",
+  "Sign in to manage your foundation's content.": "আপনার ফাউন্ডেশনের কন্টেন্ট পরিচালনার জন্য সাইন ইন করুন।",
+  "Email Address": "ইমেল অ্যাড্রেস",
+  "Password": "পাসওয়ার্ড",
+  "Sign In to Dashboard": "ড্যাশবোর্ডে সাইন ইন করুন",
+  "← View Website": "← ওয়েবসাইট দেখুন",
+  "Content Management System": "কনটেন্ট ম্যানেজমেন্ট সিস্টেম",
+
   /* 404 page */
   "Page Not Found — Kamalarani Foundation": "পৃষ্ঠা পাওয়া যায়নি — কমলারাণী ফাউন্ডেশন",
   "The page you were looking for doesn't exist. It may have been moved or the link may be incorrect.": "আপনি যে পৃষ্ঠাটি খুঁজছিলেন তা নেই। এটি সরানো হয়েছে বা লিংকটি ভুল হতে পারে।",
-  "The page you were looking for could not be found.": "আপনি যে পৃষ্ঠাটি খুঁজছিলেন তা পাওয়া যায়নি।",
-  "← Back to Home": "← হোমে ফিরুন"
+  "← Back to Home": "← হোমে ফিরুন",
+
+  /* Event History */
+  "View History": "ইতিহাস দেখুন",
+  "📜 View History": "📜 ইতিহাস দেখুন",
+  "Event History": "ইভেন্টের ইতিহাস",
+  "Event Details & History": "ইভেন্টের বিস্তারিত ও ইতিহাস",
+  "Full history, audit log, and timeline for this event.": "এই ইভেন্টের সম্পূর্ণ ইতিহাস, অডিট লগ এবং সময়রেখা।",
+  "← Back to Events": "← ইভেন্টে ফিরুন",
+  "← Back to Calendar": "← ক্যালেন্ডারে ফিরুন",
+  "Live Now": "বর্তমানে লাইভ",
+  "Upcoming Event": "আসন্ন ইভেন্ট",
+  "Past Event": "অতীত ইভেন্ট",
+  "Published": "প্রকাশিত",
+  "Draft": "খসড়া",
+  "Event Information": "ইভেন্ট তথ্য",
+  "Audit Log & Timeline": "অডিট লগ ও সময়রেখা",
+  "Event Created": "ইভেন্ট তৈরি হয়েছে",
+  "Last Modified": "সর্বশেষ পরিবর্তিত",
+  "Created By": "তৈরি করেছেন",
+  "Scheduled Start": "নির্ধারিত শুরু",
+  "Scheduled End": "নির্ধারিত সমাপ্তি",
+  "System Admin": "সিস্টেম অ্যাডমিন",
+  "Event ID": "ইভেন্ট আইডি",
+  "Share Event Link": "ইভেন্ট লিংক শেয়ার করুন",
+  "Link Copied!": "লিংক কপি হয়েছে!"
 };
+
