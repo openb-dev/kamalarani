@@ -79,7 +79,7 @@
      UPCOMING EVENTS STRIP
   ───────────────────────────────────────────── */
   .upcoming-section {
-    margin-bottom: 60px;
+    margin-bottom: 24px;
   }
   .upcoming-section-head {
     display: flex;
@@ -125,7 +125,7 @@
   .upcoming-card {
     background: linear-gradient(135deg, #0F1B2D 0%, #1b2f4e 100%);
     border-radius: 16px;
-    padding: 22px 22px 24px;
+    padding: 22px 22px 20px;
     position: relative;
     overflow: hidden;
     transition: transform .2s, box-shadow .2s;
@@ -380,7 +380,7 @@
   .cal-divider {
     border: none;
     border-top: 1.5px solid var(--temple-cream-2);
-    margin: 0 0 52px;
+    margin: 0 0 28px;
   }
 
   /* ─────────────────────────────────────────────
@@ -802,7 +802,7 @@
     <div class="upcoming-strip" id="upcomingStrip">
       <!-- Injected by JS -->
     </div>
-    <div style="text-align:center; margin-top:20px;" id="upcomingToggleWrap">
+    <div style="text-align:center; margin-top:16px;" id="upcomingToggleWrap">
       <button type="button" class="btn btn-primary" id="viewFullUpcomingBtn" style="display:none;" data-en="View Full Events" data-bn="সমস্ত ইভেন্ট দেখুন">View Full Events</button>
     </div>
   </div>
@@ -1078,14 +1078,12 @@
       var dateLabel = formatDateShort(ev.dateObj) + (timeStr ? ' · ' + timeStr : '');
       var metaHtml = eventMetaHtml(ev);
       var descHtml = eventDescHtml(ev, 'upcoming-card-desc');
-      var historyBtnHtml = '<div><a href="/events/' + ev.id + '/history" class="event-history-btn" data-en="📜 View History" data-bn="📜 ইতিহাস দেখুন">' + (kfIsBn() ? '📜 ইতিহাস দেখুন' : '📜 View History') + '</a></div>';
       card.innerHTML =
         '<span class="upcoming-days-badge">' + days + '</span>' +
         '<div class="upcoming-card-day">' + dateLabel + '</div>' +
         eventTitleHtml(ev, 'upcoming-card-title') +
         '<div class="upcoming-card-meta">' + metaHtml + '</div>' +
-        descHtml +
-        historyBtnHtml;
+        descHtml;
       upcomingStrip.appendChild(card);
     });
 
@@ -1145,14 +1143,12 @@
 
       var card = document.createElement('article');
       card.className = 'past-card' + (i >= ARCHIVE_PAGE_SIZE ? ' archive-hidden' : '');
-      var historyBtnHtml = '<div><a href="/events/' + ev.id + '/history" class="event-history-btn" data-en="📜 View History" data-bn="📜 ইতিহাস দেখুন">' + (kfIsBn() ? '📜 ইতিহাস দেখুন' : '📜 View History') + '</a></div>';
       card.innerHTML =
         '<span class="past-card-date-badge">' + agoStr + '</span>' +
         '<div class="past-card-day">📅 ' + dateLabel + '</div>' +
         eventTitleHtml(ev, 'past-card-title') +
         '<div class="past-card-meta">' + metaHtml + '</div>' +
-        descHtml +
-        historyBtnHtml;
+        descHtml;
       archiveGrid.appendChild(card);
     });
 
@@ -1342,15 +1338,13 @@
         (isUpcoming ? (kfIsBn() ? 'আসন্ন' : 'Upcoming') : (kfIsBn() ? 'অতীত' : 'Past')) + '</span>';
       var metaHtml = eventMetaHtml(ev);
       var descHtml = eventDescHtml(ev, 'day-detail-item-desc');
-      var historyBtnHtml = '<div><a href="/events/' + ev.id + '/history" class="day-detail-history-btn" data-en="📜 View History" data-bn="📜 ইতিহাস দেখুন">' + (kfIsBn() ? '📜 ইতিহাস দেখুন' : '📜 View History') + '</a></div>';
       item.innerHTML =
         (timeDisplay
           ? '<div class="day-detail-item-time">' + timeDisplay + badge + '</div>'
           : '<div style="margin-bottom:6px;">' + badge + '</div>') +
         eventTitleHtml(ev, 'day-detail-item-title') +
         '<div class="day-detail-item-meta">' + metaHtml + '</div>' +
-        descHtml +
-        historyBtnHtml;
+        descHtml;
       dayDetailList.appendChild(item);
     });
 

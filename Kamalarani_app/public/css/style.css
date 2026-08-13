@@ -1186,75 +1186,8 @@ html.lang-bn .brand-name-lg {
   letter-spacing: 0.02em;
 }
 
-/* ─────────────────────────────────────────────
-   EVENT HISTORY BUTTON & DETAIL PAGE
-───────────────────────────────────────────── */
-.event-history-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 12px;
-  padding: 6px 14px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--marigold-deep);
-  background: rgba(232, 145, 45, 0.08);
-  border: 1px solid rgba(232, 145, 45, 0.3);
-  border-radius: 999px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-.event-history-btn:hover {
-  background: var(--marigold);
-  color: #fff;
-  border-color: var(--marigold);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(232, 145, 45, 0.25);
-}
 
-.upcoming-card .event-history-btn {
-  color: var(--marigold);
-  background: rgba(255, 253, 248, 0.1);
-  border-color: rgba(255, 253, 248, 0.25);
-}
-.upcoming-card .event-history-btn:hover {
-  background: var(--marigold);
-  color: var(--ink);
-  border-color: var(--marigold);
-}
 
-.past-card .event-history-btn {
-  color: #4b5563;
-  background: rgba(107, 114, 128, 0.08);
-  border-color: rgba(107, 114, 128, 0.25);
-}
-.past-card .event-history-btn:hover {
-  background: #4b5563;
-  color: #ffffff;
-  border-color: #4b5563;
-}
-
-.day-detail-history-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 10px;
-  padding: 4px 12px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: var(--vermilion);
-  background: rgba(178, 58, 47, 0.06);
-  border: 1px solid rgba(178, 58, 47, 0.2);
-  border-radius: 999px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-.day-detail-history-btn:hover {
-  background: var(--vermilion);
-  color: #fff;
-}
-
-/* Event History Detail Page */
 .event-history-page {
   padding: 50px 0 80px;
   background: var(--temple-cream);
