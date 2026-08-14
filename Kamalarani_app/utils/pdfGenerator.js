@@ -41,7 +41,7 @@ function generateAdmissionPDF(app, res) {
   doc.font('Helvetica-Bold').fontSize(18).fillColor('#2B2118').text('KAMALARANI FOUNDATION', leftMargin + 60, headerStartY, { width: headerTextWidth - 60, align: 'center' });
   doc.font('Helvetica').fontSize(10).fillColor('#B23A2F').text('Sanatan Culture & Social Welfare (Reg. No. AAETK689KE20221)', leftMargin + 60, headerStartY + 22, { width: headerTextWidth - 60, align: 'center' });
   doc.font('Helvetica-Bold').fontSize(14).fillColor('#2B2118').text('ART CLASS ADMISSION FORM', leftMargin, headerStartY + 38, { width: titleWidth, align: 'center' });
-  doc.font('Helvetica-Oblique').fontSize(9).fillColor('#5A4E40').text('Nursery to Class-VIII', leftMargin, headerStartY + 56, { width: titleWidth, align: 'center' });
+  doc.font('Helvetica-Oblique').fontSize(9).fillColor('#5A4E40').text('Nursery to Graduation', leftMargin, headerStartY + 56, { width: titleWidth, align: 'center' });
 
   // Top Metadata (ARN & Date) — date stays left of the photo
   const metaY = headerStartY + 74;

@@ -101,7 +101,7 @@ function wantsJson(req) {
 }
 
 // Valid dropdown values
-const VALID_CLASSES    = ['Nursery','KG','Class I','Class II','Class III','Class IV','Class V','Class VI','Class VII','Class VIII'];
+const VALID_CLASSES    = ['Nursery','KG','Class I','Class II','Class III','Class IV','Class V','Class VI','Class VII','Class VIII','Class IX','Class X','Class XI','Class XII','Graduation'];
 const VALID_PROGRAMMES = ['Art Class','Music Class','Both','Education Programme','Gita Gyaan','Cultural Programme','Other Programmes'];
 const VALID_BRANCHES   = ['Coochbehar','Kolkata'];
 
@@ -179,7 +179,7 @@ router.post('/admissions', (req, res) => {
       if (!dob) return sendError('Date of Birth is required.');
       if (!gender) return sendError('Please select a Gender.');
       if (!classApplyingFor || !VALID_CLASSES.includes(classApplyingFor)) {
-        return sendError('Please select a valid Class (Nursery to Class VIII).');
+        return sendError('Please select a valid Class (Nursery to Graduation).');
       }
       if (!rawProgramme || !VALID_PROGRAMMES.includes(rawProgramme)) {
         return sendError('Please select a valid Programme.');
