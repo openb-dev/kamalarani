@@ -5,12 +5,28 @@ if (menuBtn && navLinks) {
   menuBtn.addEventListener('click', () => {
     const isOpen = navLinks.classList.toggle('open');
     menuBtn.setAttribute('aria-expanded', isOpen);
+    menuBtn.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+    menuBtn.textContent = isOpen ? '✕' : '☰';
+    document.body.classList.toggle('mobile-menu-open', isOpen);
   });
   navLinks.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', () => {
       navLinks.classList.remove('open');
       menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute('aria-label', 'Open navigation menu');
+      menuBtn.textContent = '☰';
+      document.body.classList.remove('mobile-menu-open');
     });
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && navLinks.classList.contains('open')) {
+      navLinks.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute('aria-label', 'Open navigation menu');
+      menuBtn.textContent = '☰';
+      document.body.classList.remove('mobile-menu-open');
+      menuBtn.focus();
+    }
   });
 }
 

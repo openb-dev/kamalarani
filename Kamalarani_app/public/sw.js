@@ -1,5 +1,5 @@
 // Kamalarani Foundation CMS — Service Worker for PWA
-const CACHE_NAME = 'kf-cms-cache-v2';
+const CACHE_NAME = 'kf-cms-cache-v3';
 const PRECACHE_ASSETS = [
   '/admin/login',
   '/css/admin.css',
@@ -61,8 +61,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first for styles so visual fixes are not hidden by an old cache.
-  if (event.request.destination === 'style') {
+  // Network-first for styles and scripts so interface fixes are not hidden by an old cache.
+  if (event.request.destination === 'style' || event.request.destination === 'script') {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
