@@ -272,13 +272,22 @@
       min-width: 0;
       justify-content: flex-start;
     }
+    .brand-text-wrap-centered {
+      min-width: 0;
+      max-width: 100%;
+    }
     .brand-name-lg {
       font-size: 0.95rem !important;
-      white-space: nowrap;
+      width: min-content;
+      max-width: 100%;
+      white-space: normal;
+      line-height: 1.05;
     }
     .brand-tagline-lg {
       font-size: 0.6rem !important;
-      white-space: nowrap;
+      max-width: 100%;
+      white-space: normal;
+      line-height: 1.1;
     }
     .brand-logo-img-lg {
       height: 44px !important;
