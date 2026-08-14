@@ -1,5 +1,5 @@
 // Kamalarani Foundation CMS — Service Worker for PWA
-const CACHE_NAME = 'kf-cms-cache-v1';
+const CACHE_NAME = 'kf-cms-cache-v2';
 const PRECACHE_ASSETS = [
   '/admin/login',
   '/css/admin.css',
@@ -61,7 +61,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-First / Stale-While-Revalidate for static CSS, JS, and Images
+  // Network-first for styles so visual fixes are not hidden by an old cache.
+  if (event.request.destination === 'style') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Stale-while-revalidate for other static assets.
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {

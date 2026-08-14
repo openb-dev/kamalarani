@@ -253,6 +253,10 @@
     font-size: 0.9rem; font-weight: 700; cursor: pointer;
   }
 
+  .mobile-social-wrap {
+    display: none;
+  }
+
   @media(max-width: 880px) {
     .header-top-tier { padding: 10px 16px; }
     .header-social-wrap, .header-quick-actions { display: none; }
@@ -260,7 +264,17 @@
     .brand-tagline-lg { font-size: 0.68rem; }
     .brand-logo-img-lg { height: 44px; width: 44px; }
     .header-donate-cta { display: none; }
-    .menu-btn { display: block; margin: 0 auto; }
+    .nav-inner { padding: 8px 16px; }
+    .mobile-social-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mobile-social-wrap .header-social-icon {
+      width: 32px;
+      height: 32px;
+    }
+    .menu-btn { display: block; margin-left: auto; }
     nav.links {
       position: fixed; top: 120px; left: 0; right: 0;
       background: var(--temple-cream-2); flex-direction: column;
@@ -827,9 +841,42 @@
   fill: none !important;
   stroke: var(--vermilion) !important;
 }
+.social-icon-btn svg[fill="currentColor"] {
+  fill: currentColor !important;
+  stroke: none !important;
+}
 .social-icon-btn:hover svg {
   color: #FFFFFF !important;
   stroke: #FFFFFF !important;
+}
+
+/* Keep footer social actions visible against the dark background. */
+footer .social-links-wrap {
+  display: flex !important;
+  flex-wrap: wrap;
+}
+footer .social-icon-btn {
+  border-color: var(--marigold) !important;
+  color: var(--marigold) !important;
+}
+footer .social-icon-btn svg {
+  color: var(--marigold) !important;
+  stroke: var(--marigold) !important;
+}
+footer .social-icon-btn svg[fill="currentColor"] {
+  fill: var(--marigold) !important;
+  stroke: none !important;
+}
+
+@media (max-width: 600px) {
+  footer .footer-grid {
+    flex-direction: column;
+  }
+
+  footer .social-links-wrap {
+    width: 100%;
+    margin-top: 16px !important;
+  }
 }
 
 /* ===== Founder & Tribute Pages (ISKCON Bhiwandi Style Layout) ===== */
