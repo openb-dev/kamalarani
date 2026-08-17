@@ -91,9 +91,18 @@
                     </td>
                     <td class="td-truncate" style="max-width:160px;"><%= msg.subject || '—' %></td>
                     <td>
-                      <span title="<%= msg.message %>" class="td-truncate" style="max-width:200px;display:block;font-size:0.82rem;color:var(--text-muted);">
+                      <button
+                        type="button"
+                        class="message-preview-btn message-view-btn td-truncate"
+                        title="View full message"
+                        data-name="<%= msg.name %>"
+                        data-email="<%= msg.email %>"
+                        data-subject="<%= msg.subject || 'No subject' %>"
+                        data-message="<%= msg.message %>"
+                        data-received="<%= new Date(msg.created_at).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' }) %>"
+                      >
                         <%= msg.message.substring(0, 80) %><%= msg.message.length > 80 ? '…' : '' %>
-                      </span>
+                      </button>
                     </td>
                     <td style="white-space:nowrap;font-size:0.8rem;">
                       <%= new Date(msg.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
@@ -103,6 +112,15 @@
                     </td>
                     <td>
                       <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-sm message-view-btn"
+                          data-name="<%= msg.name %>"
+                          data-email="<%= msg.email %>"
+                          data-subject="<%= msg.subject || 'No subject' %>"
+                          data-message="<%= msg.message %>"
+                          data-received="<%= new Date(msg.created_at).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' }) %>"
+                        >View</button>
                         <!-- Update Status -->
                         <form action="/admin/messages/<%= msg.id %>?_method=PUT" method="POST" style="display:flex;gap:4px;">
                           <select name="status" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:0.78rem;padding:4px 8px;">
@@ -129,6 +147,51 @@
     </div>
   </div>
 </div>
+
+<dialog class="message-dialog" id="messageDialog" aria-labelledby="messageDialogSubject">
+  <div class="message-dialog-header">
+    <div>
+      <div class="message-dialog-label">Contact message</div>
+      <h2 id="messageDialogSubject">Message</h2>
+    </div>
+    <button type="button" class="message-dialog-close" id="messageDialogClose" aria-label="Close message">✕</button>
+  </div>
+  <div class="message-dialog-meta">
+    <div><strong>From:</strong> <span id="messageDialogName"></span></div>
+    <div><strong>Email:</strong> <a id="messageDialogEmail"></a></div>
+    <div><strong>Received:</strong> <span id="messageDialogReceived"></span></div>
+  </div>
+  <div class="message-dialog-body" id="messageDialogBody"></div>
+</dialog>
+
 <script src="/js/admin.js"></script>
+<script>
+  (function () {
+    const dialog = document.getElementById('messageDialog');
+    const closeButton = document.getElementById('messageDialogClose');
+    const subject = document.getElementById('messageDialogSubject');
+    const senderName = document.getElementById('messageDialogName');
+    const senderEmail = document.getElementById('messageDialogEmail');
+    const received = document.getElementById('messageDialogReceived');
+    const body = document.getElementById('messageDialogBody');
+
+    document.querySelectorAll('.message-view-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        subject.textContent = button.dataset.subject;
+        senderName.textContent = button.dataset.name;
+        senderEmail.textContent = button.dataset.email;
+        senderEmail.href = 'mailto:' + button.dataset.email;
+        received.textContent = button.dataset.received;
+        body.textContent = button.dataset.message;
+        dialog.showModal();
+      });
+    });
+
+    closeButton.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => {
+      if (event.target === dialog) dialog.close();
+    });
+  })();
+</script>
 </body>
 </html>

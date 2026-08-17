@@ -814,3 +814,87 @@ input[type="datetime-local"] {
 .lang-toggle-btn.is-bn .lang-opt-en { color: var(--vermilion); }
 .lang-toggle-btn.is-bn .lang-opt-bn { color: #ffffff; }
 
+/* ===== Contact Message Viewer ===== */
+.message-preview-btn {
+  display: block;
+  max-width: 200px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+.message-preview-btn:hover {
+  color: var(--vermilion);
+  text-decoration: underline;
+}
+.message-dialog {
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  overflow: auto;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(43,33,24,0.28);
+}
+.message-dialog::backdrop {
+  background: rgba(24,20,16,0.58);
+  backdrop-filter: blur(2px);
+}
+.message-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.message-dialog-header h2 {
+  margin-top: 4px;
+  font-family: 'Fraunces', serif;
+  font-size: 1.35rem;
+  line-height: 1.3;
+}
+.message-dialog-label {
+  color: var(--vermilion);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.message-dialog-close {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  color: var(--vermilion);
+  background: var(--danger-soft);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.message-dialog-meta {
+  display: grid;
+  gap: 7px;
+  padding: 18px 24px;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  border-bottom: 1px solid var(--border);
+}
+.message-dialog-meta a {
+  color: var(--info);
+}
+.message-dialog-body {
+  min-height: 130px;
+  padding: 24px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
