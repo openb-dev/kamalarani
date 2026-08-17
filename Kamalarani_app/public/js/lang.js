@@ -7,12 +7,12 @@
 
   const SKIP_SELECTORS = [
     'script', 'style', 'noscript', 'code', 'pre',
-    '.notranslate', '#langToggleBtn'
+    '.notranslate', '[data-language-toggle]'
   ].join(',');
 
   function shouldSkip(el) {
     if (!el || el.nodeType !== 1) return true;
-    if (el.closest('#langToggleBtn')) return true;
+    if (el.closest('[data-language-toggle]')) return true;
     if (el.closest('.notranslate')) return true;
     return false;
   }
@@ -143,8 +143,7 @@
   let currentLang = localStorage.getItem('kf_lang') || 'en';
 
   function updateButtonUI() {
-    const toggleBtn = document.getElementById('langToggleBtn');
-    if (toggleBtn) {
+    document.querySelectorAll('[data-language-toggle]').forEach(toggleBtn => {
       const isBn = currentLang === 'bn';
       toggleBtn.classList.toggle('is-bn', isBn);
       toggleBtn.setAttribute('aria-pressed', isBn ? 'true' : 'false');
@@ -154,7 +153,7 @@
           ? 'Switch Language (বাংলা → ENG)'
           : 'Switch Language (ENG → বাংলা)'
       );
-    }
+    });
     document.documentElement.lang = currentLang === 'bn' ? 'bn' : 'en';
     document.documentElement.classList.toggle('lang-bn', currentLang === 'bn');
   }
@@ -196,14 +195,13 @@
       notifyLangChange('bn');
     }
 
-    const toggleBtn = document.getElementById('langToggleBtn');
-    if (toggleBtn) {
+    document.querySelectorAll('[data-language-toggle]').forEach(toggleBtn => {
       toggleBtn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         window.toggleLanguage();
       });
-    }
+    });
   }
 
   if (document.readyState === 'loading') {
