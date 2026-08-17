@@ -927,12 +927,10 @@
   today.setHours(0, 0, 0, 0);
 
   /* year bounds */
-  var minYear = today.getFullYear();
   var maxYear = today.getFullYear() + 1;
   if (EVENTS.length) {
     EVENTS.forEach(function(e) {
       var y = e.dateObj.getFullYear();
-      if (y < minYear) minYear = y;
       if (y > maxYear) maxYear = y;
     });
   }
@@ -1187,7 +1185,7 @@
   /* ── MONTH TILE GRID ────────────────────────────────────────── */
   function renderMonthGrid() {
     yearLabel.textContent  = currentYear;
-    prevYearBtn.disabled   = (currentYear <= minYear);
+    prevYearBtn.disabled   = (currentYear === 2022);
     nextYearBtn.disabled   = (currentYear >= maxYear);
     monthsGrid.innerHTML   = '';
 
@@ -1377,7 +1375,7 @@
 
   /* ── YEAR NAV ────────────────────────────────────────────────── */
   prevYearBtn.addEventListener('click', function() {
-    if (currentYear > minYear) {
+    if (currentYear > 2022) {
       currentYear--;
       selectedMonth = null;
       selectedDay   = null;
