@@ -33,7 +33,7 @@ function generateAdmissionPDF(app, res) {
   const photoBoxW = 90;
   const photoBoxH = 105;
   const photoBoxX = leftMargin + contentWidth - photoBoxW;
-  const photoBoxY = headerStartY;
+  const photoBoxY = headerStartY - 10;
   // Center titles in the band left of the photo, but bias slightly toward page centre
   const headerTextWidth = photoBoxX - leftMargin - 12;
   const titleWidth = Math.round((headerTextWidth + contentWidth) / 2);
