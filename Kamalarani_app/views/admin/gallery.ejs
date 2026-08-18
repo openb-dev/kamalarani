@@ -76,9 +76,31 @@
     }
     .gallery-admin-thumb {
       width:100%; aspect-ratio:4/3; background:var(--bg-input); overflow:hidden; position:relative;
+      display:block; padding:0; border:0; cursor:pointer;
     }
     .gallery-admin-thumb img,
-    .gallery-admin-thumb video { width:100%; height:100%; object-fit:cover; display:block; }
+    .gallery-admin-thumb video { width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s ease; }
+    .gallery-admin-thumb:hover img,
+    .gallery-admin-thumb:hover video { transform:scale(1.04); }
+    .gallery-viewer {
+      width:min(900px, calc(100vw - 32px)); max-height:calc(100vh - 32px);
+      padding:0; overflow:hidden; border:0; border-radius:14px;
+      background:#111; box-shadow:0 24px 80px rgba(0,0,0,.45);
+    }
+    .gallery-viewer::backdrop { background:rgba(0,0,0,.72); backdrop-filter:blur(2px); }
+    .gallery-viewer-content {
+      min-height:220px; display:flex; align-items:center; justify-content:center;
+    }
+    .gallery-viewer-content img,
+    .gallery-viewer-content video {
+      display:block; max-width:100%; max-height:calc(100vh - 80px); object-fit:contain;
+    }
+    .gallery-viewer-close {
+      position:absolute; top:10px; right:10px; z-index:2;
+      width:36px; height:36px; border:0; border-radius:50%;
+      color:#fff; background:rgba(178,58,47,.92); font-size:1.1rem;
+      box-shadow:0 3px 12px rgba(0,0,0,.3); cursor:pointer;
+    }
     .gallery-admin-info {
       padding:10px 12px; display:flex; flex-direction:column; gap:4px;
       border-top:1px solid var(--border); background:#fff;
@@ -197,10 +219,10 @@
                   const pPlace = item.place || 'Natabari';
                 %>
                 <div class="gallery-admin-card">
-                  <div class="gallery-admin-thumb">
+                  <button type="button" class="gallery-admin-thumb gallery-media-open" data-media-type="image" data-media-url="<%= item.media_url %>" data-media-title="<%= pPurpose %>" title="Open full image">
                     <img src="<%= item.media_url %>" alt="<%= pPurpose %>" loading="lazy">
                     <div class="item-type-badge"><span class="badge badge-image">image</span></div>
-                  </div>
+                  </button>
                   <div class="gallery-admin-info">
                     <div style="font-weight:700; font-size:0.83rem; color:var(--text-primary); line-height:1.2;"><%= pPurpose %></div>
                     <div style="font-size:0.75rem; color:var(--text-secondary); display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
@@ -238,10 +260,10 @@
                   const vPlace = item.place || 'Natabari';
                 %>
                 <div class="gallery-admin-card">
-                  <div class="gallery-admin-thumb">
+                  <button type="button" class="gallery-admin-thumb gallery-media-open" data-media-type="video" data-media-url="<%= item.media_url %>" data-media-title="<%= vPurpose %>" title="Open and play video">
                     <video src="<%= item.media_url %>" muted preload="metadata"></video>
                     <div class="item-type-badge"><span class="badge badge-video">video</span></div>
-                  </div>
+                  </button>
                   <div class="gallery-admin-info">
                     <div style="font-weight:700; font-size:0.83rem; color:var(--text-primary); line-height:1.2;"><%= vPurpose %></div>
                     <div style="font-size:0.75rem; color:var(--text-secondary); display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
@@ -262,6 +284,11 @@
     </div>
   </div>
 </div>
+
+<dialog class="gallery-viewer" id="galleryViewer" aria-label="Gallery media viewer">
+  <button type="button" class="gallery-viewer-close" id="galleryViewerClose" aria-label="Close media viewer">✕</button>
+  <div class="gallery-viewer-content" id="galleryViewerContent"></div>
+</dialog>
 
 <script src="/js/admin.js"></script>
 <script>
@@ -529,6 +556,44 @@
         if (firstMissingInp) firstMissingInp.focus();
       }
     });
+  });
+
+  // ── Full-size media viewer ──────────────────────────────────────────────────
+  const galleryViewer = document.getElementById('galleryViewer');
+  const galleryViewerContent = document.getElementById('galleryViewerContent');
+  const galleryViewerClose = document.getElementById('galleryViewerClose');
+
+  function closeGalleryViewer() {
+    const video = galleryViewerContent.querySelector('video');
+    if (video) video.pause();
+    galleryViewer.close();
+    galleryViewerContent.replaceChildren();
+  }
+
+  document.querySelectorAll('.gallery-media-open').forEach(button => {
+    button.addEventListener('click', () => {
+      const isVideo = button.dataset.mediaType === 'video';
+      const media = document.createElement(isVideo ? 'video' : 'img');
+      media.src = button.dataset.mediaUrl;
+      if (isVideo) {
+        media.controls = true;
+        media.autoplay = true;
+      } else {
+        media.alt = button.dataset.mediaTitle || 'Gallery image';
+      }
+      galleryViewerContent.replaceChildren(media);
+      galleryViewer.showModal();
+    });
+  });
+
+  galleryViewerClose.addEventListener('click', closeGalleryViewer);
+  galleryViewer.addEventListener('click', event => {
+    if (event.target === galleryViewer) closeGalleryViewer();
+  });
+  galleryViewer.addEventListener('close', () => {
+    const video = galleryViewerContent.querySelector('video');
+    if (video) video.pause();
+    galleryViewerContent.replaceChildren();
   });
 </script>
 </body>
