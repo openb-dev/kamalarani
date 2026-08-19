@@ -700,9 +700,10 @@
     font-weight: 700;
     color: var(--ink);
     margin: 0 0 6px;
+    text-align: center;
   }
   .team-role-badge {
-    display: inline-block;
+    display: table;
     font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -711,6 +712,8 @@
     background: rgba(180,50,20,0.08);
     padding: 4px 12px;
     border-radius: 999px;
+    margin-left: auto;
+    margin-right: auto;
   }
   .team-phone {
     display: block;
@@ -920,8 +923,41 @@
     background:var(--white); border-radius:16px; padding:28px; margin-bottom:18px;
     border:1px solid var(--temple-cream-2);
   }
-  .contact-card p, .contact-card a:not(.social-icon-btn){color:var(--ink-soft); font-size:0.94rem; display:block; margin-bottom:4px;}
-  .contact-card a:not(.social-icon-btn):hover{color:var(--vermilion);}
+  .contact-card p, .contact-card a:not(.social-icon-btn):not(.contact-map-link){color:var(--ink-soft); font-size:0.94rem; display:block; margin-bottom:4px;}
+  .contact-card a:not(.social-icon-btn):not(.contact-map-link):hover{color:var(--vermilion);}
+  .contact-address-row {
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .contact-address-row p {
+    flex:1;
+  }
+  .contact-map-link {
+    width:42px;
+    height:42px;
+    flex:0 0 42px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--vermilion);
+    background:rgba(178,58,47,0.08);
+    border:1.5px solid var(--vermilion);
+    border-radius:50%;
+    transition:all .2s ease;
+  }
+  .contact-map-link svg {
+    width:21px;
+    height:21px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+  }
+  .contact-map-link:hover {
+    color:var(--white);
+    background:var(--vermilion);
+    transform:translateY(-2px);
+  }
 
   form.contact-form{background:var(--white); border-radius:16px; padding:32px; border:1px solid var(--temple-cream-2);}
   form.contact-form .field{margin-bottom:16px;}

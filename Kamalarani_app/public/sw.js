@@ -1,11 +1,11 @@
 // Kamalarani Foundation CMS — Service Worker for PWA
-const CACHE_NAME = 'kf-cms-cache-v3';
+const CACHE_NAME = 'kf-cms-cache-v4';
 const PRECACHE_ASSETS = [
   '/admin/login',
   '/css/admin.css',
   '/images/logo.png',
-  '/images/icon-192.png',
-  '/images/icon-512.png',
+  '/images/icon-192.png?v=2',
+  '/images/icon-512.png?v=2',
   '/manifest.json'
 ];
 
