@@ -188,7 +188,7 @@ router.post('/admissions', (req, res) => {
       let programme = rawProgramme;
       if (['Cultural Programme', 'Other Programmes'].includes(rawProgramme)) {
         if (!programmeDetails) {
-          return sendError('Please describe the specific programme you wish to enroll in.');
+          return sendError('Please describe the specific programme you wish to enrol in.');
         }
         programme = `${rawProgramme} (${programmeDetails})`;
       }
