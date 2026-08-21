@@ -433,6 +433,9 @@ table th, table td {
 table td.td-truncate {
   white-space: nowrap;
 }
+.messages-actions-heading {
+  padding-left: 63px;
+}
 
 /* ===== Badges ===== */
 .badge {

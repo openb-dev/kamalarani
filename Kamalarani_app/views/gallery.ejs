@@ -154,7 +154,7 @@
       transform: translateY(-4px);
       box-shadow: 0 16px 40px -18px rgba(43,33,24,0.3);
     }
-    .video-card video { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#000; }
+    .video-card video { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#000; cursor:pointer; }
     .video-card-caption {
       padding: 10px 14px;
       font-size: 0.84rem; color: var(--ink-soft);
@@ -177,7 +177,8 @@
       display:none; align-items:center; justify-content:center; padding:20px;
     }
     .lightbox.open { display:flex; }
-    .lightbox img {
+    .lightbox img,
+    .lightbox video {
       max-width:90vw; max-height:90vh;
       border-radius:10px; object-fit:contain;
       box-shadow:0 0 60px rgba(43,33,24,.5);
@@ -273,7 +274,17 @@
               const vPlace = item.place || (item.id % 2 === 0 ? 'Kolkata' : 'Natabari');
             %>
             <div class="video-card">
-              <video src="<%= item.media_url %>" controls preload="metadata"></video>
+              <video
+                src="<%= item.media_url %>"
+                class="video-grid-item"
+                data-url="<%= item.media_url %>"
+                data-caption="<%= vPurpose %> • <%= vPlace %> (<%= vDate %>)"
+                muted
+                preload="metadata"
+                tabindex="0"
+                role="button"
+                aria-label="Play <%= vPurpose %>"
+              ></video>
               <div class="video-card-caption">
                 <div style="font-weight:700; font-size:0.88rem; color:var(--ink); margin-bottom:4px;"><%= vPurpose %></div>
                 <div style="display:flex; gap:12px; font-size:0.78rem; color:var(--ink-soft);">
@@ -291,9 +302,10 @@
 </main>
 
 <!-- Lightbox -->
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Gallery media viewer">
   <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
   <img id="lightboxImg" src="" alt="">
+  <video id="lightboxVideo" controls playsinline style="display:none;"></video>
   <div class="lightbox-caption" id="lightboxCaption"></div>
 </div>
 
@@ -311,27 +323,59 @@
   }
 
   // Lightbox — use data attributes, no inline EJS in onclick
-  var lightbox     = document.getElementById('lightbox');
-  var lightboxImg  = document.getElementById('lightboxImg');
-  var lightboxCap  = document.getElementById('lightboxCaption');
+  var lightbox      = document.getElementById('lightbox');
+  var lightboxImg   = document.getElementById('lightboxImg');
+  var lightboxVideo = document.getElementById('lightboxVideo');
+  var lightboxCap   = document.getElementById('lightboxCaption');
   var lightboxClose = document.getElementById('lightboxClose');
 
-  document.querySelectorAll('.photo-grid-item').forEach(function(item) {
-    item.addEventListener('click', function() {
+  function openLightbox(item, isVideo) {
+    lightboxCap.textContent = item.dataset.caption || '';
+    if (isVideo) {
+      lightboxImg.style.display = 'none';
+      lightboxVideo.style.display = 'block';
+      lightboxVideo.src = item.dataset.url;
+      lightboxVideo.play().catch(function() {});
+    } else {
+      lightboxVideo.style.display = 'none';
+      lightboxImg.style.display = 'block';
       lightboxImg.src = item.dataset.url;
       lightboxImg.alt = item.dataset.caption || '';
-      lightboxCap.textContent = item.dataset.caption || '';
-      lightbox.classList.add('open');
-      document.body.style.overflow = 'hidden';
+    }
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.querySelectorAll('.photo-img-wrap').forEach(function(item) {
+    item.addEventListener('click', function() {
+      openLightbox(item, false);
     });
     item.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') item.click();
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        item.click();
+      }
+    });
+  });
+
+  document.querySelectorAll('.video-grid-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      openLightbox(item, true);
+    });
+    item.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        item.click();
+      }
     });
   });
 
   function closeLightbox() {
     lightbox.classList.remove('open');
     lightboxImg.src = '';
+    lightboxVideo.pause();
+    lightboxVideo.removeAttribute('src');
+    lightboxVideo.load();
     document.body.style.overflow = '';
   }
 
