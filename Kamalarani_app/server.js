@@ -105,7 +105,7 @@ app.get('/', async (req, res) => {
     const [allUpcomingEvents] = await pool.query(
       `SELECT * FROM events
        WHERE is_published = TRUE
-         AND COALESCE(end_date, event_date) >= CURDATE()
+         AND DATE(event_date) >= CURDATE()
        ORDER BY event_date ASC`
     );
 

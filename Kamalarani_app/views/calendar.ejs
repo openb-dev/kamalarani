@@ -977,11 +977,17 @@
     if (h === 0 && m === 0) return '';
     return d.toLocaleTimeString(kfLocale(), { hour: 'numeric', minute: '2-digit', hour12: true });
   }
+  function startOfDay(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
   function daysFromNow(d) {
-    var diff = Math.ceil((d - today) / 86400000);
+    var diff = Math.round((startOfDay(d) - today) / 86400000);
     if (diff === 0) return kfIsBn() ? 'আজ' : 'Today';
     if (diff === 1) return kfIsBn() ? 'আগামীকাল' : 'Tomorrow';
     return kfIsBn() ? diff + ' দিনে' : 'In ' + diff + ' days';
+  }
+  function isEventPast(ev) {
+    return startOfDay(ev.dateObj) < today;
   }
 
   function eventTitleHtml(ev, titleClass) {
@@ -1023,18 +1029,13 @@
     return { year: year, month: month };
   }
 
-  function eventEndDate(ev) {
-    return ev.endObj || ev.dateObj;
-  }
-
   var upcomingExpanded = false;
 
   function renderUpcoming() {
     var win = getUpcomingMonthWindow();
 
     var allUpcoming = EVENTS.filter(function(ev) {
-      var end = eventEndDate(ev);
-      return end >= today;
+      return !isEventPast(ev);
     }).sort(function(a, b) { return a.dateObj - b.dateObj; });
 
     var monthUpcoming = allUpcoming.filter(function(ev) {
@@ -1112,9 +1113,8 @@
   var archiveExpanded   = false;
 
   function renderArchive() {
-    var past = EVENTS.filter(function(ev) {
-      return ev.dateObj < today;
-    }).sort(function(a, b) { return b.dateObj - a.dateObj; }); /* newest first */
+    var past = EVENTS.filter(isEventPast)
+      .sort(function(a, b) { return b.dateObj - a.dateObj; }); /* newest first */
 
     if (past.length === 0) {
       archiveSection.style.display = 'none';
@@ -1132,9 +1132,8 @@
       var descHtml  = eventDescHtml(ev, 'past-card-desc');
 
       /* How long ago */
-      var daysAgo = Math.round((today - ev.dateObj) / 86400000);
-      var agoStr  = daysAgo === 0 ? (kfIsBn() ? 'গতকাল' : 'Yesterday')
-                  : daysAgo === 1 ? (kfIsBn() ? '১ দিন আগে' : '1 day ago')
+      var daysAgo = Math.round((today - startOfDay(ev.dateObj)) / 86400000);
+      var agoStr  = daysAgo <= 1 ? (kfIsBn() ? 'গতকাল' : 'Yesterday')
                   : daysAgo < 30  ? (kfIsBn() ? daysAgo + ' দিন আগে' : daysAgo + ' days ago')
                   : daysAgo < 365 ? (kfIsBn() ? Math.round(daysAgo / 30) + ' মাস আগে' : Math.round(daysAgo / 30) + ' mo ago')
                   : (kfIsBn() ? Math.round(daysAgo / 365) + ' বছর আগে' : Math.round(daysAgo / 365) + ' yr ago');
@@ -1325,7 +1324,7 @@
     dayDetailList.innerHTML = '';
 
     evs.forEach(function(ev, i) {
-      var isUpcoming = ev.dateObj >= today;
+      var isUpcoming = !isEventPast(ev);
       var timeStr    = formatTime(ev.dateObj);
       var endStr     = ev.endObj ? formatTime(ev.endObj) : '';
       var item = document.createElement('div');
