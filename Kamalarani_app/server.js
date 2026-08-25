@@ -79,6 +79,7 @@ app.use('/', require('./routes/contact'));
 app.use('/', require('./routes/events'));
 app.use('/', require('./routes/gallery'));
 app.use('/', require('./routes/admissions'));
+app.use('/', require('./routes/members'));
 
 // Homepage
 app.get('/', async (req, res) => {

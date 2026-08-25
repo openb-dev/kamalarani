@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en" class="notranslate">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="apple-touch-icon" href="/images/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#B23A2F">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KF CMS">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Members — Kamalarani Foundation CMS</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/js/pwa-register.js" defer></script>
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <%
+      var editMember = locals.editMember || null;
+      var members = locals.members || [];
+
+      function attr(value) {
+        return String(value == null ? '' : value)
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/</g, '&lt;');
+      }
+    %>
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <span class="topbar-title">Members</span>
+      </div>
+      <div class="topbar-right">
+        <span style="font-size:0.82rem;color:var(--text-secondary);"><%= members.length %> total</span>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <% if (locals.success && locals.success.length) { %>
+        <div class="flash-bar success">✅ <%= locals.success[0] %></div>
+      <% } %>
+      <% if (locals.error && locals.error.length) { %>
+        <div class="flash-bar error">⚠️ <%= locals.error[0] %></div>
+      <% } %>
+
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Members</h1>
+          <p>Add and manage Kolkata and Coochbehar members, including photo and contact details.</p>
+        </div>
+      </div>
+
+      <div class="events-management-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><%= editMember ? '✏️ Edit Member' : '➕ Add New Member' %></span>
+            <% if (editMember) { %>
+              <a href="/admin/members" class="btn btn-ghost btn-sm">Cancel Edit</a>
+            <% } %>
+          </div>
+          <div class="card-body">
+            <% if (editMember) { %>
+              <form action="/admin/members/<%= editMember.id %>?_method=PUT" method="POST" class="event-form-stack" enctype="multipart/form-data">
+            <% } else { %>
+              <form action="/admin/members" method="POST" class="event-form-stack" enctype="multipart/form-data">
+            <% } %>
+              <div class="field">
+                <label for="memberName">Name *</label>
+                <input type="text" id="memberName" name="name" required
+                  value="<%= editMember ? editMember.name : '' %>"
+                  placeholder="Full name">
+              </div>
+
+              <div class="field">
+                <label for="memberBranch">Branch *</label>
+                <select id="memberBranch" name="branch" required>
+                  <option value="">Select Branch</option>
+                  <option value="Kolkata" <%= editMember && editMember.branch === 'Kolkata' ? 'selected' : '' %>>Kolkata</option>
+                  <option value="Coochbehar" <%= editMember && editMember.branch === 'Coochbehar' ? 'selected' : '' %>>Coochbehar</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="memberFather">Father's Name *</label>
+                <input type="text" id="memberFather" name="father_name" required
+                  value="<%= editMember ? (editMember.father_name || '') : '' %>"
+                  placeholder="Father's full name">
+              </div>
+
+              <div class="field">
+                <label for="memberOccupation">Occupation *</label>
+                <input type="text" id="memberOccupation" name="occupation" required
+                  value="<%= editMember ? (editMember.occupation || '') : '' %>"
+                  placeholder="e.g. Teacher, Farmer">
+              </div>
+
+              <div class="field">
+                <label for="memberPhone">Phone Number *</label>
+                <input type="tel" id="memberPhone" name="phone" required
+                  inputmode="numeric" maxlength="15" pattern="[0-9+\-\s]{10,15}"
+                  value="<%= editMember ? (editMember.phone || '') : '' %>"
+                  placeholder="10-digit mobile number">
+              </div>
+
+              <div class="field">
+                <label for="memberPhoto">Photo <%= editMember ? '' : '*' %></label>
+                <% if (editMember && editMember.photo_url) { %>
+                  <div style="margin-bottom:10px;">
+                    <img src="<%= editMember.photo_url %>" alt="Current photo" style="width:72px;height:88px;object-fit:cover;border-radius:8px;border:1px solid var(--border);">
+                  </div>
+                <% } %>
+                <input type="file" id="memberPhoto" name="photo" accept=".jpg,.jpeg,.png,.webp"
+                  <%= editMember ? '' : 'required' %>>
+                <span style="font-size:0.75rem;color:var(--text-muted);">
+                  JPG, PNG or WEBP. <%= editMember ? 'Leave empty to keep the current photo.' : 'Required for new members.' %>
+                </span>
+              </div>
+
+              <div class="form-actions" style="margin-top:8px;">
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                  <%= editMember ? '💾 Save Changes' : '➕ Add Member' %>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">All Members (<%= members.length %>)</span>
+          </div>
+          <% if (members.length === 0) { %>
+            <div class="empty-state">
+              <div class="empty-icon">👥</div>
+              <p>No members added yet. Use the form to add the first member.</p>
+            </div>
+          <% } else { %>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Branch</th>
+                    <th>Father's Name</th>
+                    <th>Occupation</th>
+                    <th>Phone</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% members.forEach(member => { %>
+                    <tr class="<%= editMember && editMember.id === member.id ? 'editing-row' : '' %>">
+                      <td>
+                        <% if (member.photo_url) { %>
+                          <button
+                            type="button"
+                            class="member-view-btn"
+                            title="View member"
+                            data-name="<%= attr(member.name) %>"
+                            data-branch="<%= attr(member.branch) %>"
+                            data-father="<%= attr(member.father_name) %>"
+                            data-occupation="<%= attr(member.occupation) %>"
+                            data-phone="<%= attr(member.phone) %>"
+                            data-photo="<%= attr(member.photo_url) %>"
+                            style="padding:0;border:0;background:transparent;cursor:pointer;"
+                          >
+                            <img src="<%= member.photo_url %>" alt="<%= member.name %>" style="width:40px;height:48px;object-fit:cover;border-radius:4px;border:1px solid var(--border);display:block;">
+                          </button>
+                        <% } else { %>
+                          <span style="color:var(--text-muted);font-size:0.75rem;">No Photo</span>
+                        <% } %>
+                      </td>
+                      <td class="td-name">
+                        <button
+                          type="button"
+                          class="event-preview-btn member-view-btn"
+                          title="View member"
+                          data-name="<%= attr(member.name) %>"
+                          data-branch="<%= attr(member.branch) %>"
+                          data-father="<%= attr(member.father_name) %>"
+                          data-occupation="<%= attr(member.occupation) %>"
+                          data-phone="<%= attr(member.phone) %>"
+                          data-photo="<%= attr(member.photo_url) %>"
+                        ><%= member.name %></button>
+                      </td>
+                      <td>
+                        <% if (member.branch === 'Coochbehar') { %>
+                          <span class="badge" style="background:rgba(76,107,63,.12);color:var(--leaf);">Coochbehar</span>
+                        <% } else if (member.branch === 'Kolkata') { %>
+                          <span class="badge" style="background:rgba(217,169,78,.18);color:#8A6020;">Kolkata</span>
+                        <% } else { %>
+                          <span style="color:var(--text-muted);font-size:0.82rem;"><%= member.branch || '—' %></span>
+                        <% } %>
+                      </td>
+                      <td class="td-truncate" style="max-width:160px;"><%= member.father_name || '—' %></td>
+                      <td class="td-truncate" style="max-width:140px;"><%= member.occupation || '—' %></td>
+                      <td style="white-space:nowrap;">
+                        <a href="tel:+91<%= member.phone %>" style="color:var(--info);font-weight:600;">📞 <%= member.phone %></a>
+                      </td>
+                      <td style="text-align:right;">
+                        <div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+                          <button
+                            type="button"
+                            class="btn btn-primary btn-sm member-view-btn"
+                            data-name="<%= attr(member.name) %>"
+                            data-branch="<%= attr(member.branch) %>"
+                            data-father="<%= attr(member.father_name) %>"
+                            data-occupation="<%= attr(member.occupation) %>"
+                            data-phone="<%= attr(member.phone) %>"
+                            data-photo="<%= attr(member.photo_url) %>"
+                          >View</button>
+                          <a href="/admin/members/<%= member.id %>/edit" class="btn btn-ghost btn-sm">✏️ Edit</a>
+                          <form action="/admin/members/<%= member.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this member permanently?')">
+                            <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dialog class="message-dialog" id="memberDialog" aria-labelledby="memberDialogName">
+  <div class="message-dialog-header">
+    <div>
+      <div class="message-dialog-label">Member details</div>
+      <h2 id="memberDialogName">Member</h2>
+    </div>
+    <button type="button" class="message-dialog-close" id="memberDialogClose" aria-label="Close member">✕</button>
+  </div>
+  <div class="message-dialog-meta">
+    <div id="memberDialogPhotoWrap" style="display:none;margin-bottom:8px;">
+      <img id="memberDialogPhoto" alt="Member photo" style="width:120px;height:148px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">
+    </div>
+    <div><strong>Branch:</strong> <span id="memberDialogBranch"></span></div>
+    <div><strong>Father's Name:</strong> <span id="memberDialogFather"></span></div>
+    <div><strong>Occupation:</strong> <span id="memberDialogOccupation"></span></div>
+    <div><strong>Phone:</strong> <a id="memberDialogPhone"></a></div>
+  </div>
+</dialog>
+
+<script src="/js/admin.js"></script>
+<script>
+  (function () {
+    const dialog = document.getElementById('memberDialog');
+    const closeButton = document.getElementById('memberDialogClose');
+    const nameEl = document.getElementById('memberDialogName');
+    const branchEl = document.getElementById('memberDialogBranch');
+    const fatherEl = document.getElementById('memberDialogFather');
+    const occupationEl = document.getElementById('memberDialogOccupation');
+    const phoneEl = document.getElementById('memberDialogPhone');
+    const photoWrap = document.getElementById('memberDialogPhotoWrap');
+    const photoEl = document.getElementById('memberDialogPhoto');
+
+    function blank(value) {
+      return value && value.trim() ? value : '—';
+    }
+
+    document.querySelectorAll('.member-view-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        nameEl.textContent = blank(button.dataset.name);
+        branchEl.textContent = blank(button.dataset.branch);
+        fatherEl.textContent = blank(button.dataset.father);
+        occupationEl.textContent = blank(button.dataset.occupation);
+        const phone = blank(button.dataset.phone);
+        phoneEl.textContent = phone;
+        phoneEl.href = phone !== '—' ? ('tel:+91' + phone) : '#';
+        if (button.dataset.photo) {
+          photoEl.src = button.dataset.photo;
+          photoEl.alt = button.dataset.name || 'Member photo';
+          photoWrap.style.display = 'block';
+        } else {
+          photoEl.removeAttribute('src');
+          photoWrap.style.display = 'none';
+        }
+        dialog.showModal();
+      });
+    });
+
+    closeButton.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => {
+      if (event.target === dialog) dialog.close();
+    });
+  })();
+</script>
+</body>
+</html>

@@ -21,6 +21,9 @@
     <a href="/admin/events" class="<%= locals.currentPath === '/admin/events' ? 'active' : '' %>">
       <span class="nav-icon">📅</span> Events
     </a>
+    <a href="/admin/members" class="<%= locals.currentPath === '/admin/members' || (locals.currentPath && locals.currentPath.indexOf('/admin/members/') === 0) ? 'active' : '' %>">
+      <span class="nav-icon">👥</span> Members
+    </a>
 
     <div class="nav-section-label">Inbox</div>
     <a href="/admin/messages" class="<%= locals.currentPath === '/admin/messages' ? 'active' : '' %>">
