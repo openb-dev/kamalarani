@@ -105,6 +105,7 @@ window.KF_TRANSLATIONS = {
   "100% free — no admission fee": "১০০% বিনামূল্যে — কোনো ভর্তি ফি নেই",
   "Art, Music & Cultural programmes available": "শিল্প, সঙ্গীত ও সাংস্কৃতিক কর্মসূচি উপলব্ধ",
   "Drawing materials provided by the foundation": "ফাউন্ডেশন দ্বারা অঙ্কন সামগ্রী প্রদান",
+  "Study and learning materials provided by the foundation": "ফাউন্ডেশন দ্বারা শিক্ষা ও শিখন সামগ্রী প্রদান",
   "Open to students from Nursery to Graduation": "নার্সারি থেকে স্নাতক স্তর পর্যন্ত শিক্ষার্থীদের জন্য উন্মুক্ত",
   "Classes held at Sri Sri Radha-Govinda Thakurbari, Natabari": "শ্রী শ্রী রাধা-গোবিন্দ ঠাকুরবাড়ি, নাটাবাড়িতে ক্লাস",
   "Student's Name *": "শিক্ষার্থীর নাম *",

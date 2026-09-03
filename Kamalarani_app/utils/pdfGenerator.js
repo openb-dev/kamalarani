@@ -40,7 +40,7 @@ function generateAdmissionPDF(app, res) {
 
   doc.font('Helvetica-Bold').fontSize(18).fillColor('#2B2118').text('KAMALARANI FOUNDATION', leftMargin + 60, headerStartY, { width: headerTextWidth - 60, align: 'center' });
   doc.font('Helvetica').fontSize(10).fillColor('#B23A2F').text('Sanatan Culture & Social Welfare (Reg. No. AAETK689KE20221)', leftMargin + 60, headerStartY + 22, { width: headerTextWidth - 60, align: 'center' });
-  doc.font('Helvetica-Bold').fontSize(14).fillColor('#2B2118').text('ART CLASS ADMISSION FORM', leftMargin, headerStartY + 38, { width: titleWidth, align: 'center' });
+  doc.font('Helvetica-Bold').fontSize(14).fillColor('#2B2118').text('ADMISSION FORM', leftMargin, headerStartY + 38, { width: titleWidth, align: 'center' });
   doc.font('Helvetica-Oblique').fontSize(9).fillColor('#5A4E40').text('Nursery to Graduation', leftMargin, headerStartY + 56, { width: titleWidth, align: 'center' });
 
   // Top Metadata (ARN & Date) — date stays left of the photo
@@ -159,7 +159,7 @@ function generateAdmissionPDF(app, res) {
   renderField("13. Category (General/SC/ST/OBC/EWS/Others):", app.category || 'General', leftMargin, curY, contentWidth, 250);
   curY += 28;
 
-  // Box on bottom right: Free Art Materials Checklist
+  // Box on bottom right: Free Materials Checklist (Adaptive to programme)
   const boxW = 220;
   const boxH = 135;
   const boxX = leftMargin + contentWidth - boxW;
@@ -167,17 +167,44 @@ function generateAdmissionPDF(app, res) {
 
   doc.rect(boxX, boxY, boxW, boxH).strokeColor('#666666').lineWidth(0.8).stroke();
   doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#B23A2F');
-  doc.text('Donation from our foundation Art Materials for\nFree Child Development Art Classes:', boxX + 6, boxY + 6, { width: boxW - 12, align: 'center' });
 
-  const items = [
-    'Drawing book',
-    'Pencil',
+  const progLower = (app.programme || '').trim().toLowerCase();
+  let boxTitle = 'Donation from our foundation Study & Learning\nMaterials for Free Programmes:';
+  let items = [
+    'Study / Drawing Book',
+    'Pencil / Pen',
     'Eraser',
     'Sharpener',
     'Pencil box',
-    'Colour Set Kit for Kids',
-    'Plain drawing khata'
+    'Learning & Activity Kit',
+    'Plain Khata / Notebook'
   ];
+
+  if (progLower === 'art class') {
+    boxTitle = 'Donation from our foundation Art Materials for\nFree Child Development Art Classes:';
+    items = [
+      'Drawing book',
+      'Pencil',
+      'Eraser',
+      'Sharpener',
+      'Pencil box',
+      'Colour Set Kit for Kids',
+      'Plain drawing khata'
+    ];
+  } else if (progLower === 'music class') {
+    boxTitle = 'Donation from our foundation Learning Materials for\nFree Child Development Music Classes:';
+    items = [
+      'Music Notebook / Khata',
+      'Pencil / Pen',
+      'Eraser',
+      'Sharpener',
+      'Pencil box',
+      'Musical Notes / Kit',
+      'Practice Khata'
+    ];
+  }
+
+  doc.text(boxTitle, boxX + 6, boxY + 6, { width: boxW - 12, align: 'center' });
 
   let itemY = boxY + 32;
   doc.font('Helvetica').fontSize(8).fillColor('#333333');
