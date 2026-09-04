@@ -137,3 +137,37 @@ function toggleAccordion(id) {
   }
 }
 
+(function initCopyUpiId() {
+  const button = document.getElementById('copyUpiBtn');
+  const upiEl = document.getElementById('donateUpiId');
+  if (!button || !upiEl) return;
+
+  button.addEventListener('click', async () => {
+    const upiId = upiEl.textContent.trim();
+    const isBn = (localStorage.getItem('kf_lang') || 'en') === 'bn';
+    const copiedLabel = isBn ? 'কপি হয়েছে!' : 'Copied!';
+    const defaultLabel = isBn ? 'UPI ID কপি করুন' : 'Copy UPI ID';
+
+    try {
+      await navigator.clipboard.writeText(upiId);
+    } catch (_) {
+      const range = document.createRange();
+      range.selectNodeContents(upiEl);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      document.execCommand('copy');
+      selection.removeAllRanges();
+    }
+
+    button.textContent = copiedLabel;
+    button.setAttribute('data-en', 'Copied!');
+    button.setAttribute('data-bn', 'কপি হয়েছে!');
+    setTimeout(() => {
+      button.textContent = defaultLabel;
+      button.setAttribute('data-en', 'Copy UPI ID');
+      button.setAttribute('data-bn', 'UPI ID কপি করুন');
+    }, 2000);
+  });
+})();
+

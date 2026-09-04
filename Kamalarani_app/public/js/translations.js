@@ -194,6 +194,12 @@ window.KF_TRANSLATIONS = {
   "IFSC Code": "IFSC কোড",
   "Bank Name": "ব্যাংকের নাম",
   "Branch Name": "শাখার নাম",
+  "Scan & Pay (UPI)": "স্ক্যান করে পেমেন্ট করুন (UPI)",
+  "UPI ID": "UPI আইডি",
+  "Copy UPI ID": "UPI ID কপি করুন",
+  "Copied!": "কপি হয়েছে!",
+  "Pay with UPI app": "UPI অ্যাপে দান করুন",
+  "Google Pay · PhonePe · Paytm · BHIM · Canara ai1": "Google Pay · PhonePe · Paytm · BHIM · Canara ai1",
   "CANARA BANK": "কানারা ব্যাংক",
   "BARASAT BRANCH": "বিধান নগর শাখা",
 

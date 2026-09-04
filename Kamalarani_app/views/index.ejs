@@ -864,7 +864,27 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; text-align: left;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; text-align: left;">
+
+        <div class="donate-upi">
+          <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); letter-spacing: 0.05em;">Scan &amp; Pay (UPI)</span>
+          <img
+            class="donate-upi-qr"
+            src="/images/donate-upi-qr.png"
+            alt="UPI QR code to donate to Kamalarani Foundation"
+            width="220"
+            height="220"
+          >
+          <div>
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); display: block; letter-spacing: 0.05em; margin-bottom: 4px;">UPI ID</span>
+            <strong class="donate-upi-id notranslate" id="donateUpiId">310917908431700@cnrb</strong>
+          </div>
+          <div class="donate-upi-actions">
+            <button type="button" class="btn btn-primary" id="copyUpiBtn" data-en="Copy UPI ID" data-bn="UPI ID কপি করুন">Copy UPI ID</button>
+            <a class="btn btn-ghost" href="upi://pay?pa=310917908431700@cnrb&amp;pn=KAMALARANI%20FOUNDATION&amp;cu=INR" data-en="Pay with UPI app" data-bn="UPI অ্যাপে দান করুন">Pay with UPI app</a>
+          </div>
+          <p class="donate-upi-apps">Google Pay · PhonePe · Paytm · BHIM · Canara ai1</p>
+        </div>
         
         <!-- Account Info -->
         <div style="display: flex; flex-direction: column; gap: 14px;">

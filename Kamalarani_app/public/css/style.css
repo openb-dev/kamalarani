@@ -917,6 +917,50 @@
   .support-card .num{font-family:'Fraunces',serif; font-size:1.6rem; margin-bottom:8px; display:block;}
   .support-card p{color:rgba(255,255,255,0.85); font-size:0.88rem; margin:0;}
 
+  .donate-upi {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:10px;
+    padding:6px 4px 4px;
+  }
+  .donate-upi-qr {
+    width:220px;
+    height:220px;
+    object-fit:contain;
+    background:#fff;
+    padding:10px;
+    border-radius:14px;
+    box-shadow:0 8px 24px rgba(43,33,24,0.12);
+    border:1px solid var(--temple-cream-2);
+  }
+  .donate-upi-id {
+    font-family:ui-monospace,Consolas,monospace;
+    font-size:0.92rem;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:0.01em;
+    word-break:break-all;
+  }
+  .donate-upi-actions {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+  }
+  .donate-upi-actions .btn {
+    font-size:0.82rem;
+    padding:8px 14px;
+  }
+  .donate-upi-apps {
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    margin:0;
+    max-width:240px;
+    line-height:1.4;
+  }
+
   /* ===== Contact ===== */
   .contact{background:var(--temple-cream);}
   .contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:50px;}
