@@ -226,6 +226,7 @@ window.KF_TRANSLATIONS = {
   "Support Us": "আমাদের সাহায্য করুন",
   "Contact": "যোগাযোগ",
   "Admin Login": "এডমিন লগইন",
+  "Visitors:": "দর্শনার্থী:",
   "All rights reserved.": "সর্বস্বত্ব সংরক্ষিত।",
   "A registered non-profit bringing free art and education to village children across West Bengal. Reg. No. AAETK689KE20221.": "পশ্চিমবঙ্গ জুড়ে গ্রামের শিশুদের বিনামূল্যে শিল্প ও শিক্ষা পৌঁছে দেওয়া একটি নিবন্ধিত অলাভজনক সংস্থা। নিবন্ধন নং AAETK689KE20221।",
   "Contact Kamalarani Foundation": "কমলারাণী ফাউন্ডেশনে যোগাযোগ",

@@ -70,6 +70,7 @@ app.use((req, res, next) => {
 
   res.locals.admin   = req.session.admin || null;
   res.locals.currentPath = req.path;
+  res.locals.gaMeasurementId = process.env.GA_MEASUREMENT_ID || null;
   next();
 });
 
@@ -80,6 +81,7 @@ app.use('/', require('./routes/events'));
 app.use('/', require('./routes/gallery'));
 app.use('/', require('./routes/admissions'));
 app.use('/', require('./routes/members'));
+app.use('/', require('./routes/visitors'));
 
 // Homepage
 app.get('/', async (req, res) => {

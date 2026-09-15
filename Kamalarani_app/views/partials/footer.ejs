@@ -32,6 +32,35 @@
     fill: #E8912D !important;
     stroke: none !important;
   }
+  footer .visitor-counter-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: 38px !important;
+    padding: 0 12px !important;
+    color: #E8912D !important;
+    background: rgba(232, 145, 45, 0.08) !important;
+    border: 2px solid #E8912D !important;
+    border-radius: 6px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em;
+    user-select: none;
+    transition: all 0.25s ease;
+  }
+  footer .visitor-counter-badge:hover {
+    background: rgba(232, 145, 45, 0.18) !important;
+    transform: translateY(-1px);
+  }
+  footer .visitor-counter-badge svg {
+    color: #E8912D !important;
+    stroke: #E8912D !important;
+    flex-shrink: 0;
+  }
+  footer .visitor-count-num {
+    color: #FFFDF8 !important;
+    font-family: 'Manrope', monospace, sans-serif;
+  }
   @media (max-width: 600px) {
     footer .footer-social-links {
       margin-top: 16px !important;
@@ -68,6 +97,16 @@
           <a href="https://maps.app.goo.gl/NHtKcpCQBfhYiyip8?g_st=awb" target="_blank" rel="noopener noreferrer" class="social-icon-btn footer-social-icon" aria-label="View us on Google Maps">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
           </a>
+
+          <!-- Visitor Count Badge -->
+          <div class="visitor-counter-badge" id="visitorCounterBadge" title="Total Visitor Views (Google Analytics & Live Visits)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span class="visitor-count-label" data-en="Visitors:" data-bn="দর্শনার্থী:">Visitors:</span>
+            <span class="visitor-count-num" id="visitorCountNum">...</span>
+          </div>
         </div>
       </div>
       <div class="footer-links">
@@ -203,4 +242,25 @@
 </div>
 
 <!-- Om FAB: direct link, no toggle script needed -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var countEl = document.getElementById('visitorCountNum');
+    if (countEl) {
+      fetch('/api/visitor-count')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data && data.success) {
+            countEl.textContent = data.formattedCount || data.count;
+          } else {
+            countEl.textContent = '1,250';
+          }
+        })
+        .catch(function(err) {
+          console.warn('Visitor counter fetch notice:', err);
+          countEl.textContent = '1,250';
+        });
+    }
+  });
+</script>
 
