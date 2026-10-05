@@ -18,6 +18,7 @@
   <script src="/js/pwa-register.js" defer></script>
   <style>
     .row-pending { background: rgba(240,192,64,0.04); }
+    .editing-row { background: rgba(178,58,47,0.08) !important; font-weight: 500; }
     .print-only-header { display: none; }
     .table-wrap table th:nth-child(13) {
       padding-left: 78px;
@@ -115,7 +116,18 @@
   <%- include('partials/sidebar') %>
 
   <div class="admin-main">
-    <% var apps = locals.apps || []; %>
+    <%
+      var editApp = locals.editApp || null;
+      var apps = locals.apps || [];
+
+      function formatLocalDateInput(dateObj) {
+        if (!dateObj) return '';
+        const d = new Date(dateObj);
+        if (isNaN(d.getTime())) return '';
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      }
+    %>
     <div class="admin-topbar">
       <div style="display:flex;align-items:center;gap:14px;">
         <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
@@ -161,6 +173,179 @@
           <% } %>
         </div>
       </div>
+
+      <!-- Edit Admission Application Card -->
+      <% if (editApp) { %>
+        <div class="card no-print" style="margin-bottom:24px; border:2px solid var(--vermilion); background:#fff;" id="editAdmissionCard">
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; background: rgba(178, 58, 47, 0.05); border-bottom: 1px solid var(--border); padding: 14px 20px;">
+            <span class="card-title" style="color:var(--vermilion); font-weight:700; font-size:1.05rem;">
+              ✏️ Edit Admission Application — <%= editApp.arn || ('KFA-2026-' + String(editApp.id).padStart(4, '0')) %> (<%= editApp.student_name %>)
+            </span>
+            <a href="/admin/admissions" class="btn btn-ghost btn-sm">Cancel Edit</a>
+          </div>
+          <div class="card-body" style="padding:20px;">
+            <form action="/admin/admissions/<%= editApp.id %>?_method=PUT" method="POST" enctype="multipart/form-data" class="event-form-stack">
+              
+              <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--vermilion); margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:4px;">
+                1. Student Information
+              </div>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:14px; margin-bottom:20px;">
+                <div class="field">
+                  <label for="edit_student_name">Student Full Name *</label>
+                  <input type="text" id="edit_student_name" name="student_name" required value="<%= editApp.student_name || '' %>" placeholder="e.g. Rahul Das">
+                </div>
+                <div class="field">
+                  <label for="edit_dob">Date of Birth *</label>
+                  <input type="date" id="edit_dob" name="dob" required value="<%= formatLocalDateInput(editApp.dob) %>">
+                </div>
+                <div class="field">
+                  <label for="edit_gender">Gender *</label>
+                  <select id="edit_gender" name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male" <%= editApp.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                    <option value="Female" <%= editApp.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                    <option value="Other" <%= editApp.gender === 'Other' ? 'selected' : '' %>>Other</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="edit_school_name">School Currently Attending</label>
+                  <input type="text" id="edit_school_name" name="school_name" value="<%= editApp.school_name || '' %>" placeholder="e.g. Jenkins School">
+                </div>
+                <div class="field">
+                  <label for="edit_class_applying_for">Class Applying For *</label>
+                  <select id="edit_class_applying_for" name="class_applying_for" required>
+                    <option value="">Select Class</option>
+                    <% ['Nursery','KG','Class I','Class II','Class III','Class IV','Class V','Class VI','Class VII','Class VIII','Class IX','Class X','Class XI','Class XII','Graduation'].forEach(cls => { %>
+                      <option value="<%= cls %>" <%= editApp.class_applying_for === cls ? 'selected' : '' %>><%= cls %></option>
+                    <% }) %>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="edit_programme">Programme *</label>
+                  <select id="edit_programme" name="programme" required>
+                    <option value="">Select Programme</option>
+                    <% ['Art Class','Music Class','Both','Education Programme','Gita Gyaan','Cultural Programme','Other Programmes'].forEach(prog => { %>
+                      <option value="<%= prog %>" <%= (editApp.programme || '').startsWith(prog) ? 'selected' : '' %>><%= prog %></option>
+                    <% }) %>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="edit_branch">Branch *</label>
+                  <select id="edit_branch" name="branch" required>
+                    <option value="Coochbehar" <%= editApp.branch === 'Coochbehar' ? 'selected' : '' %>>Coochbehar</option>
+                    <option value="Kolkata" <%= editApp.branch === 'Kolkata' ? 'selected' : '' %>>Kolkata</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="edit_status">Application Status *</label>
+                  <select id="edit_status" name="status" required style="font-weight:700; color:var(--vermilion);">
+                    <option value="pending" <%= editApp.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="approved" <%= editApp.status === 'approved' ? 'selected' : '' %>>Approved</option>
+                    <option value="rejected" <%= editApp.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--vermilion); margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:4px;">
+                2. Parent &amp; Contact Details
+              </div>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:14px; margin-bottom:20px;">
+                <div class="field">
+                  <label for="edit_father_name">Father's Name *</label>
+                  <input type="text" id="edit_father_name" name="father_name" required value="<%= editApp.father_name || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_mother_name">Mother's Name *</label>
+                  <input type="text" id="edit_mother_name" name="mother_name" required value="<%= editApp.mother_name || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_occupation">Father's / Guardian's Occupation *</label>
+                  <input type="text" id="edit_occupation" name="occupation" required value="<%= editApp.occupation || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_parent_mobile">Primary Contact Mobile *</label>
+                  <input type="tel" id="edit_parent_mobile" name="parent_mobile" required value="<%= editApp.parent_mobile || '' %>" placeholder="10-digit mobile number">
+                </div>
+                <div class="field">
+                  <label for="edit_mother_mobile">Mother's Mobile</label>
+                  <input type="tel" id="edit_mother_mobile" name="mother_mobile" value="<%= editApp.mother_mobile || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_email">Email Address</label>
+                  <input type="email" id="edit_email" name="email" value="<%= editApp.email || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_aadhaar_no">Aadhaar Number</label>
+                  <input type="text" id="edit_aadhaar_no" name="aadhaar_no" value="<%= editApp.aadhaar_no || '' %>">
+                </div>
+              </div>
+
+              <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--vermilion); margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:4px;">
+                3. Address Details
+              </div>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:14px; margin-bottom:20px;">
+                <div class="field">
+                  <label for="edit_village_locality">Village / Locality *</label>
+                  <input type="text" id="edit_village_locality" name="village_locality" required value="<%= editApp.village_locality || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_po">Post Office (P.O.) *</label>
+                  <input type="text" id="edit_po" name="po" required value="<%= editApp.po || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_ps">Police Station (P.S.) *</label>
+                  <input type="text" id="edit_ps" name="ps" required value="<%= editApp.ps || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_district">District *</label>
+                  <input type="text" id="edit_district" name="district" required value="<%= editApp.district || '' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_state">State *</label>
+                  <input type="text" id="edit_state" name="state" required value="<%= editApp.state || 'West Bengal' %>">
+                </div>
+                <div class="field">
+                  <label for="edit_pin_code">PIN Code *</label>
+                  <input type="text" id="edit_pin_code" name="pin_code" required value="<%= editApp.pin_code || '' %>">
+                </div>
+              </div>
+
+              <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--vermilion); margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:4px;">
+                4. Uploaded Documents (Optional Replace)
+              </div>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:20px;">
+                <div class="field">
+                  <label for="edit_passport_photo">Passport Photo</label>
+                  <% if (editApp.passport_photo) { %>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                      <img src="<%= editApp.passport_photo %>" alt="Current Photo" style="width:38px; height:46px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">
+                      <a href="<%= editApp.passport_photo %>" target="_blank" style="font-size:0.78rem; color:var(--info); font-weight:600;">View Photo ↗</a>
+                    </div>
+                  <% } %>
+                  <input type="file" id="edit_passport_photo" name="passport_photo" accept="image/*">
+                  <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:2px;">Leave empty to keep current photo.</small>
+                </div>
+
+                <div class="field">
+                  <label for="edit_id_proof">Identity Proof (Aadhaar / Birth Cert)</label>
+                  <% if (editApp.id_proof) { %>
+                    <div style="margin-bottom:8px;">
+                      <a href="<%= editApp.id_proof %>" target="_blank" style="font-size:0.78rem; color:var(--info); font-weight:600;">🪪 View Document ↗</a>
+                    </div>
+                  <% } %>
+                  <input type="file" id="edit_id_proof" name="id_proof" accept="image/*,.pdf">
+                  <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:2px;">Leave empty to keep current document.</small>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:12px; margin-top:24px;">
+                <button type="submit" class="btn btn-primary" style="padding:10px 24px; font-weight:700;">💾 Save Changes</button>
+                <a href="/admin/admissions" class="btn btn-ghost" style="padding:10px 20px;">Cancel Edit</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      <% } %>
 
       <!-- Admissions Summary & Analytics Report -->
       <%
@@ -285,7 +470,7 @@
               </thead>
               <tbody>
                 <% apps.forEach((app, idx) => { %>
-                  <tr class="app-row <%= app.status === 'pending' ? 'row-pending' : '' %>" data-programme="<%= (app.programme || '').toLowerCase() %>" data-branch="<%= (app.branch || '').toLowerCase() %>" data-status="<%= (app.status || '').toLowerCase() %>">
+                  <tr class="app-row <%= editApp && editApp.id === app.id ? 'editing-row' : '' %> <%= app.status === 'pending' ? 'row-pending' : '' %>" data-programme="<%= (app.programme || '').toLowerCase() %>" data-branch="<%= (app.branch || '').toLowerCase() %>" data-status="<%= (app.status || '').toLowerCase() %>">
                     <td style="color:var(--text-muted);font-size:0.8rem;"><%= idx + 1 %></td>
                     <td>
                       <% if (app.passport_photo) { %>
@@ -366,6 +551,9 @@
                     </td>
                     <td>
                       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                        <a href="/admin/admissions/<%= app.id %>/edit" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:0.75rem;font-weight:700;" title="Edit Application">
+                          ✏️ Edit
+                        </a>
                         <a href="/admin/admissions/pdf/<%= app.id %>" target="_blank" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:0.75rem;font-weight:700;" title="Print/Download PDF Form">
                           📄 PDF
                         </a>

@@ -287,7 +287,7 @@ router.get('/admin/admissions/pdf/:id', requireAdminSession, async (req, res) =>
 router.get('/admin/admissions', requireAdminSession, async (req, res) => {
   try {
     const [apps] = await pool.query('SELECT * FROM admission_applications ORDER BY created_at DESC');
-    res.render('admin/admissions', { apps });
+    res.render('admin/admissions', { apps, editApp: null });
   } catch (err) {
     console.error(err);
     req.flash('error', 'Failed to load admissions.');
@@ -295,16 +295,136 @@ router.get('/admin/admissions', requireAdminSession, async (req, res) => {
   }
 });
 
-// Admin: update application status
-router.put('/admin/admissions/:id', requireAdminSession, async (req, res) => {
+// Admin: show edit form for admission application
+router.get('/admin/admissions/:id/edit', requireAdminSession, async (req, res) => {
   try {
-    await pool.query('UPDATE admission_applications SET status = ? WHERE id = ?', [req.body.status, req.params.id]);
-    req.flash('success', 'Status updated.');
+    const [apps] = await pool.query('SELECT * FROM admission_applications ORDER BY created_at DESC');
+    const [rows] = await pool.query('SELECT * FROM admission_applications WHERE id = ?', [req.params.id]);
+    if (!rows.length) {
+      req.flash('error', 'Admission application not found.');
+      return res.redirect('/admin/admissions');
+    }
+    res.render('admin/admissions', { apps, editApp: rows[0] });
   } catch (err) {
-    console.error(err);
-    req.flash('error', 'Failed to update status.');
+    console.error('[ADMIN ADMISSION EDIT GET ERROR]', err);
+    req.flash('error', 'Failed to load admission application.');
+    res.redirect('/admin/admissions');
   }
-  res.redirect('/admin/admissions');
+});
+
+// Admin: update application (full edit or status update)
+router.put('/admin/admissions/:id', requireAdminSession, (req, res) => {
+  uploadDocuments(req, res, async (err) => {
+    if (err) {
+      const errorMsg = err instanceof multer.MulterError
+        ? 'Upload Error: ' + err.message
+        : (err.message || 'File upload failed.');
+      req.flash('error', errorMsg);
+      return res.redirect(`/admin/admissions/${req.params.id}/edit`);
+    }
+
+    try {
+      const body = req.body || {};
+
+      // If student_name is present in request body, it's a full form edit
+      if (body.student_name !== undefined) {
+        const studentName      = String(body.student_name || '').trim();
+        const dob              = String(body.dob || '').trim() || null;
+        const gender           = String(body.gender || '').trim() || null;
+        const schoolName       = String(body.school_name || '').trim() || null;
+        const classApplyingFor = String(body.class_applying_for || '').trim() || null;
+        const programme        = String(body.programme || '').trim() || null;
+        const branch           = String(body.branch || '').trim() || null;
+        const fatherName       = String(body.father_name || '').trim() || null;
+        const motherName       = String(body.mother_name || '').trim() || null;
+        const occupation       = String(body.occupation || '').trim() || null;
+        const parentMobile     = String(body.parent_mobile || '').trim() || null;
+        const motherMobile     = String(body.mother_mobile || '').trim() || null;
+        const email            = String(body.email || '').trim() || null;
+        const aadhaarNo        = String(body.aadhaar_no || '').trim() || null;
+        const status           = String(body.status || 'pending').trim();
+
+        const villageLocality  = String(body.village_locality || '').trim() || null;
+        const po               = String(body.po || '').trim() || null;
+        const ps               = String(body.ps || '').trim() || null;
+        const district         = String(body.district || '').trim() || null;
+        const state            = String(body.state || 'West Bengal').trim() || 'West Bengal';
+        const pinCode          = String(body.pin_code || '').trim() || null;
+
+        let address = `${villageLocality || ''}, P.O. ${po || ''}, P.S. ${ps || ''}, Dist. ${district || ''}, ${state} - ${pinCode || ''}`
+          .replace(/^,\s*/, '')
+          .trim();
+
+        if (!studentName) {
+          req.flash('error', 'Student Name is required.');
+          return res.redirect(`/admin/admissions/${req.params.id}/edit`);
+        }
+
+        const [existing] = await pool.query('SELECT passport_photo, id_proof FROM admission_applications WHERE id = ?', [req.params.id]);
+        if (!existing.length) {
+          req.flash('error', 'Application not found.');
+          return res.redirect('/admin/admissions');
+        }
+
+        const passportFile = req.files && req.files.passport_photo ? req.files.passport_photo[0] : null;
+        const idProofFile  = req.files && req.files.id_proof ? req.files.id_proof[0] : null;
+
+        let passportPhoto = existing[0].passport_photo;
+        let idProof       = existing[0].id_proof;
+
+        if (passportFile) {
+          passportPhoto = await saveUploadedFile(passportFile);
+        }
+        if (idProofFile) {
+          idProof = await saveUploadedFile(idProofFile);
+        }
+
+        await pool.query(
+          `UPDATE admission_applications SET
+            student_name = ?,
+            dob = ?,
+            gender = ?,
+            school_name = ?,
+            class_applying_for = ?,
+            programme = ?,
+            branch = ?,
+            father_name = ?,
+            mother_name = ?,
+            occupation = ?,
+            parent_mobile = ?,
+            mother_mobile = ?,
+            email = ?,
+            aadhaar_no = ?,
+            village_locality = ?,
+            po = ?,
+            ps = ?,
+            district = ?,
+            state = ?,
+            pin_code = ?,
+            address = ?,
+            status = ?,
+            passport_photo = ?,
+            id_proof = ?
+          WHERE id = ?`,
+          [
+            studentName, dob, gender, schoolName, classApplyingFor, programme, branch,
+            fatherName, motherName, occupation, parentMobile, motherMobile, email, aadhaarNo,
+            villageLocality, po, ps, district, state, pinCode, address, status,
+            passportPhoto, idProof, req.params.id
+          ]
+        );
+        req.flash('success', 'Application details updated successfully.');
+      } else {
+        // Quick status update from list table
+        await pool.query('UPDATE admission_applications SET status = ? WHERE id = ?', [body.status, req.params.id]);
+        req.flash('success', 'Status updated.');
+      }
+    } catch (updateErr) {
+      console.error('[ADMIN ADMISSION UPDATE ERROR]', updateErr);
+      req.flash('error', 'Failed to update application: ' + (updateErr.message || ''));
+    }
+    res.redirect('/admin/admissions');
+  });
 });
 
 // Admin: delete application

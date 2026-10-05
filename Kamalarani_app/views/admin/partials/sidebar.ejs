@@ -18,7 +18,7 @@
     <a href="/admin/gallery" class="<%= locals.currentPath === '/admin/gallery' ? 'active' : '' %>">
       <span class="nav-icon">🖼️</span> Gallery
     </a>
-    <a href="/admin/events" class="<%= locals.currentPath === '/admin/events' ? 'active' : '' %>">
+    <a href="/admin/events" class="<%= locals.currentPath === '/admin/events' || (locals.currentPath && locals.currentPath.indexOf('/admin/events/') === 0) ? 'active' : '' %>">
       <span class="nav-icon">📅</span> Events
     </a>
     <a href="/admin/members" class="<%= locals.currentPath === '/admin/members' || (locals.currentPath && locals.currentPath.indexOf('/admin/members/') === 0) ? 'active' : '' %>">
@@ -29,7 +29,7 @@
     <a href="/admin/messages" class="<%= locals.currentPath === '/admin/messages' ? 'active' : '' %>">
       <span class="nav-icon">✉️</span> Messages
     </a>
-    <a href="/admin/admissions" class="<%= locals.currentPath === '/admin/admissions' ? 'active' : '' %>">
+    <a href="/admin/admissions" class="<%= locals.currentPath === '/admin/admissions' || (locals.currentPath && locals.currentPath.indexOf('/admin/admissions/') === 0) ? 'active' : '' %>">
       <span class="nav-icon">🎒</span> Admissions
     </a>
   </nav>
