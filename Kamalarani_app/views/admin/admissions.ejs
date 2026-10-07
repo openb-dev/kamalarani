@@ -28,20 +28,17 @@
     }
 
     @media print {
-      @page {
-        size: A4 portrait;
-        margin: 8mm;
-      }
       body {
         background: #fff !important;
-        color: #000 !important;
-        font-family: 'Manrope', sans-serif !important;
+        color: #111 !important;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
       .admin-sidebar, .admin-topbar, .sidebar-toggle, .flash-bar, .page-header, .no-print, .card-header, #filterPillGroup, button, .btn,
       th:nth-child(2), td:nth-child(2),
       th:nth-child(4), td:nth-child(4),
+      th:nth-child(11), td:nth-child(11),
       th:nth-child(13), td:nth-child(13) {
         display: none !important;
       }
@@ -54,25 +51,25 @@
       .print-only-header {
         display: block !important;
         text-align: center;
-        margin-bottom: 16px;
-        padding-bottom: 10px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
         border-bottom: 2px solid #B23A2F;
       }
       .print-only-header h1 {
         font-family: 'Fraunces', serif;
-        font-size: 18pt;
+        font-size: 16pt;
         color: #B23A2F;
         margin: 0 0 2px 0;
         letter-spacing: 0.05em;
       }
       .print-only-header p {
-        font-size: 9pt;
+        font-size: 8.5pt;
         color: #222;
         margin: 2px 0;
       }
       .print-report-meta {
-        font-size: 8pt;
-        color: #444;
+        font-size: 7.5pt;
+        color: #555;
         margin-top: 4px;
         font-weight: 600;
       }
@@ -83,31 +80,59 @@
         border-collapse: collapse !important;
         font-size: 7.5pt !important;
       }
+      thead {
+        display: table-header-group !important;
+      }
+      tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      tbody tr:nth-child(even) {
+        background-color: #faf7f2 !important;
+      }
       th, td {
-        border: 1px solid #777 !important;
-        padding: 4px 5px !important;
+        border: 1px solid #c0b4a5 !important;
+        padding: 5px 6px !important;
         text-align: left !important;
+        vertical-align: top !important;
         word-wrap: break-word !important;
         overflow-wrap: break-word !important;
         white-space: normal !important;
+        color: #111 !important;
       }
       th {
-        background: #f0f0f0 !important;
-        font-weight: bold !important;
-        color: #000 !important;
+        background: #f2e9dc !important;
+        font-weight: 700 !important;
+        color: #2b2118 !important;
+        font-size: 7.5pt !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.04em !important;
+        white-space: nowrap !important;
+        padding: 6px 5px !important;
       }
 
-      /* Specific column width ratios for A4 Portrait print */
-      th:nth-child(1), td:nth-child(1) { width: 3%; }  /* # */
-      th:nth-child(3), td:nth-child(3) { width: 18%; } /* Student Name & ARN */
-      th:nth-child(5), td:nth-child(5) { width: 10%; } /* DOB/Gender */
-      th:nth-child(6), td:nth-child(6) { width: 8%; }  /* Class */
-      th:nth-child(7), td:nth-child(7) { width: 14%; } /* Programme */
-      th:nth-child(8), td:nth-child(8) { width: 9%; }  /* Branch */
-      th:nth-child(9), td:nth-child(9) { width: 16%; } /* Parents/Mobile/Aadhaar */
-      th:nth-child(10), td:nth-child(10) { width: 15%; }/* Full Address */
-      th:nth-child(11), td:nth-child(11) { width: 0%; display:none !important; } /* Date */
-      th:nth-child(12), td:nth-child(12) { width: 7%; display:table-cell !important; } /* Status */
+      /* Landscape Column Width Ratios (default & when print-mode-landscape is set) */
+      th:nth-child(1), td:nth-child(1) { width: 3.5%; text-align: center !important; font-weight: bold; } /* # */
+      th:nth-child(3), td:nth-child(3) { width: 17.5%; } /* Student Name & ARN */
+      th:nth-child(5), td:nth-child(5) { width: 9%; }   /* DOB/Gender */
+      th:nth-child(6), td:nth-child(6) { width: 7%; text-align: center !important; }  /* Class */
+      th:nth-child(7), td:nth-child(7) { width: 13%; }  /* Programme */
+      th:nth-child(8), td:nth-child(8) { width: 9%; text-align: center !important; }  /* Branch */
+      th:nth-child(9), td:nth-child(9) { width: 19%; }  /* Parents/Mobile/Aadhaar */
+      th:nth-child(10), td:nth-child(10) { width: 14%; } /* Full Address */
+      th:nth-child(12), td:nth-child(12) { width: 8%; display:table-cell !important; text-align: center !important; } /* Status */
+
+      /* Portrait Column Width Ratios (when print-mode-portrait is set) */
+      body.print-mode-portrait th, body.print-mode-portrait td { font-size: 6.8pt !important; padding: 4px 4px !important; }
+      body.print-mode-portrait th:nth-child(1), body.print-mode-portrait td:nth-child(1) { width: 4%; text-align: center !important; font-weight: bold; }
+      body.print-mode-portrait th:nth-child(3), body.print-mode-portrait td:nth-child(3) { width: 18%; }
+      body.print-mode-portrait th:nth-child(5), body.print-mode-portrait td:nth-child(5) { width: 10%; }
+      body.print-mode-portrait th:nth-child(6), body.print-mode-portrait td:nth-child(6) { width: 7%; text-align: center !important; }
+      body.print-mode-portrait th:nth-child(7), body.print-mode-portrait td:nth-child(7) { width: 13%; }
+      body.print-mode-portrait th:nth-child(8), body.print-mode-portrait td:nth-child(8) { width: 8%; text-align: center !important; }
+      body.print-mode-portrait th:nth-child(9), body.print-mode-portrait td:nth-child(9) { width: 19%; }
+      body.print-mode-portrait th:nth-child(10), body.print-mode-portrait td:nth-child(10) { width: 13%; }
+      body.print-mode-portrait th:nth-child(12), body.print-mode-portrait td:nth-child(12) { width: 8%; display:table-cell !important; text-align: center !important; }
     }
   </style>
 </head>
@@ -376,9 +401,14 @@
               Total Applications: <strong><%= totalApps %></strong> (Pending: <%= countPending %> | Approved: <%= countApproved %> | Rejected: <%= countRejected %>)
             </p>
           </div>
-          <button type="button" onclick="window.print()" class="btn btn-outline" style="font-size:0.82rem; padding:6px 14px;">
-            🖨️ Print Summary Report
-          </button>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button type="button" onclick="printReport('portrait')" class="btn btn-outline" style="font-size:0.82rem; padding:6px 12px; display:inline-flex; align-items:center; gap:6px;">
+              📄 <span>Print Portrait</span>
+            </button>
+            <button type="button" onclick="printReport('landscape')" class="btn btn-outline" style="font-size:0.82rem; padding:6px 12px; display:inline-flex; align-items:center; gap:6px;">
+              🖼️ <span>Print Landscape</span>
+            </button>
+          </div>
         </div>
 
         <!-- Filter Pill Tabs -->
@@ -530,16 +560,19 @@
                     </td>
                     <td style="font-size:0.8rem;color:var(--text-muted);">
                       <%
-                        const addrParts = [
-                          app.village_locality ? ('Vill/Loc: ' + app.village_locality) : null,
-                          app.po ? ('P.O.: ' + app.po) : null,
-                          app.ps ? ('P.S.: ' + app.ps) : null,
-                          app.district ? ('Dist: ' + app.district) : null,
-                          app.state ? app.state : null,
-                          app.pin_code ? ('PIN: ' + app.pin_code) : null,
-                          app.address ? app.address : null
-                        ].filter(Boolean);
-                        const fullAddress = addrParts.join(', ');
+                        let fullAddress = '';
+                        if (app.village_locality || app.po || app.ps || app.district || app.pin_code) {
+                          fullAddress = [
+                            app.village_locality ? ('Vill/Loc: ' + app.village_locality) : null,
+                            app.po ? ('P.O.: ' + app.po) : null,
+                            app.ps ? ('P.S.: ' + app.ps) : null,
+                            app.district ? ('Dist: ' + app.district) : null,
+                            app.state ? app.state : null,
+                            app.pin_code ? ('PIN: ' + app.pin_code) : null
+                          ].filter(Boolean).join(', ');
+                        } else if (app.address) {
+                          fullAddress = app.address;
+                        }
                       %>
                       <%= fullAddress || '—' %>
                     </td>
@@ -580,8 +613,30 @@
 
     </div>
   </div>
-</div>
 <script>
+function printReport(orientation) {
+  let styleEl = document.getElementById('printOrientationStyle');
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = 'printOrientationStyle';
+    document.head.appendChild(styleEl);
+  }
+
+  if (orientation === 'portrait') {
+    document.body.classList.remove('print-mode-landscape');
+    document.body.classList.add('print-mode-portrait');
+    styleEl.textContent = '@media print { @page { size: A4 portrait; margin: 8mm 6mm; } }';
+  } else {
+    document.body.classList.remove('print-mode-portrait');
+    document.body.classList.add('print-mode-landscape');
+    styleEl.textContent = '@media print { @page { size: A4 landscape; margin: 8mm 10mm; } }';
+  }
+
+  setTimeout(function() {
+    window.print();
+  }, 100);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const pills = document.querySelectorAll('#filterPillGroup .filter-pill');
   const tableRows = document.querySelectorAll('tbody tr.app-row');
