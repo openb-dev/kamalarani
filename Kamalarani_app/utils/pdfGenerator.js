@@ -19,41 +19,40 @@ function generateAdmissionPDF(app, res) {
   const leftMargin = 36;
   const contentWidth = 523; // A4 width 595.28 - 72
 
-  // --- Top Header ---
-  // Try loading foundation logo if exists
+  // --- Top Header (Full Width Centered) ---
   const logoPath = path.join(__dirname, '../public/images/logo.png');
   let headerStartY = 36;
   if (fs.existsSync(logoPath)) {
     try {
-      doc.image(logoPath, leftMargin, headerStartY, { width: 50 });
+      doc.image(logoPath, leftMargin + 8, headerStartY + 2, { width: 50 });
     } catch (_) {}
   }
 
-  // Passport photo first so title can be centered in the remaining header space
-  const photoBoxW = 90;
-  const photoBoxH = 105;
-  const photoBoxX = leftMargin + contentWidth - photoBoxW;
-  const photoBoxY = headerStartY - 10;
-  // Center titles in the band left of the photo, but bias slightly toward page centre
-  const headerTextWidth = photoBoxX - leftMargin - 12;
-  const titleWidth = Math.round((headerTextWidth + contentWidth) / 2);
+  doc.font('Helvetica-Bold').fontSize(18).fillColor('#2B2118').text('KAMALARANI FOUNDATION', leftMargin, headerStartY, { width: contentWidth, align: 'center' });
+  doc.font('Helvetica').fontSize(9.5).fillColor('#B23A2F').text('Sanatan Culture & Social Welfare (Reg. No. AAETK689KE20221)', leftMargin, headerStartY + 22, { width: contentWidth, align: 'center' });
+  doc.font('Helvetica-Bold').fontSize(14).fillColor('#2B2118').text('ADMISSION FORM', leftMargin, headerStartY + 38, { width: contentWidth, align: 'center' });
+  doc.font('Helvetica-Oblique').fontSize(8.5).fillColor('#5A4E40').text('Nursery to Graduation', leftMargin, headerStartY + 55, { width: contentWidth, align: 'center' });
 
-  doc.font('Helvetica-Bold').fontSize(18).fillColor('#2B2118').text('KAMALARANI FOUNDATION', leftMargin + 60, headerStartY, { width: headerTextWidth - 60, align: 'center' });
-  doc.font('Helvetica').fontSize(10).fillColor('#B23A2F').text('Sanatan Culture & Social Welfare (Reg. No. AAETK689KE20221)', leftMargin + 60, headerStartY + 22, { width: headerTextWidth - 60, align: 'center' });
-  doc.font('Helvetica-Bold').fontSize(14).fillColor('#2B2118').text('ADMISSION FORM', leftMargin, headerStartY + 38, { width: titleWidth, align: 'center' });
-  doc.font('Helvetica-Oblique').fontSize(9).fillColor('#5A4E40').text('Nursery to Graduation', leftMargin, headerStartY + 56, { width: titleWidth, align: 'center' });
-
-  // Top Metadata (ARN & Date) — date stays left of the photo
+  // Top Metadata (ARN & Date)
   const metaY = headerStartY + 74;
-  doc.font('Helvetica-Bold').fontSize(10).fillColor('#000000');
+  doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#000000');
   doc.text(`Admission No. (ARN): ${app.arn || ('KFA-' + new Date().getFullYear() + '-' + String(app.id).padStart(4, '0'))}`, leftMargin, metaY);
 
   const createdDateStr = app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN');
-  const dateX = leftMargin + 250;
-  doc.text(`Admission Date: ${createdDateStr}`, dateX, metaY, {
-    width: photoBoxX - dateX - 10,
-    lineBreak: false
-  });
+  doc.text(`Admission Date: ${createdDateStr}`, leftMargin + 300, metaY, { width: contentWidth - 300, align: 'right' });
+
+  // --- Horizontal Divider Line (Header Margin) ---
+  const dividerY = metaY + 18;
+  doc.moveTo(leftMargin, dividerY).lineTo(leftMargin + contentWidth, dividerY).strokeColor('#CCCCCC').lineWidth(0.8).stroke();
+
+  // --- Section Below Divider: Photo Box on Right, Student Details on Left ---
+  let curY = dividerY + 10;
+
+  const photoBoxW = 92;
+  const photoBoxH = 110;
+  const photoBoxX = leftMargin + contentWidth - photoBoxW;
+  const photoBoxY = curY;
+  const leftWidth = photoBoxX - leftMargin - 16; // width available to the left of the photo
 
   doc.rect(photoBoxX, photoBoxY, photoBoxW, photoBoxH).strokeColor('#8A7F6E').lineWidth(1).stroke();
 
@@ -71,13 +70,8 @@ function generateAdmissionPDF(app, res) {
   }
 
   if (!photoLoaded) {
-    doc.font('Helvetica').fontSize(8).fillColor('#8A7F6E').text('Passport Size Photo', photoBoxX + 5, photoBoxY + 45, { width: photoBoxW - 10, align: 'center' });
+    doc.font('Helvetica').fontSize(8).fillColor('#8A7F6E').text('Passport Size Photo', photoBoxX + 4, photoBoxY + 48, { width: photoBoxW - 8, align: 'center' });
   }
-
-  // --- Horizontal Divider ---
-  let curY = metaY + 22;
-  doc.moveTo(leftMargin, curY).lineTo(leftMargin + contentWidth, curY).strokeColor('#CCCCCC').lineWidth(0.8).stroke();
-  curY += 14;
 
   // Helper for key-value row with underline
   function renderField(label, value, x, y, width, labelWidth = 140) {
@@ -98,25 +92,26 @@ function generateAdmissionPDF(app, res) {
     ageStr = `${Math.abs(ageDate.getUTCFullYear() - 1970)} Years`;
   }
 
-  // Fields Section
-  renderField("1. Student's Name:", app.student_name, leftMargin, curY, contentWidth - 110, 110);
+  // Fields 1 to 5: to the left of the passport photo
+  renderField("1. Student's Name:", app.student_name, leftMargin, curY, leftWidth, 110);
   curY += 22;
 
-  renderField("2. Date of Birth (DD/MM/YYYY):", app.dob ? new Date(app.dob).toLocaleDateString('en-IN') : '—', leftMargin, curY, 270, 160);
-  renderField("Age:", ageStr, leftMargin + 285, curY, 135, 35);
+  renderField("2. Date of Birth (DD/MM/YYYY):", app.dob ? new Date(app.dob).toLocaleDateString('en-IN') : '—', leftMargin, curY, 260, 160);
+  renderField("Age:", ageStr, leftMargin + 270, curY, leftWidth - 270, 35);
   curY += 22;
 
-  renderField("3. Gender:", app.gender, leftMargin, curY, contentWidth - 110, 60);
+  renderField("3. Gender:", app.gender, leftMargin, curY, leftWidth, 65);
   curY += 22;
 
-  renderField("4. School Name (if any):", app.school_name, leftMargin, curY, 270, 130);
-  renderField("Class:", app.class_applying_for, leftMargin + 285, curY, 235, 45);
+  renderField("4. School Name (if any):", app.school_name, leftMargin, curY, 260, 130);
+  renderField("Class:", app.class_applying_for, leftMargin + 270, curY, leftWidth - 270, 45);
   curY += 22;
 
-  renderField("5. Programme:", app.programme || '—', leftMargin, curY, 270, 85);
-  renderField("Branch:", app.branch || '—', leftMargin + 285, curY, 235, 55);
-  curY += 22;
+  renderField("5. Programme:", app.programme || '—', leftMargin, curY, 260, 85);
+  renderField("Branch:", app.branch || '—', leftMargin + 270, curY, leftWidth - 270, 50);
+  curY += 26;
 
+  // Fields 6 onwards: full width below the passport photo
   renderField("6. Father's Name:", app.father_name, leftMargin, curY, 270, 105);
   renderField("Mobile No.:", app.parent_mobile, leftMargin + 285, curY, 235, 75);
   curY += 22;
